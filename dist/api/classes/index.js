@@ -23,7 +23,7 @@ const GetVdxfIdResponse_1 = require("./GetVdxfId/GetVdxfIdResponse");
 Object.defineProperty(exports, "GetVdxfIdResponse", { enumerable: true, get: function () { return GetVdxfIdResponse_1.GetVdxfIdResponse; } });
 const GetIdentityRequest_1 = require("./GetIdentity/GetIdentityRequest");
 Object.defineProperty(exports, "GetIdentityRequest", { enumerable: true, get: function () { return GetIdentityRequest_1.GetIdentityRequest; } });
-const GetIdentityContentRequest_1 = require("./GetIdentity/GetIdentityContentRequest");
+const GetIdentityContentRequest_1 = require("./GetIdentityContent/GetIdentityContentRequest");
 Object.defineProperty(exports, "GetIdentityContentRequest", { enumerable: true, get: function () { return GetIdentityContentRequest_1.GetIdentityContentRequest; } });
 const GetIdentityResponse_1 = require("./GetIdentity/GetIdentityResponse");
 Object.defineProperty(exports, "GetIdentityResponse", { enumerable: true, get: function () { return GetIdentityResponse_1.GetIdentityResponse; } });

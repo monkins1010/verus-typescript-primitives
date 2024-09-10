@@ -9,7 +9,7 @@ import { GetBlockResponse } from './GetBlock/GetBlockResponse';
 import { GetVdxfIdRequest } from './GetVdxfId/GetVdxfIdRequest';
 import { GetVdxfIdResponse } from './GetVdxfId/GetVdxfIdResponse';
 import { GetIdentityRequest } from './GetIdentity/GetIdentityRequest';
-import { GetIdentityContentRequest } from './GetIdentity/GetIdentityContentRequest';
+import { GetIdentityContentRequest } from './GetIdentityContent/GetIdentityContentRequest';
 import { GetIdentityResponse } from './GetIdentity/GetIdentityResponse';
 import { GetCurrencyRequest } from './GetCurrency/GetCurrencyRequest';
 import { GetCurrencyResponse } from './GetCurrency/GetCurrencyResponse';

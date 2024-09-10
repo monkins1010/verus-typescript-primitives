@@ -4,7 +4,8 @@ import { GET_IDENTITY_CONTENT } from "../../../constants/cmds";
 
 export class GetIdentityContentRequest extends ApiRequest {
   nameOrAddress: string;
-  height?: number;
+  heightstart?: number;
+  heightend?: number;
   txproof?: boolean;
   txproofheight?: number;
   vdxfkey?: string;
@@ -12,14 +13,16 @@ export class GetIdentityContentRequest extends ApiRequest {
   constructor(
     chain: string,
     nameOrAddress: string,
-    height?: number,
+    heightstart?: number,
+    heightend?: number,
     txproof?: boolean,
     txproofheight?: number,
     vdxfkey?: string
   ) {
     super(chain, GET_IDENTITY_CONTENT);
     this.nameOrAddress = nameOrAddress;
-    this.height = height;
+    this.heightstart = heightstart;
+    this.heightend = heightend;
     this.txproof = txproof;
     this.txproofheight = txproofheight;
     this.vdxfkey = vdxfkey;
@@ -28,7 +31,8 @@ export class GetIdentityContentRequest extends ApiRequest {
   getParams(): RequestParams {
     const params = [
       this.nameOrAddress,
-      this.height,
+      this.heightstart,
+      this.heightend,
       this.txproof,
       this.txproofheight,
       this.vdxfkey
@@ -41,9 +45,10 @@ export class GetIdentityContentRequest extends ApiRequest {
     return new GetIdentityContentRequest(
       object.chain as string,
       object.nameOrAddress as string,
-      object.height != null ? (object.height as number) : undefined,
+      object.heightstart != null ? (object.heightstart as number) : undefined,
+      object.heightend != null ? (object.heightend as number) : undefined,
       object.txproof != null ? (object.txproof as boolean) : undefined,
-      object.txproofheight != null ? (object.txproof as number) : undefined,
+      object.txproofheight != null ? (object.txproofheight as number) : undefined,
       object.vdxfkey != null ? (object.vdxfkey as string) : undefined
     );
   }
@@ -52,7 +57,8 @@ export class GetIdentityContentRequest extends ApiRequest {
     return {
       chain: this.chain,
       nameOrAddress: this.nameOrAddress,
-      height: this.height,
+      heightstart: this.heightstart,
+      heightend: this.heightend,
       txproof: this.txproof,
       txproofheight: this.txproofheight,
       vdxfkey: this.vdxfkey
