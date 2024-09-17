@@ -39,7 +39,7 @@ export class GetIdentityRequest extends ApiRequest {
       object.nameOrAddress as string,
       object.height != null ? (object.height as number) : undefined,
       object.txproof != null ? (object.txproof as boolean) : undefined,
-      object.txproofheight != null ? (object.txproof as number) : undefined
+      object.txproofheight != null ? (object.txproofheight as number) : undefined
     );
   }
 
