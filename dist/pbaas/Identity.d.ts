@@ -74,6 +74,8 @@ export declare class Identity extends Principal implements SerializableEntity {
     getIdentityAddress(): string;
     isRevoked(): boolean;
     isLocked(): boolean;
+    hasActiveCurrency(): boolean;
+    hasTokenizedIdControl(): boolean;
     lock(unlockTime: BigNumber): void;
     unlock(height?: BigNumber, txExpiryHeight?: BigNumber): void;
     revoke(): void;

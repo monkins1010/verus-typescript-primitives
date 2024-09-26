@@ -213,6 +213,12 @@ class Identity extends Principal_1.Principal {
     isLocked() {
         return !!(this.flags.and(exports.IDENTITY_FLAG_LOCKED).toNumber());
     }
+    hasActiveCurrency() {
+        return !!(this.flags.and(exports.IDENTITY_FLAG_ACTIVECURRENCY).toNumber());
+    }
+    hasTokenizedIdControl() {
+        return !!(this.flags.and(exports.IDENTITY_FLAG_TOKENIZED_CONTROL).toNumber());
+    }
     lock(unlockTime) {
         let unlockAfter = unlockTime;
         if (unlockTime.lte(new bn_js_1.BN(0))) {

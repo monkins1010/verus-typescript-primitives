@@ -326,6 +326,14 @@ export class Identity extends Principal implements SerializableEntity {
     return !!(this.flags.and(IDENTITY_FLAG_LOCKED).toNumber());
   }
 
+  hasActiveCurrency(): boolean {
+    return !!(this.flags.and(IDENTITY_FLAG_ACTIVECURRENCY).toNumber());
+  }
+
+  hasTokenizedIdControl(): boolean {
+    return !!(this.flags.and(IDENTITY_FLAG_TOKENIZED_CONTROL).toNumber());
+  }
+
   lock(unlockTime: BigNumber) {
     let unlockAfter: BigNumber = unlockTime;
 
