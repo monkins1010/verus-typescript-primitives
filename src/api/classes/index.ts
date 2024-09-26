@@ -9,6 +9,7 @@ import { GetBlockResponse } from './GetBlock/GetBlockResponse'
 import { GetVdxfIdRequest } from './GetVdxfId/GetVdxfIdRequest'
 import { GetVdxfIdResponse } from './GetVdxfId/GetVdxfIdResponse'
 import { GetIdentityRequest } from './GetIdentity/GetIdentityRequest'
+import { GetIdentityContentRequest } from './GetIdentityContent/GetIdentityContentRequest'
 import { GetIdentityResponse } from './GetIdentity/GetIdentityResponse'
 import { GetCurrencyRequest } from './GetCurrency/GetCurrencyRequest'
 import { GetCurrencyResponse } from './GetCurrency/GetCurrencyResponse'
@@ -53,6 +54,7 @@ export {
   GetVdxfIdRequest,
   GetVdxfIdResponse,
   GetIdentityRequest,
+  GetIdentityContentRequest,
   GetIdentityResponse,
   GetCurrencyRequest,
   GetCurrencyResponse,
@@ -93,6 +95,7 @@ export type RpcRequest =
   | typeof GetVdxfIdRequest
   | typeof GetInfoRequest
   | typeof GetIdentityRequest
+  | typeof GetIdentityContentRequest
   | typeof GetCurrencyRequest
   | typeof SendRawTransactionRequest
   | typeof GetRawTransactionRequest
