@@ -3,7 +3,7 @@ import bufferutils from '../utils/bufferutils'
 import { BigNumber } from '../utils/types/BigNumber';
 import { Principal } from './Principal';
 import { fromBase58Check, nameAndParentAddrToIAddr, toBase58Check, toIAddress } from '../utils/address';
-import { I_ADDR_VERSION } from '../constants/vdxf';
+import { I_ADDR_VERSION, R_ADDR_VERSION } from '../constants/vdxf';
 import { BN } from 'bn.js';
 import { IdentityID } from './IdentityID';
 import { SaplingPaymentAddress } from './SaplingPaymentAddress';
@@ -370,6 +370,21 @@ export class Identity extends Principal implements SerializableEntity {
 
   unrevoke() {
     this.flags = this.flags.and(IDENTITY_FLAG_REVOKED.notn(16));
+  }
+
+  setPrimaryAddresses(addresses: Array<string>) {
+    const primaryAddresses: Array<KeyID> = [];
+
+    for (const str of addresses) {
+      const addr = KeyID.fromAddress(str);
+
+      if (addr.version !== R_ADDR_VERSION) throw new Error("Primary addresses must be r-addresses.");
+      else {
+        primaryAddresses.push(addr);
+      }
+    }
+
+    this.primary_addresses = primaryAddresses;
   }
 
   upgradeVersion(version: BigNumber = Identity.VERSION_CURRENT) {

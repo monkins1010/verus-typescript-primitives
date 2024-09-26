@@ -49,6 +49,55 @@ describe('Serializes and deserializes identity properly', () => {
     expect(identityFromBuf.toBuffer().toString('hex')).toBe(identity.toBuffer().toString('hex'));
   })
 
+  test('deserialize/serialize VerusID after editing primary addresses', () => {
+    const contentmap = new Map();
+    contentmap.set("iPsFBfFoCcxtuZNzE8yxPQhXVn4dmytf8j", Buffer.alloc(32));
+    contentmap.set("iK7a5JNJnbeuYWVHCDRpJosj3irGJ5Qa8c", Buffer.alloc(32));
+
+    const identity = new Identity({
+      version: IDENTITY_VERSION_PBAAS,
+      min_sigs: new BN(1),
+      primary_addresses: [
+        KeyID.fromAddress("RQVsJRf98iq8YmRQdehzRcbLGHEx6YfjdH"),
+        KeyID.fromAddress("RP4Qct9197i5vrS11qHVtdyRRoAHVNJS47")
+      ],
+      parent: IdentityID.fromAddress("iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq"),
+      system_id: IdentityID.fromAddress("iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq"),
+      name: "TestID",
+      content_map: contentmap,
+      content_multimap: ContentMultiMap.fromJson({
+        iPsFBfFoCcxtuZNzE8yxPQhXVn4dmytf8j: [
+          { iK7a5JNJnbeuYWVHCDRpJosj3irGJ5Qa8c: 'Test String 123454321' },
+          { iK7a5JNJnbeuYWVHCDRpJosj3irGJ5Qa8c: 'Test String 123454321' },
+          { iK7a5JNJnbeuYWVHCDRpJosj3irGJ5Qa8c: 'Test String 123454321' },
+          { iK7a5JNJnbeuYWVHCDRpJosj3irGJ5Qa8c: 'Test String 123454321' }
+        ],
+        iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq: '6868686868686868686868686868686868686868',
+        i5v3h9FWVdRFbNHU7DfcpGykQjRaHtMqu7: [
+          '6868686868686868686868686868686868686868',
+          '6868686868686868686868686868686868686868',
+          '6868686868686868686868686868686868686868'
+        ],
+        i81XL8ZpuCo9jmWLv5L5ikdxrGuHrrpQLz: { iK7a5JNJnbeuYWVHCDRpJosj3irGJ5Qa8c: 'Test String 123454321' }
+      }),
+      recovery_authority: IdentityID.fromAddress("i81XL8ZpuCo9jmWLv5L5ikdxrGuHrrpQLz"),
+      revocation_authority: IdentityID.fromAddress("i5v3h9FWVdRFbNHU7DfcpGykQjRaHtMqu7"),
+      unlock_after: new BN("123456", 10)
+    })
+
+    identity.setPrimaryAddresses(["RKjVHqM4VF2pCfVcwGzKH7CxvfMUE4H6o8", "RP1j8ziHUzgs6THJiAQa2BiqjRLLCWQxAk"])
+    
+    const identityFromBuf = new Identity();
+
+    identityFromBuf.fromBuffer(identity.toBuffer());
+
+    expect(identityFromBuf.toBuffer().toString('hex')).toBe(identity.toBuffer().toString('hex'));
+    
+    const idJson = identityFromBuf.toJson();
+    expect(idJson.primaryaddresses[0]).toBe("RKjVHqM4VF2pCfVcwGzKH7CxvfMUE4H6o8");
+    expect(idJson.primaryaddresses[1]).toBe("RP1j8ziHUzgs6THJiAQa2BiqjRLLCWQxAk");
+  })
+
   test('deserialize/serialize VerusID without zaddr, post pbaas, without multimap', () => {
     const contentmap = new Map();
     contentmap.set("iPsFBfFoCcxtuZNzE8yxPQhXVn4dmytf8j", Buffer.alloc(32));
