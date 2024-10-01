@@ -163,12 +163,12 @@ class TransferDestination {
             aux_dests: this.aux_dests.map(x => x.toJson())
         };
     }
-    IsValid() {
+    isValid() {
         // verify aux dests
         let valid = (((this.type.and(exports.FLAG_DEST_AUX).gt(new bn_js_1.BN(0))) && this.aux_dests.length > 0) || (!(this.type.and(exports.FLAG_DEST_AUX).gt(new bn_js_1.BN(0))) && !(this.aux_dests.length > 0)));
-        if (valid && this.aux_dests) {
+        if (valid && this.aux_dests && this.aux_dests.length > 0) {
             for (let i = 0; i < this.aux_dests.length; i++) {
-                if (!this.GetAuxDest(i).IsValid()) {
+                if (!this.getAuxDest(i).isValid()) {
                     valid = false;
                     break;
                 }
@@ -177,9 +177,9 @@ class TransferDestination {
         return !!(valid &&
             !this.typeNoFlags().eq(exports.DEST_INVALID) &&
             this.typeNoFlags().lte(exports.LAST_VALID_TYPE_NO_FLAGS) &&
-            ((!(this.type.and(exports.FLAG_DEST_GATEWAY)) && !this.gateway_id) || this.gateway_id));
+            (((this.type.and(exports.FLAG_DEST_GATEWAY).eq(new bn_js_1.BN(0))) && (this.gateway_id == null)) || this.gateway_id != null));
     }
-    GetAuxDest(destNum) {
+    getAuxDest(destNum) {
         const retVal = this.aux_dests[destNum];
         if (destNum >= 0 && destNum < this.aux_dests.length) {
             if (retVal.type.and(exports.FLAG_DEST_AUX).gt(new bn_js_1.BN(0)) || retVal.aux_dests.length > 0) {

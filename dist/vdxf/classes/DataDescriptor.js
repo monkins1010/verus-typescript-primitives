@@ -209,7 +209,7 @@ class DataDescriptor {
     SetFlags() {
         this.flags = this.CalcFlags();
     }
-    IsValid() {
+    isValid() {
         return !!(this.version.gte(DataDescriptor.FIRST_VERSION) && this.version.lte(DataDescriptor.LAST_VERSION) && this.flags.and(DataDescriptor.FLAG_MASK.notn(DataDescriptor.FLAG_MASK.bitLength())));
     }
     toJson() {
@@ -419,7 +419,7 @@ class MMRDescriptor {
     HasData() {
         return !!(this.mmrHashes.objectdata && this.dataDescriptors);
     }
-    IsValid() {
+    isValid() {
         return this.version >= MMRDescriptor.FIRST_VERSION && this.version <= MMRDescriptor.LAST_VERSION;
     }
     toJson() {
@@ -560,10 +560,10 @@ const VectorEncodeVDXFUni = (obj) => {
         }
         else if (objTypeKey == VDXF_Data.DataRatingsKey().vdxfid) {
             const version = new bn_js_1.BN(oneValValues[k].version);
-            const trustLevel = new bn_js_1.BN(oneValValues[k].trustLevel);
+            const trust_level = new bn_js_1.BN(oneValValues[k].trust_level);
             const destinations = Object.keys(oneValValues[k].rating);
             const values = Object.values(oneValValues[k]);
-            const oneRatingMap = new Rating_1.Rating({ ratings: new Map(destinations.map((key, index) => [key, Buffer.from(values[index], 'hex')])), version, trustLevel });
+            const oneRatingMap = new Rating_1.Rating({ ratings: new Map(destinations.map((key, index) => [key, Buffer.from(values[index], 'hex')])), version, trust_level });
             let length = 20;
             length += varint_1.default.encodingLength(oneRatingMap.version);
             length += varuint_1.default.encodingLength(oneRatingMap.getByteLength());
@@ -673,7 +673,7 @@ const VDXFDataToUniValue = (buffer, offset = 0, pSuccess = null) => {
             version = reader.readVarInt();
             objSize = reader.readCompactSize();
             reader.offset = oneCurrencyMap.fromBuffer(reader.buffer, reader.offset);
-            if (oneCurrencyMap.IsValid()) {
+            if (oneCurrencyMap.isValid()) {
                 objectUni = { [checkVal]: oneCurrencyMap.toJson() };
             }
         }
@@ -682,7 +682,7 @@ const VDXFDataToUniValue = (buffer, offset = 0, pSuccess = null) => {
             version = reader.readVarInt();
             objSize = reader.readCompactSize();
             reader.offset = oneRatingObj.fromBuffer(reader.buffer, reader.offset);
-            if (oneRatingObj.IsValid()) {
+            if (oneRatingObj.isValid()) {
                 objectUni = { [checkVal]: oneRatingObj.toJson() };
             }
         }
@@ -691,7 +691,7 @@ const VDXFDataToUniValue = (buffer, offset = 0, pSuccess = null) => {
             version = reader.readVarInt();
             objSize = reader.readCompactSize();
             reader.offset = oneTransferDest.fromBuffer(reader.buffer, reader.offset);
-            if (oneTransferDest.IsValid()) {
+            if (oneTransferDest.isValid()) {
                 objectUni = { [checkVal]: oneTransferDest.toJson() };
             }
         }
@@ -702,7 +702,7 @@ const VDXFDataToUniValue = (buffer, offset = 0, pSuccess = null) => {
             // ss >> VARINT(version);
             // ss >> COMPACTSIZE(objSize);
             // ss >> oneContentRemove;
-            // if (oneContentRemove.IsValid())
+            // if (oneContentRemove.isValid())
             // {
             //     objectUni = UniValue(UniValue::VOBJ);
             //     objectUni.pushKV(EncodeDestination(CIdentityID(checkVal)), oneContentRemove.ToUniValue());
@@ -729,7 +729,7 @@ const VDXFDataToUniValue = (buffer, offset = 0, pSuccess = null) => {
             // ss >> VARINT(version);
             // ss >> COMPACTSIZE(objSize);
             // ss >> dataRef;
-            // if (dataRef.IsValid())
+            // if (dataRef.isValid())
             // {
             //     objectUni = UniValue(UniValue::VOBJ);
             //     objectUni.pushKV(EncodeDestination(CIdentityID(checkVal)), dataRef.ToUniValue());
@@ -740,7 +740,7 @@ const VDXFDataToUniValue = (buffer, offset = 0, pSuccess = null) => {
             version = reader.readVarInt();
             objSize = reader.readCompactSize();
             reader.offset = dataDescriptor.fromBuffer(reader.buffer, reader.offset);
-            if (dataDescriptor.IsValid()) {
+            if (dataDescriptor.isValid()) {
                 objectUni = { [checkVal]: dataDescriptor.toJson() };
             }
         }
@@ -749,7 +749,7 @@ const VDXFDataToUniValue = (buffer, offset = 0, pSuccess = null) => {
             version = reader.readVarInt();
             objSize = reader.readCompactSize();
             reader.offset = mmrDescriptor.fromBuffer(reader.buffer, reader.offset);
-            if (mmrDescriptor.IsValid()) {
+            if (mmrDescriptor.isValid()) {
                 objectUni = { [checkVal]: mmrDescriptor.toJson() };
             }
         }
@@ -758,7 +758,7 @@ const VDXFDataToUniValue = (buffer, offset = 0, pSuccess = null) => {
             version = reader.readVarInt();
             objSize = reader.readCompactSize();
             reader.offset = sigData.fromBuffer(reader.buffer, reader.offset);
-            if (sigData.IsValid()) {
+            if (sigData.isValid()) {
                 objectUni = { [checkVal]: sigData.toJson() };
             }
         }

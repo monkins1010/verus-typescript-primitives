@@ -50,7 +50,7 @@ export declare class DataDescriptor {
     HasLabel(): boolean;
     CalcFlags(): BigNumber;
     SetFlags(): void;
-    IsValid(): boolean;
+    isValid(): boolean;
     toJson(): {
         version: string;
         flags: string;
@@ -105,7 +105,7 @@ export declare class MMRDescriptor {
     toBuffer(): Buffer;
     fromBuffer(buffer: Buffer, offset?: number): number;
     HasData(): boolean;
-    IsValid(): boolean;
+    isValid(): boolean;
     toJson(): {
         version: string;
         objecthashtype: EHashTypes;

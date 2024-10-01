@@ -69,7 +69,7 @@ export class VDXFObject implements VDXFObjectInterface {
   }
 
   fromDataBuffer(buffer: Buffer, offset: number = 0) {
-    return offset + 1;
+    return offset;
   }
 
   isValidVersion() {
@@ -117,10 +117,8 @@ export class VDXFObject implements VDXFObjectInterface {
     }
     
     writer.writeVarInt(new BN(this.version, 10));
-
     
-    writer.writeVarSlice(this.toDataBuffer());
-    
+    writer.writeVarSlice(this.toDataBuffer());    
 
     return writer.buffer;
   }

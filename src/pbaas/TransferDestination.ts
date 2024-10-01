@@ -200,15 +200,15 @@ export class TransferDestination implements SerializableEntity {
     }
   }
 
-  IsValid(): boolean
+  isValid(): boolean
   {
       // verify aux dests
       let valid = (((this.type.and(FLAG_DEST_AUX).gt(new BN(0))) && this.aux_dests.length > 0) || (!(this.type.and(FLAG_DEST_AUX).gt(new BN(0))) && !(this.aux_dests.length > 0)));
-      if (valid && this.aux_dests)
+      if (valid && this.aux_dests && this.aux_dests.length > 0)
       {
           for (let i = 0; i < this.aux_dests.length; i++)
           {
-              if (!this.GetAuxDest(i).IsValid())
+              if (!this.getAuxDest(i).isValid())
               {
                   valid = false;
                   break;
@@ -218,10 +218,10 @@ export class TransferDestination implements SerializableEntity {
       return !!(valid &&
              !this.typeNoFlags().eq(DEST_INVALID) &&
              this.typeNoFlags().lte(LAST_VALID_TYPE_NO_FLAGS) &&
-             ((!(this.type.and(FLAG_DEST_GATEWAY)) && !this.gateway_id) || this.gateway_id));
+             (((this.type.and(FLAG_DEST_GATEWAY).eq(new BN(0))) && (this.gateway_id == null)) || this.gateway_id != null));
   }
 
-  GetAuxDest(destNum)
+  getAuxDest(destNum)
   {
     const retVal = this.aux_dests[destNum];
     if (destNum >= 0 && destNum < this.aux_dests.length)

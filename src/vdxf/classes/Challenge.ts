@@ -5,12 +5,7 @@ import {
   ID_SYSTEMID_VDXF_KEY,
   Utf8DataVdxfObject,
   VDXFObject,
-  Utf8OrBase58Object,
-  ATTESTATION_READ_REQUEST,
-  IDENTITY_VIEW,
-  IDENTITY_AGREEMENT,
-  PROFILE_DATA_VIEW_REQUEST,
-  LOGIN_CONSENT_PERSONALINFO_WEBHOOK_VDXF_KEY
+  Utf8OrBase58Object
 } from "../";
 import bufferutils from "../../utils/bufferutils";
 import varuint from "../../utils/varuint";

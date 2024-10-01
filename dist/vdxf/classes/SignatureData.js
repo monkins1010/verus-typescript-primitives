@@ -123,7 +123,7 @@ class SignatureData {
         this.signatureAsVch = reader.readVarSlice();
         return reader.offset;
     }
-    IsValid() {
+    isValid() {
         return !!(this.version.gte(SignatureData.FIRST_VERSION) &&
             this.version.lte(SignatureData.LAST_VERSION) &&
             this.systemID);

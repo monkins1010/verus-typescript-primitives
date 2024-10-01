@@ -165,7 +165,7 @@ export class SignatureData implements SerializableEntity {
     return reader.offset;
   }
 
-  IsValid() {
+  isValid() {
     return !!(this.version.gte(SignatureData.FIRST_VERSION) && 
       this.version.lte(SignatureData.LAST_VERSION) &&
       this.systemID);

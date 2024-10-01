@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Rating = void 0;
-const varint_1 = require("../utils/varint");
 const varuint_1 = require("../utils/varuint");
 const address_1 = require("../utils/address");
 const bufferutils_1 = require("../utils/bufferutils");
@@ -11,17 +10,17 @@ const { BufferReader, BufferWriter } = bufferutils_1.default;
 class Rating {
     constructor(data = {}) {
         this.version = data.version || new bn_js_1.BN(1, 10);
-        this.trustLevel = data.trustLevel || new bn_js_1.BN(0, 10);
+        this.trust_level = data.trust_level || new bn_js_1.BN(0, 10);
         this.ratings = new Map(data.ratings || []);
     }
     getByteLength() {
         let byteLength = 0;
         byteLength += 4; // version uint32
-        byteLength + 1; // trustLevel uint8
+        byteLength + 1; // trust_level uint8
         byteLength += varuint_1.default.encodingLength(this.ratings.size);
         for (const [key, value] of this.ratings) {
             byteLength += 20;
-            byteLength += varint_1.default.encodingLength(new bn_js_1.BN(value.length));
+            byteLength += varuint_1.default.encodingLength(value.length);
             byteLength += value.length;
         }
         return byteLength;
@@ -29,7 +28,7 @@ class Rating {
     toBuffer() {
         const bufferWriter = new BufferWriter(Buffer.alloc(this.getByteLength()));
         bufferWriter.writeUInt32(this.version.toNumber());
-        bufferWriter.writeUInt8(this.trustLevel.toNumber());
+        bufferWriter.writeUInt8(this.trust_level.toNumber());
         bufferWriter.writeCompactSize(this.ratings.size);
         for (const [key, value] of this.ratings) {
             const { hash } = (0, address_1.fromBase58Check)(key);
@@ -41,7 +40,7 @@ class Rating {
     fromBuffer(buffer, offset = 0) {
         const reader = new BufferReader(buffer, offset);
         this.version = new bn_js_1.BN(reader.readUInt32());
-        this.trustLevel = new bn_js_1.BN(reader.readUInt8());
+        this.trust_level = new bn_js_1.BN(reader.readUInt8());
         const count = reader.readCompactSize();
         for (let i = 0; i < count; i++) {
             const hash = reader.readSlice(20);
@@ -51,14 +50,14 @@ class Rating {
         }
         return reader.offset;
     }
-    IsValid() {
+    isValid() {
         return this.version.gte(Rating.VERSION_FIRST) && this.version.lte(Rating.VERSION_LAST) &&
-            this.trustLevel.gte(Rating.TRUST_FIRST) && this.trustLevel.lte(Rating.TRUST_LAST);
+            this.trust_level.gte(Rating.TRUST_FIRST) && this.trust_level.lte(Rating.TRUST_LAST);
     }
     toJson() {
         return {
             version: this.version.toString(),
-            trustlevel: this.trustLevel.toString(),
+            trust_level: this.trust_level.toString(),
             ratings: this.ratings
         };
     }

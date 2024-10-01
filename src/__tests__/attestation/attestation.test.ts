@@ -2,31 +2,27 @@ import {
   LOGIN_CONSENT_ATTESTATION_WEBHOOK_VDXF_KEY,
   PROFILE_DATA_VIEW_REQUEST,
   LOGIN_CONSENT_PERSONALINFO_WEBHOOK_VDXF_KEY,
-  ATTESTATION_READ_REQUEST,
   IDENTITY_VIEW,
-  IDENTITYDATA_FIRSTNAME,
   LOGIN_CONSENT_REDIRECT_VDXF_KEY,
-  VerusIDSignature,
-  IDENTITYDATA_LASTNAME,
-  IDENTITYDATA_ATTESTOR,
-  IDENTITYDATA_IDENTITY,
-  IDENTITYDATA_PERSONAL_DETAILS,
-  IDENTITYDATA_CONTACT,
-  IDENTITYDATA_LOCATIONS,
-  IDENTITYDATA_BANKING_INFORMATION,
-  IDENTITYDATA_DOCUMENTS_AND_IMAGES
+  IDENTITY_PERSONALDETAILS,
+  IDENTITY_CONTACTDETAILS,
+  IDENTITY_LOCATION,
+  IDENTITY_BANKINGDETAILS,
+  IDENTITY_DOCUMENTS,
+  ATTESTATION_PROVISION_TYPE,
+  ATTESTATION_PROVISION_OBJECT
 } from "../../vdxf";
 
 import { Attestation, LoginConsentRequest } from "../../vdxf/classes";
 import { RedirectUri, RequestedPermission } from "../../vdxf/classes/Challenge";
 import { Context } from "../../vdxf/classes/Context";
 import { Subject } from "../../vdxf/classes/Challenge";
-
-
+import { DataDescriptor } from "../../vdxf/classes/DataDescriptor";
+import { toBase58Check, fromBase58Check } from '../../utils/address';
 
 describe('Serializes and deserializes attestation request', () => {
 
-  test("request profile information", async () => {
+  test("request profile information to Create an Attestation", async () => {
 
     const profileInfoRequest = new LoginConsentRequest({
       system_id: "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV",
@@ -44,23 +40,23 @@ describe('Serializes and deserializes attestation request', () => {
         ],
         redirect_uris: [],
         subject: [new Subject(
-          IDENTITYDATA_PERSONAL_DETAILS.vdxfid,
+          IDENTITY_PERSONALDETAILS.vdxfid,
           PROFILE_DATA_VIEW_REQUEST.vdxfid
         ),
         new Subject(
-          IDENTITYDATA_CONTACT.vdxfid,
+          IDENTITY_CONTACTDETAILS.vdxfid,
           PROFILE_DATA_VIEW_REQUEST.vdxfid
         ),
         new Subject(
-          IDENTITYDATA_LOCATIONS.vdxfid,
+          IDENTITY_LOCATION.vdxfid,
           PROFILE_DATA_VIEW_REQUEST.vdxfid
         ),
         new Subject(
-          IDENTITYDATA_BANKING_INFORMATION.vdxfid,
+          IDENTITY_BANKINGDETAILS.vdxfid,
           PROFILE_DATA_VIEW_REQUEST.vdxfid
         ),
         new Subject(
-          IDENTITYDATA_DOCUMENTS_AND_IMAGES.vdxfid,
+          IDENTITY_DOCUMENTS.vdxfid,
           PROFILE_DATA_VIEW_REQUEST.vdxfid
         ),
         new Subject(
@@ -71,8 +67,13 @@ describe('Serializes and deserializes attestation request', () => {
         provisioning_info: [],
         created_at: Number((Date.now() / 1000).toFixed(0)),
       }
-
     });
+
+    const serializedRequest = profileInfoRequest.toBuffer().toString('hex'); // Serialize the request to a hex string
+    const newProfileInfoRequest = new LoginConsentRequest();
+
+    newProfileInfoRequest.fromBuffer(Buffer.from(serializedRequest, 'hex')); // Deserialize the request from the hex string
+    expect(serializedRequest).toStrictEqual(newProfileInfoRequest.toBuffer().toString('hex')) // Compare the original serialized request to the new serialized request
   });
 
   test("send attestation to a user", async () => {
@@ -101,11 +102,39 @@ describe('Serializes and deserializes attestation request', () => {
       },
     });
 
+    const serializedRequest = req.toBuffer().toString('hex'); // Serialize the request to a hex string
+    const newProfileInfoRequest = new LoginConsentRequest();
+
+    newProfileInfoRequest.fromBuffer(Buffer.from(serializedRequest, 'hex')); // Deserialize the request from the hex string
+    expect(serializedRequest).toStrictEqual(newProfileInfoRequest.toBuffer().toString('hex')) // Compare the original serialized request to the new serialized request
 
   });
 
+  test('attestation provision serialize and deserialize', async () => {
 
-  test('attestation request with reply', async () => {
+    const attestationDataDescriptor = DataDescriptor.fromJson({
+      version: 1,
+      "flags": 2,
+      "objectdata": {
+        "i4GC1YGEVD21afWudGoFJVdnfjJ5XWnCQv": {
+          "version": 1,
+          "flags": 96,
+          "mimetype": "text/plain",
+          "objectdata": {
+            "message": "John"
+          },
+          "label": "i4GqsotHGa4czCdtg2d8FVHKfJFzVyBPrM"
+        }
+      },
+      "salt": "4f66603f256d3f757b6dc3ea44802d4041d2a1901e06005028fd60b85a5878a2"
+    });
+
+    const attestationitem = Buffer.concat([fromBase58Check(ATTESTATION_PROVISION_TYPE.vdxfid).hash,
+      Buffer.from([0x01]), 
+      attestationDataDescriptor.toBuffer()]);
+
+    const attestationObject = new Attestation(attestationitem.toString('hex'), ATTESTATION_PROVISION_OBJECT.vdxfid);
+
     const req = new LoginConsentRequest({
       system_id: "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV",
       signing_id: "iB5PRXMHLYcNtM8dfLB6KwfJrHU2mKDYuU",
@@ -128,29 +157,15 @@ describe('Serializes and deserializes attestation request', () => {
         context: new Context({
           ["i4KyLCxWZXeSkw15dF95CUKytEK3HU7em9"]: "test",
         }),
+        attestations: [ attestationObject]
       },
     });
 
-      // TODO
-    // const componentsMap = new Map();
+    const serializedRequest = req.toBuffer().toString('hex'); // Serialize the request to a hex string
+    const attestationProvisionRequest = new LoginConsentRequest();
 
-    // componentsMap.set(0, new AttestationDataType("Chris", IDENTITYDATA_FIRSTNAME.vdxfid, "8e6744dc4f229e543bbd00d65b395829e44c8eb7b358ee3131ca25e6ecc3b210"));
-    // componentsMap.set(1, new AttestationDataType("Monkins", IDENTITYDATA_LASTNAME.vdxfid, "7c3920940db4385cd305557a57a8df33346712096e76b58d7c4ace05e17b90a2"));
-    // componentsMap.set(2, new AttestationDataType("chad@", IDENTITYDATA_IDENTITY.vdxfid, "ce662d61a20ae211728cdb1b924628c84edfe0fcbd59a86f56a125ad73689ac1"));
-    // componentsMap.set(3, new AttestationDataType("valu attestation@", IDENTITYDATA_ATTESTOR.vdxfid, "9067dc6a9b38dd15f985770bb819eb62de39a5d1f0e12f9a4807f78968794af4"));
-
-
-    // const signaturesForAttestation = new VerusIDSignature({
-    //   signature: "AYG2IQABQSAN1fp6A9NIVbxvKuOVLLU+0I+G3oQGbRtS6u4Eampfb217Cdf5FCMScQhV9kMxtjI9GWzpchmjuiTB2tctk6qT",
-    // })
-
-    // const attestationResponse = new Attestation({
-    //   data: new AttestationData(componentsMap),
-    //   signature: signaturesForAttestation,
-    //   system_id: "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV",
-    //   signing_id: "iB5PRXMHLYcNtM8dfLB6KwfJrHU2mKDYuU"
-    // },
-    // );
+    attestationProvisionRequest.fromBuffer(Buffer.from(serializedRequest, 'hex')); // Deserialize the request from the hex string
+    expect(serializedRequest).toStrictEqual(attestationProvisionRequest.toBuffer().toString('hex')) // Compare the original serialized request to the new serialized request
 
   });
 

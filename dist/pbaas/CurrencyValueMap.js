@@ -59,7 +59,7 @@ class CurrencyValueMap {
         }
         return reader.offset;
     }
-    IsValid() {
+    isValid() {
         for (let [key, value] of this.value_map) {
             if (!key) {
                 return false;

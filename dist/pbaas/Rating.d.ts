@@ -13,20 +13,20 @@ export declare class Rating implements SerializableEntity {
     static TRUST_FIRST: import("bn.js");
     static TRUST_LAST: import("bn.js");
     version: BigNumber;
-    trustLevel: BigNumber;
+    trust_level: BigNumber;
     ratings: Map<string, Buffer>;
     constructor(data?: {
         version?: BigNumber;
-        trustLevel?: BigNumber;
+        trust_level?: BigNumber;
         ratings?: Map<string, Buffer>;
     });
     getByteLength(): number;
     toBuffer(): Buffer;
     fromBuffer(buffer: Buffer, offset?: number): number;
-    IsValid(): boolean;
+    isValid(): boolean;
     toJson(): {
         version: string;
-        trustlevel: string;
+        trust_level: string;
         ratings: Map<string, Buffer>;
     };
 }

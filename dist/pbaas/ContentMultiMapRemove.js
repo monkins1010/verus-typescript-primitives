@@ -10,8 +10,8 @@ class ContentMultiMapRemove {
     constructor(data) {
         this.version = data.version || new bn_js_1.BN(1, 10);
         this.action = data.action || new bn_js_1.BN(0, 10);
-        this.entryKey = data.entryKey || "";
-        this.valueHash = data.valueHash || Buffer.alloc(0);
+        this.entry_key = data.entry_key || "";
+        this.value_hash = data.value_hash || Buffer.alloc(0);
     }
     getByteLength() {
         let byteLength = 0;
@@ -30,9 +30,9 @@ class ContentMultiMapRemove {
         bufferWriter.writeUInt32(this.version.toNumber());
         bufferWriter.writeUInt32(this.action.toNumber());
         if (this.action != ContentMultiMapRemove.ACTION_CLEAR_MAP) {
-            bufferWriter.writeSlice((0, address_1.fromBase58Check)(this.entryKey).hash);
+            bufferWriter.writeSlice((0, address_1.fromBase58Check)(this.entry_key).hash);
             if (this.action != ContentMultiMapRemove.ACTION_REMOVE_ALL_KEY) {
-                bufferWriter.writeSlice(this.valueHash);
+                bufferWriter.writeSlice(this.value_hash);
             }
         }
         return bufferWriter.buffer;
@@ -42,9 +42,9 @@ class ContentMultiMapRemove {
         this.version = new bn_js_1.BN(reader.readUInt32());
         this.action = new bn_js_1.BN(reader.readUInt32());
         if (this.action != ContentMultiMapRemove.ACTION_CLEAR_MAP) {
-            this.entryKey = (0, address_1.toBase58Check)(reader.readSlice(20), vdxf_1.I_ADDR_VERSION);
+            this.entry_key = (0, address_1.toBase58Check)(reader.readSlice(20), vdxf_1.I_ADDR_VERSION);
             if (this.action != ContentMultiMapRemove.ACTION_REMOVE_ALL_KEY) {
-                this.valueHash = reader.readSlice(32);
+                this.value_hash = reader.readSlice(32);
             }
         }
         return reader.offset;

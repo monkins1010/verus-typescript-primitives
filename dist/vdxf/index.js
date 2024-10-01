@@ -53,7 +53,7 @@ class VDXFObject {
         return Buffer.alloc(0);
     }
     fromDataBuffer(buffer, offset = 0) {
-        return offset + 1;
+        return offset;
     }
     isValidVersion() {
         return true;

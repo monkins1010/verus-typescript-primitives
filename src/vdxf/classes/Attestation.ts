@@ -5,109 +5,208 @@ import { DataDescriptor } from './DataDescriptor';
 import { ATTESTATION_VIEW_REQUEST, ATTESTATION_PROVISION_TYPE } from '../';
 import varuint from '../../utils/varuint';
 import { BufferDataVdxfObject } from '../index';
+import { Serializable } from 'child_process';
+import { SerializableEntity } from '../../utils/types/SerializableEntity';
 const { BufferReader, BufferWriter } = bufferutils;
-
-export interface AttestationRequestInterface {
-  attestationId: string,
-  accepted_attestors: Array<string>,
-  attestation_keys: Array<string>,
-  attestor_filters?: Array<string>}
 
 export class Attestation extends BufferDataVdxfObject {
 
-  setAttestationViewRequestData(attestationId: string, accepted_attestors: Array<string>, attestation_keys: Array<string>, attestor_filters: Array<string>) {
-    
-    this.vdxfkey = ATTESTATION_VIEW_REQUEST.vdxfid;
+  getAttestationData(): { [key: string]: AttestationViewRequest } {
 
-    let length = 20; // attestationId
-    length += varuint.encodingLength(accepted_attestors.length);
-    length += accepted_attestors.length * 20; // accepted_attestors
-    length += varuint.encodingLength(attestation_keys.length);
-    length += attestation_keys.length * 20; // attestation_keys
-    length += varuint.encodingLength(attestor_filters.length);
-    length += attestor_filters.length * 20; // attestor_filters
+    const reader = new BufferReader(Buffer.from(this.data, 'hex'));
 
-    let writer = new BufferWriter(Buffer.alloc(length));
+    const returnedData = {};
 
-    writer.writeSlice(fromBase58Check(attestationId).hash);
+    while (reader.buffer.length > reader.offset) {
 
-    writer.writeCompactSize(accepted_attestors.length);
+      let vdxfkey = toBase58Check(reader.readSlice(20), I_ADDR_VERSION);
 
-    for (let i = 0; i < accepted_attestors.length; i++) {
-      writer.writeSlice(fromBase58Check(accepted_attestors[i]).hash);
+      switch (vdxfkey) {
+        case ATTESTATION_VIEW_REQUEST.vdxfid:
+          returnedData[vdxfkey] = new AttestationViewRequest();
+          reader.offset = returnedData[vdxfkey].fromBuffer(reader.buffer, reader.offset);
+          break;
+        case ATTESTATION_PROVISION_TYPE.vdxfid:
+
+          let dataDescriptorItemsCount = reader.readCompactSize();
+
+          let dataDescriptors = [];
+
+          for (let i = 0; i < dataDescriptorItemsCount; i++) {
+            let dataDescriptor = new DataDescriptor();
+            reader.offset = dataDescriptor.fromBuffer(reader.buffer, reader.offset);
+            dataDescriptors.push(dataDescriptor);
+          }
+          returnedData[vdxfkey] = dataDescriptors;
+          break;
+        default:
+          throw new Error("Unsupported Attestation Data Type");
+      }
+
     }
 
-    writer.writeCompactSize(attestation_keys.length);
+    return returnedData;
+  }
+}
 
-    for (let i = 0; i < attestation_keys.length; i++) {
-      writer.writeSlice(fromBase58Check(attestation_keys[i]).hash);
-    }
+export class AttestationViewRequest implements SerializableEntity {
+  attestation_id: string;
+  accepted_attestors: Array<string>;
+  attestation_keys: Array<string>;
+  attestor_filters: Array<string>;
 
-    writer.writeCompactSize(attestor_filters.length);
-
-    for (let i = 0; i < attestor_filters.length; i++) {
-      writer.writeSlice(fromBase58Check(attestor_filters[i]).hash);
-    }    
+  constructor(data?: { attestation_id?: string, accepted_attestors?: Array<string>, attestation_keys?: Array<string>, attestor_filters?: Array<string> }) {
+    this.attestation_id = data.attestation_id || "";
+    this.accepted_attestors = data.accepted_attestors || [];
+    this.attestation_keys = data.attestation_keys || [];
+    this.attestor_filters = data.attestor_filters || [];
   }
 
-  getAttestationViewRequestData(): AttestationRequestInterface {
+  getByteLength() {
 
-    if (this.vdxfkey != ATTESTATION_VIEW_REQUEST.vdxfid) {
-      throw new Error("Invalid attestation request type");
+    let length = 0; // attestation_id
+    length += varuint.encodingLength(this.accepted_attestors.length);
+    length += this.accepted_attestors.length * 20; // accepted_attestors
+    length += varuint.encodingLength(this.attestation_keys.length);
+    length += this.attestation_keys.length * 20; // attestation_keys
+    length += varuint.encodingLength(this.attestor_filters.length);
+    length += this.attestor_filters.length * 20; // attestor_filters
+
+    return length
+  }
+
+  toBuffer() {
+    const bufferWriter = new BufferWriter(Buffer.alloc(this.getByteLength()))
+
+    bufferWriter.writeSlice(fromBase58Check(this.attestation_id).hash);
+
+    bufferWriter.writeCompactSize(this.accepted_attestors.length);
+
+    for (let i = 0; i < this.accepted_attestors.length; i++) {
+      bufferWriter.writeSlice(fromBase58Check(this.accepted_attestors[i]).hash);
     }
 
-    let retVal: AttestationRequestInterface = {
-      attestationId: "",
-      accepted_attestors: [],
-      attestation_keys: [],
-      attestor_filters: []
-    };
+    bufferWriter.writeCompactSize(this.attestation_keys.length);
 
-    const reader = new BufferReader(Buffer.from(this.data, 'hex'), 0);
+    for (let i = 0; i < this.attestation_keys.length; i++) {
+      bufferWriter.writeSlice(fromBase58Check(this.attestation_keys[i]).hash);
+    }
 
-    retVal.attestationId = toBase58Check(reader.readSlice(20), I_ADDR_VERSION);
+    bufferWriter.writeCompactSize(this.attestor_filters.length);
+
+    for (let i = 0; i < this.attestor_filters.length; i++) {
+      bufferWriter.writeSlice(fromBase58Check(this.attestor_filters[i]).hash);
+    }
+
+    return bufferWriter.buffer
+  }
+
+  fromBuffer(buffer: Buffer, offset: number = 0) {
+    const reader = new BufferReader(buffer, offset);
+
+
+    this.attestation_id = toBase58Check(reader.readSlice(20), I_ADDR_VERSION);
 
     let attestorCount = reader.readCompactSize();
 
     for (let i = 0; i < attestorCount; i++) {
-      retVal.accepted_attestors.push(toBase58Check(reader.readSlice(20), I_ADDR_VERSION));
+      this.accepted_attestors.push(toBase58Check(reader.readSlice(20), I_ADDR_VERSION));
     }
 
     let attestationKeyCount = reader.readCompactSize();
 
     for (let i = 0; i < attestationKeyCount; i++) {
-      retVal.attestation_keys.push(toBase58Check(reader.readSlice(20), I_ADDR_VERSION));
+      this.attestation_keys.push(toBase58Check(reader.readSlice(20), I_ADDR_VERSION));
     }
 
     let attestorFilterCount = reader.readCompactSize();
 
     for (let i = 0; i < attestorFilterCount; i++) {
-      retVal.attestor_filters.push(toBase58Check(reader.readSlice(20), I_ADDR_VERSION));
+      this.attestor_filters.push(toBase58Check(reader.readSlice(20), I_ADDR_VERSION));
     }
 
-    return retVal;
-
+    return reader.offset;
   }
 
-  getAttestationProvisioningData() {
+}
 
-    if (this.vdxfkey != ATTESTATION_PROVISION_TYPE.vdxfid) {
-      throw new Error("Invalid attestation request type");
+export class AttestationProvisioningData implements SerializableEntity {
+  attestation_id: string;
+  accepted_attestors: Array<string>;
+  attestation_keys: Array<string>;
+  attestor_filters: Array<string>;
+
+  constructor(data?: { attestation_id?: string, accepted_attestors?: Array<string>, attestation_keys?: Array<string>, attestor_filters?: Array<string> }) {
+    this.attestation_id = data.attestation_id || "";
+    this.accepted_attestors = data.accepted_attestors || [];
+    this.attestation_keys = data.attestation_keys || [];
+    this.attestor_filters = data.attestor_filters || [];
+  }
+
+  getByteLength() {
+
+    let length = 0; // attestation_id
+    length += varuint.encodingLength(this.accepted_attestors.length);
+    length += this.accepted_attestors.length * 20; // accepted_attestors
+    length += varuint.encodingLength(this.attestation_keys.length);
+    length += this.attestation_keys.length * 20; // attestation_keys
+    length += varuint.encodingLength(this.attestor_filters.length);
+    length += this.attestor_filters.length * 20; // attestor_filters
+
+    return length
+  }
+
+  toBuffer() {
+    const bufferWriter = new BufferWriter(Buffer.alloc(this.getByteLength()))
+
+    bufferWriter.writeSlice(fromBase58Check(this.attestation_id).hash);
+
+    bufferWriter.writeCompactSize(this.accepted_attestors.length);
+
+    for (let i = 0; i < this.accepted_attestors.length; i++) {
+      bufferWriter.writeSlice(fromBase58Check(this.accepted_attestors[i]).hash);
     }
 
-    const reader = new BufferReader(Buffer.from(this.data, 'hex'), 0);
+    bufferWriter.writeCompactSize(this.attestation_keys.length);
 
-    let dataDescriptorItemsCount = reader.readCompactSize();
-
-    let dataDescriptors = [];
-
-    for (let i = 0; i < dataDescriptorItemsCount; i++) {
-      let dataDescriptor = new DataDescriptor();
-      reader.offset = dataDescriptor.fromBuffer(reader.buffer, reader.offset);
-      dataDescriptors.push(dataDescriptor);
+    for (let i = 0; i < this.attestation_keys.length; i++) {
+      bufferWriter.writeSlice(fromBase58Check(this.attestation_keys[i]).hash);
     }
 
-    return dataDescriptors;
+    bufferWriter.writeCompactSize(this.attestor_filters.length);
+
+    for (let i = 0; i < this.attestor_filters.length; i++) {
+      bufferWriter.writeSlice(fromBase58Check(this.attestor_filters[i]).hash);
+    }
+
+    return bufferWriter.buffer
+  }
+
+  fromBuffer(buffer: Buffer, offset: number = 0) {
+    const reader = new BufferReader(buffer, offset);
+
+
+    this.attestation_id = toBase58Check(reader.readSlice(20), I_ADDR_VERSION);
+
+    let attestorCount = reader.readCompactSize();
+
+    for (let i = 0; i < attestorCount; i++) {
+      this.accepted_attestors.push(toBase58Check(reader.readSlice(20), I_ADDR_VERSION));
+    }
+
+    let attestationKeyCount = reader.readCompactSize();
+
+    for (let i = 0; i < attestationKeyCount; i++) {
+      this.attestation_keys.push(toBase58Check(reader.readSlice(20), I_ADDR_VERSION));
+    }
+
+    let attestorFilterCount = reader.readCompactSize();
+
+    for (let i = 0; i < attestorFilterCount; i++) {
+      this.attestor_filters.push(toBase58Check(reader.readSlice(20), I_ADDR_VERSION));
+    }
+
+    return reader.offset;
   }
 
 }
