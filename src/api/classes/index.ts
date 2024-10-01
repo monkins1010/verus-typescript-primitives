@@ -39,6 +39,8 @@ import { ListCurrenciesRequest } from './ListCurrencies/ListCurrenciesRequest'
 import { ListCurrenciesResponse } from './ListCurrencies/ListCurrenciesResponse'
 import { EstimateConversionRequest } from './EstimateConversion/EstimateConversionRequest'
 import { EstimateConversionResponse } from './EstimateConversion/EstimateConversionResponse'
+import { ZGetOperationStatusRequest } from './ZGetOperationStatus/ZGetOperationStatusRequest'
+import { ZGetOperationStatusResponse } from './ZGetOperationStatus/ZGetOperationStatusResponse'
 
 export {
   GetAddressBalanceRequest,
@@ -81,7 +83,9 @@ export {
   ListCurrenciesRequest,
   ListCurrenciesResponse,
   EstimateConversionRequest,
-  EstimateConversionResponse
+  EstimateConversionResponse,
+  ZGetOperationStatusRequest,
+  ZGetOperationStatusResponse
 }
 
 export type RpcRequest =
@@ -105,7 +109,8 @@ export type RpcRequest =
   | typeof FundRawTransactionRequest
   | typeof GetCurrencyConvertersRequest
   | typeof ListCurrenciesRequest
-  | typeof EstimateConversionRequest;
+  | typeof EstimateConversionRequest
+  | typeof ZGetOperationStatusRequest;
 
 export type RpcResponse =
   | typeof MakeOfferResponse
@@ -127,4 +132,5 @@ export type RpcResponse =
   | typeof FundRawTransactionResponse
   | typeof GetCurrencyConvertersResponse
   | typeof ListCurrenciesResponse
-  | typeof EstimateConversionResponse;
+  | typeof EstimateConversionResponse
+  | typeof ZGetOperationStatusResponse;
