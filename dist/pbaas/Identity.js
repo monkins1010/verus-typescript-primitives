@@ -213,6 +213,12 @@ class Identity extends Principal_1.Principal {
     isLocked() {
         return !!(this.flags.and(exports.IDENTITY_FLAG_LOCKED).toNumber());
     }
+    hasActiveCurrency() {
+        return !!(this.flags.and(exports.IDENTITY_FLAG_ACTIVECURRENCY).toNumber());
+    }
+    hasTokenizedIdControl() {
+        return !!(this.flags.and(exports.IDENTITY_FLAG_TOKENIZED_CONTROL).toNumber());
+    }
     lock(unlockTime) {
         let unlockAfter = unlockTime;
         if (unlockTime.lte(new bn_js_1.BN(0))) {
@@ -246,6 +252,27 @@ class Identity extends Principal_1.Principal {
     }
     unrevoke() {
         this.flags = this.flags.and(exports.IDENTITY_FLAG_REVOKED.notn(16));
+    }
+    setPrimaryAddresses(addresses) {
+        const primaryAddresses = [];
+        for (const str of addresses) {
+            const addr = KeyID_1.KeyID.fromAddress(str);
+            if (addr.version !== vdxf_1.R_ADDR_VERSION)
+                throw new Error("Primary addresses must be r-addresses.");
+            else {
+                primaryAddresses.push(addr);
+            }
+        }
+        this.primary_addresses = primaryAddresses;
+    }
+    setRevocation(iAddr) {
+        this.revocation_authority = IdentityID_1.IdentityID.fromAddress(iAddr);
+    }
+    setRecovery(iAddr) {
+        this.recovery_authority = IdentityID_1.IdentityID.fromAddress(iAddr);
+    }
+    setPrivateAddress(zAddr) {
+        this.private_addresses = [SaplingPaymentAddress_1.SaplingPaymentAddress.fromAddressString(zAddr)];
     }
     upgradeVersion(version = Identity.VERSION_CURRENT) {
         if (version.eq(this.version))

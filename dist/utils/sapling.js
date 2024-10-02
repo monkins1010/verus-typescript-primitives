@@ -54,7 +54,7 @@ const decodeSaplingAddress = (address) => {
     if (result.data.length !== 43) {
         throw new Error('Invalid sapling address');
     }
-    return { d: result.data.subarray(0, 11), pk_d: result.data.subarray(11) };
+    return { d: Buffer.from(result.data.subarray(0, 11)), pk_d: Buffer.from(result.data.subarray(11)) };
 };
 exports.decodeSaplingAddress = decodeSaplingAddress;
 const encodeSaplingAddress = (data) => {

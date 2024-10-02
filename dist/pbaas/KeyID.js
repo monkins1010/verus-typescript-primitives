@@ -12,7 +12,7 @@ class KeyID extends Hash160_1.Hash160SerEnt {
         this.version = vdxf_1.R_ADDR_VERSION;
         return ret;
     }
-    static fromAddress(address, varlength) {
+    static fromAddress(address) {
         return new KeyID(Hash160_1.Hash160SerEnt.fromAddress(address, false).hash);
     }
 }

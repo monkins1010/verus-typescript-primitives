@@ -94,7 +94,7 @@ export function decompile (buffer: Array<ScriptChunk> | Buffer): Array<ScriptChu
       // attempt to read too much data? empty script
       if (i + d.number > buffer.length) return [];
 
-      var data = buffer.subarray(i, i + d.number);
+      var data = Buffer.from(buffer.subarray(i, i + d.number));
       i += d.number;
 
       // decompile minimally

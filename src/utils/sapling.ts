@@ -59,7 +59,7 @@ export const decodeSaplingAddress = (address: string): { d: Buffer, pk_d: Buffer
     throw new Error('Invalid sapling address');
   }
 
-  return { d: result.data.subarray(0, 11), pk_d: result.data.subarray(11) };
+  return { d: Buffer.from(result.data.subarray(0, 11)), pk_d: Buffer.from(result.data.subarray(11)) };
 }
 
 export const encodeSaplingAddress = (data: { d: Buffer, pk_d: Buffer }): string => {

@@ -17,7 +17,7 @@ export class KeyID extends Hash160SerEnt implements SerializableEntity {
     return ret;
   }
 
-  static fromAddress(address: string, varlength?: boolean): Hash160SerEnt {
+  static fromAddress(address: string): Hash160SerEnt {
     return new KeyID(Hash160SerEnt.fromAddress(address, false).hash);
   }
 }

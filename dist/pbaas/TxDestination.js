@@ -96,7 +96,7 @@ class TxDestination {
         return dest;
     }
     toChunk() {
-        return this.toBuffer().subarray(varuint_1.default.encodingLength(this.data.toBuffer().length));
+        return Buffer.from(this.toBuffer().subarray(varuint_1.default.encodingLength(this.data.toBuffer().length)));
     }
 }
 exports.TxDestination = TxDestination;

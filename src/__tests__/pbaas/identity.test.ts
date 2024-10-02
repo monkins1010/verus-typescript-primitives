@@ -1,6 +1,6 @@
 import { BN } from "bn.js";
 import { ContentMultiMap } from "../../pbaas/ContentMultiMap";
-import { IDENTITY_VERSION_PBAAS, Identity } from "../../pbaas/Identity";
+import { IDENTITY_FLAG_TOKENIZED_CONTROL, IDENTITY_VERSION_PBAAS, Identity, IDENTITY_FLAG_ACTIVECURRENCY } from "../../pbaas/Identity";
 import { KeyID } from "../../pbaas/KeyID";
 import { IdentityID } from "../../pbaas/IdentityID";
 import { DATA_TYPE_STRING } from "../../vdxf";
@@ -47,6 +47,60 @@ describe('Serializes and deserializes identity properly', () => {
     identityFromBuf.fromBuffer(identity.toBuffer());
 
     expect(identityFromBuf.toBuffer().toString('hex')).toBe(identity.toBuffer().toString('hex'));
+  })
+
+  test('deserialize/serialize VerusID after editing addresses', () => {
+    const contentmap = new Map();
+    contentmap.set("iPsFBfFoCcxtuZNzE8yxPQhXVn4dmytf8j", Buffer.alloc(32));
+    contentmap.set("iK7a5JNJnbeuYWVHCDRpJosj3irGJ5Qa8c", Buffer.alloc(32));
+
+    const identity = new Identity({
+      version: IDENTITY_VERSION_PBAAS,
+      min_sigs: new BN(1),
+      primary_addresses: [
+        KeyID.fromAddress("RQVsJRf98iq8YmRQdehzRcbLGHEx6YfjdH"),
+        KeyID.fromAddress("RP4Qct9197i5vrS11qHVtdyRRoAHVNJS47")
+      ],
+      parent: IdentityID.fromAddress("iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq"),
+      system_id: IdentityID.fromAddress("iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq"),
+      name: "TestID",
+      content_map: contentmap,
+      content_multimap: ContentMultiMap.fromJson({
+        iPsFBfFoCcxtuZNzE8yxPQhXVn4dmytf8j: [
+          { iK7a5JNJnbeuYWVHCDRpJosj3irGJ5Qa8c: 'Test String 123454321' },
+          { iK7a5JNJnbeuYWVHCDRpJosj3irGJ5Qa8c: 'Test String 123454321' },
+          { iK7a5JNJnbeuYWVHCDRpJosj3irGJ5Qa8c: 'Test String 123454321' },
+          { iK7a5JNJnbeuYWVHCDRpJosj3irGJ5Qa8c: 'Test String 123454321' }
+        ],
+        iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq: '6868686868686868686868686868686868686868',
+        i5v3h9FWVdRFbNHU7DfcpGykQjRaHtMqu7: [
+          '6868686868686868686868686868686868686868',
+          '6868686868686868686868686868686868686868',
+          '6868686868686868686868686868686868686868'
+        ],
+        i81XL8ZpuCo9jmWLv5L5ikdxrGuHrrpQLz: { iK7a5JNJnbeuYWVHCDRpJosj3irGJ5Qa8c: 'Test String 123454321' }
+      }),
+      recovery_authority: IdentityID.fromAddress("i81XL8ZpuCo9jmWLv5L5ikdxrGuHrrpQLz"),
+      revocation_authority: IdentityID.fromAddress("i5v3h9FWVdRFbNHU7DfcpGykQjRaHtMqu7"),
+      unlock_after: new BN("123456", 10)
+    })
+
+    identity.setPrimaryAddresses(["RKjVHqM4VF2pCfVcwGzKH7CxvfMUE4H6o8", "RP1j8ziHUzgs6THJiAQa2BiqjRLLCWQxAk"])
+
+    identity.setRecovery("iQghVEWZdpCJepn2JbKqkfMSKYR4fxKGGZ");
+    identity.setRevocation("iQghVEWZdpCJepn2JbKqkfMSKYR4fxKGGZ");
+
+    identity.setPrivateAddress("zs1e0r2fuxpn6kymwa656trkwk8mpwzj03ucpw6kpvje5gjl6mgtjgdvafcgl54su2uclwgw6v24em");
+    
+    const identityFromBuf = new Identity();
+
+    identityFromBuf.fromBuffer(identity.toBuffer());
+
+    expect(identityFromBuf.toBuffer().toString('hex')).toBe(identity.toBuffer().toString('hex'));
+    
+    const idJson = identityFromBuf.toJson();
+    expect(idJson.primaryaddresses[0]).toBe("RKjVHqM4VF2pCfVcwGzKH7CxvfMUE4H6o8");
+    expect(idJson.primaryaddresses[1]).toBe("RP1j8ziHUzgs6THJiAQa2BiqjRLLCWQxAk");
   })
 
   test('deserialize/serialize VerusID without zaddr, post pbaas, without multimap', () => {
@@ -173,6 +227,83 @@ describe('Serializes and deserializes identity properly', () => {
           }
         ]
       },
+      "flags": (new BN(0).xor(IDENTITY_FLAG_ACTIVECURRENCY)).xor(IDENTITY_FLAG_TOKENIZED_CONTROL).toNumber(),
+      "identityaddress": "iPsFBfFoCcxtuZNzE8yxPQhXVn4dmytf8j",
+      "minimumsignatures": 1,
+      "name": "Chris",
+      "parent": "iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq",
+      "primaryaddresses": [
+        "RKjVHqM4VF2pCfVcwGzKH7CxvfMUE4H6o8"
+      ],
+      "recoveryauthority": "iPsFBfFoCcxtuZNzE8yxPQhXVn4dmytf8j",
+      "revocationauthority": "iPsFBfFoCcxtuZNzE8yxPQhXVn4dmytf8j",
+      "systemid": "iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq",
+      "timelock": 0,
+      "version": 3,
+      "privateaddress": "zs1wczplx4kegw32h8g0f7xwl57p5tvnprwdmnzmdnsw50chcl26f7tws92wk2ap03ykaq6jyyztfa"
+    };
+
+    const identity_frombuf = Identity.fromJson(identityJson);
+    identity_frombuf.lock(new BN(10000));
+
+    expect(identity_frombuf.hasActiveCurrency()).toBe(true);
+    expect(identity_frombuf.hasTokenizedIdControl()).toBe(true);
+
+    expect(identity_frombuf.isLocked()).toBe(true);
+    expect(identity_frombuf.unlock_after.toNumber()).toEqual(10000);
+
+    identity_frombuf.unlock();
+
+    expect(identity_frombuf.hasActiveCurrency()).toBe(true);
+    expect(identity_frombuf.hasTokenizedIdControl()).toBe(true);
+    expect(identity_frombuf.isLocked()).toBe(false);
+    expect(identity_frombuf.unlock_after.toNumber()).toEqual(10000);
+    expect(identity_frombuf.isRevoked()).toBe(false);
+
+    identity_frombuf.revoke();
+
+    expect(identity_frombuf.hasActiveCurrency()).toBe(true);
+    expect(identity_frombuf.hasTokenizedIdControl()).toBe(true);
+    expect(identity_frombuf.isLocked()).toBe(false);
+    expect(identity_frombuf.isRevoked()).toBe(true);
+
+    identity_frombuf.unrevoke();
+
+    expect(identity_frombuf.hasActiveCurrency()).toBe(true);
+    expect(identity_frombuf.hasTokenizedIdControl()).toBe(true);
+    expect(identity_frombuf.isLocked()).toBe(false);
+    expect(identity_frombuf.isRevoked()).toBe(false);
+
+    identity_frombuf.lock(new BN(15000));
+
+    expect(identity_frombuf.hasActiveCurrency()).toBe(true);
+    expect(identity_frombuf.hasTokenizedIdControl()).toBe(true);
+    expect(identity_frombuf.isLocked()).toBe(true);
+    expect(identity_frombuf.unlock_after.toNumber()).toEqual(15000);
+
+    identity_frombuf.revoke();
+
+    expect(identity_frombuf.hasActiveCurrency()).toBe(true);
+    expect(identity_frombuf.hasTokenizedIdControl()).toBe(true);
+    expect(identity_frombuf.isLocked()).toBe(false);
+    expect(identity_frombuf.isRevoked()).toBe(true);
+  });
+
+  test('revoke an ID and handle other flags properly', async () => {
+    const identityJson = {
+      "contentmap": {},
+      "contentmultimap": {
+        "iAqxJCbv2veLLHGdantvrzJRupyh3dkT6B": [
+          {
+            "iK7a5JNJnbeuYWVHCDRpJosj3irGJ5Qa8c": "{\"artistName\": \"ivan@\", \"albumName\": \"testAlbum\", \"genre\": \"rock\", \"url\": \"https:///jukebox\", \"networkId\": \"roomful\", \"signature\": \"AgXmEgAAAUEgwLEQjSOMDGvQ9OqXYC6TpmvlSj+lYg17MW3aaIM58cE9ufW7gF4Jyf6M/nJJVM3wFodIm4Irb/TUeFjeKCan5g==\", \"tracks\": [{\"resourceId\": \"1945dc9dqtrg21\", \"name\": \"\В\о\п\л\і \В\і\д\о\п\л\я\с\о\в\а - \В\е\с\н\а (Cover by Grandma\\s Smuzi)\", \"duration\": 240.432}], \"albumCover\": {\"resourceId\": \"91dsp8tq6rsq1v\"}, \"artistLogo\": {\"resourceId\": \"r2f06bgtzhr8bv\"}, \"sleeveDocument\": {\"resourceId\": \"5pc60wsq353zsm\"}, \"copiesSold\": 0, \"releaseTimestamp\": \"1682559212\", \"price\": {\"VALU\": 1, \"USDC\": 200}}"
+          }
+        ],
+        "iChNhyJiQSZ3HumofCBhuASjgupq1m1NgP": [
+          {
+            "iK7a5JNJnbeuYWVHCDRpJosj3irGJ5Qa8c": "{\"albumCover\": {\"resourceId\": \"91dsp8tq6rsq1v\"}, \"albumName\": \"testAlbum11\", \"artistLogo\": {\"resourceId\": \"r2f06bgtzhr8bv\"}, \"artistName\": \"ivan@\", \"genre\": \"rock\", \"networkId\": \"roomful\", \"signature\": \"AgXmEgAAAUEgwLEQjSOMDGvQ9OqXYC6TpmvlSj+lYg17MW3aaIM58cE9ufW7gF4Jyf6M/nJJVM3wFodIm4Irb/TUeFjeKCan5g==\", \"sleeveDocument\": {\"resourceId\": \"5pc60wsq353zsm\"}, \"tracks\": [{\"duration\": 240.432, \"name\": \"\В\о\п\л\і \В\і\д\о\п\л\я\с\о\в\а - \В\е\с\н\а (Cover by Grandma\\s Smuzi)\", \"resourceId\": \"1945dc9dqtrg21\"}], \"url\": \"https:///jukebox\", \"copiesSold\": 0, \"releaseTimestamp\": \"1682536170\", \"price\": {\"VALU\": 1, \"USDC\": 200}}"
+          }
+        ]
+      },
       "flags": 0,
       "identityaddress": "iPsFBfFoCcxtuZNzE8yxPQhXVn4dmytf8j",
       "minimumsignatures": 1,
@@ -192,32 +323,45 @@ describe('Serializes and deserializes identity properly', () => {
     const identity_frombuf = Identity.fromJson(identityJson);
     identity_frombuf.lock(new BN(10000));
 
+    expect(identity_frombuf.hasActiveCurrency()).toBe(false);
+    expect(identity_frombuf.hasTokenizedIdControl()).toBe(false);
+
     expect(identity_frombuf.isLocked()).toBe(true);
     expect(identity_frombuf.unlock_after.toNumber()).toEqual(10000);
 
     identity_frombuf.unlock();
 
+    expect(identity_frombuf.hasActiveCurrency()).toBe(false);
+    expect(identity_frombuf.hasTokenizedIdControl()).toBe(false);
     expect(identity_frombuf.isLocked()).toBe(false);
     expect(identity_frombuf.unlock_after.toNumber()).toEqual(10000);
     expect(identity_frombuf.isRevoked()).toBe(false);
 
     identity_frombuf.revoke();
 
+    expect(identity_frombuf.hasActiveCurrency()).toBe(false);
+    expect(identity_frombuf.hasTokenizedIdControl()).toBe(false);
     expect(identity_frombuf.isLocked()).toBe(false);
     expect(identity_frombuf.isRevoked()).toBe(true);
 
     identity_frombuf.unrevoke();
 
+    expect(identity_frombuf.hasActiveCurrency()).toBe(false);
+    expect(identity_frombuf.hasTokenizedIdControl()).toBe(false);
     expect(identity_frombuf.isLocked()).toBe(false);
     expect(identity_frombuf.isRevoked()).toBe(false);
 
     identity_frombuf.lock(new BN(15000));
 
+    expect(identity_frombuf.hasActiveCurrency()).toBe(false);
+    expect(identity_frombuf.hasTokenizedIdControl()).toBe(false);
     expect(identity_frombuf.isLocked()).toBe(true);
     expect(identity_frombuf.unlock_after.toNumber()).toEqual(15000);
 
     identity_frombuf.revoke();
 
+    expect(identity_frombuf.hasActiveCurrency()).toBe(false);
+    expect(identity_frombuf.hasTokenizedIdControl()).toBe(false);
     expect(identity_frombuf.isLocked()).toBe(false);
     expect(identity_frombuf.isRevoked()).toBe(true);
   });

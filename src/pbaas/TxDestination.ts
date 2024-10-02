@@ -122,6 +122,6 @@ export class TxDestination implements SerializableEntity {
   }
 
   toChunk() {
-    return this.toBuffer().subarray(varuint.encodingLength(this.data.toBuffer().length))
+    return Buffer.from(this.toBuffer().subarray(varuint.encodingLength(this.data.toBuffer().length)));
   }
 }

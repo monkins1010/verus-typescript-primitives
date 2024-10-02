@@ -1,6 +1,7 @@
 export declare const MAKE_OFFER = "makeoffer";
 export declare const GET_OFFERS = "getoffers";
 export declare const GET_IDENTITY = "getidentity";
+export declare const GET_IDENTITY_CONTENT = "getidentitycontent";
 export declare const GET_CURRENCY = "getcurrency";
 export declare const GET_ADDRESS_BALANCE = "getaddressbalance";
 export declare const GET_INFO = "getinfo";
@@ -19,3 +20,4 @@ export declare const SEND_CURRENCY = "sendcurrency";
 export declare const GET_CURRENCY_CONVERTERS = "getcurrencyconverters";
 export declare const LIST_CURRENCIES = "listcurrencies";
 export declare const ESTIMATE_CONVERSION = "estimateconversion";
+export declare const Z_GET_OPERATION_STATUS = "z_getoperationstatus";

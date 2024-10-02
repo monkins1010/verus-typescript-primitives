@@ -74,10 +74,16 @@ export declare class Identity extends Principal implements SerializableEntity {
     getIdentityAddress(): string;
     isRevoked(): boolean;
     isLocked(): boolean;
+    hasActiveCurrency(): boolean;
+    hasTokenizedIdControl(): boolean;
     lock(unlockTime: BigNumber): void;
     unlock(height?: BigNumber, txExpiryHeight?: BigNumber): void;
     revoke(): void;
     unrevoke(): void;
+    setPrimaryAddresses(addresses: Array<string>): void;
+    setRevocation(iAddr: string): void;
+    setRecovery(iAddr: string): void;
+    setPrivateAddress(zAddr: string): void;
     upgradeVersion(version?: BigNumber): void;
     static fromJson(json: VerusCLIVerusIDJson): Identity;
 }
