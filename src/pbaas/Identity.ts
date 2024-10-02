@@ -387,6 +387,18 @@ export class Identity extends Principal implements SerializableEntity {
     this.primary_addresses = primaryAddresses;
   }
 
+  setRevocation(iAddr: string) {
+    this.revocation_authority = IdentityID.fromAddress(iAddr);
+  }
+
+  setRecovery(iAddr: string) {
+    this.recovery_authority = IdentityID.fromAddress(iAddr);
+  }
+
+  setPrivateAddress(zAddr: string) {
+    this.private_addresses = [SaplingPaymentAddress.fromAddressString(zAddr)]
+  }
+
   upgradeVersion(version: BigNumber = Identity.VERSION_CURRENT) {
     if (version.eq(this.version)) return;
     if (version.lt(this.version)) throw new Error("Cannot downgrade version");

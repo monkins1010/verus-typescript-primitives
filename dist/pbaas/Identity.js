@@ -265,6 +265,15 @@ class Identity extends Principal_1.Principal {
         }
         this.primary_addresses = primaryAddresses;
     }
+    setRevocation(iAddr) {
+        this.revocation_authority = IdentityID_1.IdentityID.fromAddress(iAddr);
+    }
+    setRecovery(iAddr) {
+        this.recovery_authority = IdentityID_1.IdentityID.fromAddress(iAddr);
+    }
+    setPrivateAddress(zAddr) {
+        this.private_addresses = [SaplingPaymentAddress_1.SaplingPaymentAddress.fromAddressString(zAddr)];
+    }
     upgradeVersion(version = Identity.VERSION_CURRENT) {
         if (version.eq(this.version))
             return;

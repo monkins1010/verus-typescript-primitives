@@ -49,7 +49,7 @@ describe('Serializes and deserializes identity properly', () => {
     expect(identityFromBuf.toBuffer().toString('hex')).toBe(identity.toBuffer().toString('hex'));
   })
 
-  test('deserialize/serialize VerusID after editing primary addresses', () => {
+  test('deserialize/serialize VerusID after editing addresses', () => {
     const contentmap = new Map();
     contentmap.set("iPsFBfFoCcxtuZNzE8yxPQhXVn4dmytf8j", Buffer.alloc(32));
     contentmap.set("iK7a5JNJnbeuYWVHCDRpJosj3irGJ5Qa8c", Buffer.alloc(32));
@@ -86,6 +86,11 @@ describe('Serializes and deserializes identity properly', () => {
     })
 
     identity.setPrimaryAddresses(["RKjVHqM4VF2pCfVcwGzKH7CxvfMUE4H6o8", "RP1j8ziHUzgs6THJiAQa2BiqjRLLCWQxAk"])
+
+    identity.setRecovery("iQghVEWZdpCJepn2JbKqkfMSKYR4fxKGGZ");
+    identity.setRevocation("iQghVEWZdpCJepn2JbKqkfMSKYR4fxKGGZ");
+
+    identity.setPrivateAddress("zs1e0r2fuxpn6kymwa656trkwk8mpwzj03ucpw6kpvje5gjl6mgtjgdvafcgl54su2uclwgw6v24em");
     
     const identityFromBuf = new Identity();
 
