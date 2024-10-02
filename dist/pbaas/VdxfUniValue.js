@@ -235,11 +235,7 @@ VdxfUniValue.vectorEncodeVDXFUni = (obj) => {
             ss = Buffer.concat([ss, writer.buffer]);
         }
         else if (objTypeKey == VDXF_Data.DataRatingsKey.vdxfid) {
-            const version = new bn_js_1.BN(oneValValues[k].version);
-            const trust_level = new bn_js_1.BN(oneValValues[k].trust_level);
-            const destinations = Object.keys(oneValValues[k].rating);
-            const values = Object.values(oneValValues[k]);
-            const oneRatingMap = new Rating_1.Rating({ ratings: new Map(destinations.map((key, index) => [key, Buffer.from(values[index], 'hex')])), version, trust_level });
+            const oneRatingMap = Rating_1.Rating.fromJson(oneValValues[k]);
             let length = 20;
             length += varint_1.default.encodingLength(oneRatingMap.version);
             length += varuint_1.default.encodingLength(oneRatingMap.getByteLength());
@@ -252,7 +248,7 @@ VdxfUniValue.vectorEncodeVDXFUni = (obj) => {
             ss = Buffer.concat([ss, writer.buffer]);
         }
         else if (objTypeKey == VDXF_Data.DataTransferDestinationKey.vdxfid) {
-            const transferDest = new TransferDestination_1.TransferDestination(oneValValues[k]);
+            const transferDest = TransferDestination_1.TransferDestination.fromJson(oneValValues[k]);
             let length = 20;
             length += varint_1.default.encodingLength(transferDest.typeNoFlags());
             length += varuint_1.default.encodingLength(transferDest.getByteLength());
@@ -265,7 +261,7 @@ VdxfUniValue.vectorEncodeVDXFUni = (obj) => {
             ss = Buffer.concat([ss, writer.buffer]);
         }
         else if (objTypeKey == VDXF_Data.ContentMultiMapRemoveKey.vdxfid) {
-            const transferDest = new ContentMultiMapRemove_1.ContentMultiMapRemove(oneValValues[k]);
+            const transferDest = ContentMultiMapRemove_1.ContentMultiMapRemove.fromJson(oneValValues[k]);
             let length = 20;
             length += varint_1.default.encodingLength(transferDest.version);
             length += varuint_1.default.encodingLength(transferDest.getByteLength());
@@ -278,7 +274,7 @@ VdxfUniValue.vectorEncodeVDXFUni = (obj) => {
             ss = Buffer.concat([ss, writer.buffer]);
         }
         else if (objTypeKey == VDXF_Data.CrossChainDataRefKey.vdxfid) {
-            const transferDest = new CrossChainDataRef_1.CrossChainDataRef(oneValValues[k]);
+            const transferDest = CrossChainDataRef_1.CrossChainDataRef.fromJson(oneValValues[k]);
             let length = 20;
             length += varint_1.default.encodingLength(vdxf_1.VDXF_OBJECT_DEFAULT_VERSION);
             length += varuint_1.default.encodingLength(transferDest.getByteLength());

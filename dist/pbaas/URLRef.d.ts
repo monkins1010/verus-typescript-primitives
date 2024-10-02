@@ -19,4 +19,8 @@ export declare class URLRef implements SerializableEntity {
         version: string;
         url: string;
     };
+    static fromJson(data: {
+        version: string;
+        url: string;
+    }): URLRef;
 }

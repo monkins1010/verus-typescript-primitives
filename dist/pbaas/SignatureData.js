@@ -154,7 +154,7 @@ class SignatureData {
             returnObj['vdxfkeynames'] = this.vdxf_key_names;
         }
         if (this.bound_hashes) {
-            returnObj['boundhashes'] = this.bound_hashes;
+            returnObj['boundhashes'] = this.bound_hashes.map((hash) => hash.toString('hex'));
         }
         return returnObj;
     }

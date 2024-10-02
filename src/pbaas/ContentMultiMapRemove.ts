@@ -8,6 +8,13 @@ import { I_ADDR_VERSION } from '../constants/vdxf';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
 const { BufferReader, BufferWriter } = bufferutils
 
+export interface ContentMultiMapRemoveJson {
+  version: number;
+  action: number;
+  entrykey: string;
+  valuehash: string;
+}
+
 export class ContentMultiMapRemove implements SerializableEntity {
   version: BigNumber;
   action: BigNumber;
@@ -75,5 +82,14 @@ export class ContentMultiMapRemove implements SerializableEntity {
       }
     }
     return reader.offset;
+  }
+
+  static fromJson(data: ContentMultiMapRemoveJson): ContentMultiMapRemove {
+    return new ContentMultiMapRemove({
+      version: new BN(data.version),
+      action: new BN(data.action),
+      entry_key: data.entrykey,
+      value_hash: Buffer.from(data.valuehash, 'hex')
+    })
   }
 }

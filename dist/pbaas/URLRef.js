@@ -45,6 +45,12 @@ class URLRef {
             url: this.url
         };
     }
+    static fromJson(data) {
+        return new URLRef({
+            version: new bn_js_1.BN(data.version, 10),
+            url: data.url
+        });
+    }
 }
 exports.URLRef = URLRef;
 URLRef.FIRST_VERSION = new bn_js_1.BN(1);

@@ -14,6 +14,10 @@ export declare class UTXORef implements SerializableEntity {
     isValid(): boolean;
     toJson(): {
         hash: string;
-        n: string;
+        n: number;
     };
+    static fromJson(data: {
+        hash: string;
+        n: string;
+    }): UTXORef;
 }

@@ -7,6 +7,11 @@ import { I_ADDR_VERSION } from '../constants/vdxf';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
 const { BufferReader, BufferWriter } = bufferutils
 
+export interface RatingJson {
+  version: number;
+  trustlevel: number;
+  ratings: Map<string, string>;
+}
 export class Rating implements SerializableEntity {
 
   static VERSION_INVALID = new BN(0, 10)
@@ -89,11 +94,33 @@ export class Rating implements SerializableEntity {
       this.trust_level.gte(Rating.TRUST_FIRST) && this.trust_level.lte(Rating.TRUST_LAST);
   }
   toJson() {
+
+    const ratings: { [key: string]: string } = {};
+
+    this.ratings.forEach((value, key) => {
+      ratings[key] = value.toString('hex');
+    });
+
     return {
       version: this.version.toString(),
       trust_level: this.trust_level.toString(),
-      ratings: this.ratings
+      ratings: ratings
     }
+  }
+
+  static fromJson(json: RatingJson) {
+
+    const ratings = new Map<string, Buffer>();
+
+    for (const key in json.ratings) {
+      ratings.set(key, Buffer.from(json.ratings[key], 'hex'));
+    }
+
+    return new Rating({
+      version: new BN(json.version),
+      trust_level: new BN(json.trustlevel),
+      ratings: ratings
+    })
   }
 
   //TODO: implment ratings values

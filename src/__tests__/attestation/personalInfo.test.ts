@@ -1,5 +1,5 @@
 import { DataDescriptor } from "../../pbaas/DataDescriptor";
-import { MMRDescriptor } from "../../pbaas/MMRDescriptor";
+import { MMRDescriptor, MMRDescriptorJson } from "../../pbaas/MMRDescriptor";
 import { SignatureData } from "../../pbaas/SignatureData";
 
 describe('Create a personal info request', () => {
@@ -33,7 +33,7 @@ describe('Create a personal info request', () => {
 
   test('serialize and deserialize a mmrdescriptor', async () => {
 
-    const mmrdescriptor = {
+    const mmrdescriptor: MMRDescriptorJson = {
       "version": 1,
       "objecthashtype": 5,
       "mmrhashtype": 1,

@@ -11,6 +11,15 @@ import { IdentityMultimapRef } from './IdentityMultimapRef';
 
 const { BufferReader, BufferWriter } = bufferutils
 
+export interface PBaaSEvidenceRefJson {
+  version: number;
+  flags: number;
+  output: any;
+  objectnum: number;
+  subobject: number;
+  systemid: string;
+}
+
 export class PBaaSEvidenceRef implements SerializableEntity {
   version: BigNumber;
   flags: BigNumber;
@@ -100,20 +109,28 @@ export class PBaaSEvidenceRef implements SerializableEntity {
       (this.flags.and(PBaaSEvidenceRef.FLAG_ISEVIDENCE).gt(new BN(0)));
   }
 
-  toJson() {
+  toJson(): PBaaSEvidenceRefJson {
 
-    let retval;
-
-    retval.version = this.version.toString(10);
-    retval.flags = this.flags.toString(10);
-    retval.output = this.output.toJson();
-
-    if (this.flags.and(PBaaSEvidenceRef.FLAG_HAS_SYSTEM).gt(new BN(0))) {
-      retval.systemid = this.system_id;
+    let retval: PBaaSEvidenceRefJson = {
+      version: this.version.toNumber(),
+      flags: this.flags.toNumber(),
+      output: this.output.toJson(),
+      objectnum: this.object_num.toNumber(),
+      subobject: this.sub_object.toNumber(),
+      systemid: this.system_id || ""
     }
-    retval.objectnum = this.object_num.toString(10);
-    retval.subobject = this.sub_object.toString(10);
 
     return retval;
+  }
+
+  static fromJson(json: PBaaSEvidenceRefJson): PBaaSEvidenceRef {
+    return new PBaaSEvidenceRef({
+      version: new BN(json.version),
+      flags: new BN(json.flags),
+      output: UTXORef.fromJson(json.output),
+      object_num: new BN(json.objectnum),
+      sub_object: new BN(json.subobject),
+      system_id: json.systemid
+    });
   }
 }

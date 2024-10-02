@@ -1,9 +1,17 @@
 /// <reference types="bn.js" />
 /// <reference types="node" />
 import { BigNumber } from '../utils/types/BigNumber';
-import { DataDescriptor } from './DataDescriptor';
+import { DataDescriptor, DataDescriptorJson } from './DataDescriptor';
 import { EHashTypes } from './DataDescriptor';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
+export interface MMRDescriptorJson {
+    version: number;
+    objecthashtype?: number;
+    mmrhashtype?: number;
+    mmrroot?: DataDescriptorJson;
+    mmrhashes?: DataDescriptorJson;
+    datadescriptors?: DataDescriptorJson[];
+}
 export declare class MMRDescriptor implements SerializableEntity {
     static VERSION_INVALID: import("bn.js");
     static FIRST_VERSION: import("bn.js");
@@ -23,27 +31,11 @@ export declare class MMRDescriptor implements SerializableEntity {
         mmrHashes?: DataDescriptor;
         dataDescriptors?: DataDescriptor[];
     });
-    static fromJson(data: any): MMRDescriptor;
+    static fromJson(data: MMRDescriptorJson): MMRDescriptor;
     getByteLength(): number;
     toBuffer(): Buffer;
     fromBuffer(buffer: Buffer, offset?: number): number;
     HasData(): boolean;
     isValid(): boolean;
-    toJson(): {
-        version: string;
-        objecthashtype: EHashTypes;
-        mmrhashtype: EHashTypes;
-        mmrroot: {
-            version: string;
-            flags: string;
-        };
-        mmrhashes: {
-            version: string;
-            flags: string;
-        };
-        datadescriptors: {
-            version: string;
-            flags: string;
-        }[];
-    };
+    toJson(): MMRDescriptorJson;
 }

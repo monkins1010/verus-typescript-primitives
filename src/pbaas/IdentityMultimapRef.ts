@@ -8,6 +8,16 @@ import { I_ADDR_VERSION } from '../constants/vdxf';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
 
 const { BufferReader, BufferWriter } = bufferutils
+
+export interface IdentityMultimapRefJson { 
+  version: number;
+  flags: number;
+  vdxfkey: string;
+  startheight: number;
+  endheight: number;
+  datahash: string;
+  systemid: string;
+}
 export class IdentityMultimapRef implements SerializableEntity {
   version: BigNumber;
   flags: BigNumber;
@@ -142,5 +152,17 @@ export class IdentityMultimapRef implements SerializableEntity {
     }
     retval.startheight = this.height_start.toString(10);
     retval.endheight = this.height_end.toString(10);
+  }
+
+  static fromJson(data: IdentityMultimapRefJson): IdentityMultimapRef {
+    return new IdentityMultimapRef({
+      version: new BN(data.version),
+      flags: new BN(data.flags),
+      key: data.vdxfkey,
+      height_start: new BN(data.startheight),
+      height_end: new BN(data.endheight),
+      data_hash: Buffer.from(data.datahash, 'hex'),
+      system_id: data.systemid
+    })
   }
 }

@@ -9,6 +9,17 @@ import { BufferDataVdxfObject } from '../vdxf/index';
 import * as VDXF_Data from '../vdxf/vdxfdatakeys';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
 
+export interface DataDescriptorJson {
+  version: number;
+  flags?: number;
+  objectdata?: string | {['message']: string} | object;
+  label?: string;
+  mimetype?: string;
+  salt?: string;
+  epk?: string;
+  ivk?: string;
+  ssk?: string;
+}
 export class DataDescriptor implements SerializableEntity  {
 
   static VERSION_INVALID = new BN(0);
@@ -286,11 +297,11 @@ export class DataDescriptor implements SerializableEntity  {
     return !!(this.version.gte(DataDescriptor.FIRST_VERSION) && this.version.lte(DataDescriptor.LAST_VERSION) && this.flags.and(DataDescriptor.FLAG_MASK.notn(DataDescriptor.FLAG_MASK.bitLength())));
   }
 
-  toJson() {
+  toJson():DataDescriptorJson {
 
-    const retval = {
-      version: this.version.toString(),
-      flags: this.flags.toString()
+    const retval: DataDescriptorJson = {
+      version: this.version.toNumber(),
+      flags: this.flags.toNumber()
     };
 
     let isText = false;
@@ -318,9 +329,7 @@ export class DataDescriptor implements SerializableEntity  {
 
     return retval;
   }
-
 };
-
 
 export class VDXFDataDescriptor extends BufferDataVdxfObject {
   dataDescriptor: DataDescriptor;

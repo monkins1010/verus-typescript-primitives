@@ -52,7 +52,14 @@ export class UTXORef implements SerializableEntity {
   toJson() {
     return {
       hash: this.hash.toString('hex'),
-      n: this.n.toString(10)
+      n: this.n.toNumber()
     }
+  }
+
+  static fromJson(data: { hash: string, n: string }): UTXORef {
+    return new UTXORef({
+      hash: Buffer.from(data.hash, 'hex'),
+      n: new BN(data.n, 10)
+    });
   }
 }

@@ -55,11 +55,26 @@ class Rating {
             this.trust_level.gte(Rating.TRUST_FIRST) && this.trust_level.lte(Rating.TRUST_LAST);
     }
     toJson() {
+        const ratings = {};
+        this.ratings.forEach((value, key) => {
+            ratings[key] = value.toString('hex');
+        });
         return {
             version: this.version.toString(),
             trust_level: this.trust_level.toString(),
-            ratings: this.ratings
+            ratings: ratings
         };
+    }
+    static fromJson(json) {
+        const ratings = new Map();
+        for (const key in json.ratings) {
+            ratings.set(key, Buffer.from(json.ratings[key], 'hex'));
+        }
+        return new Rating({
+            version: new bn_js_1.BN(json.version),
+            trust_level: new bn_js_1.BN(json.trustlevel),
+            ratings: ratings
+        });
     }
 }
 exports.Rating = Rating;

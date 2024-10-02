@@ -2,6 +2,11 @@
 /// <reference types="node" />
 import { BigNumber } from '../utils/types/BigNumber';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
+export interface RatingJson {
+    version: number;
+    trustlevel: number;
+    ratings: Map<string, string>;
+}
 export declare class Rating implements SerializableEntity {
     static VERSION_INVALID: import("bn.js");
     static VERSION_FIRST: import("bn.js");
@@ -27,6 +32,9 @@ export declare class Rating implements SerializableEntity {
     toJson(): {
         version: string;
         trust_level: string;
-        ratings: Map<string, Buffer>;
+        ratings: {
+            [key: string]: string;
+        };
     };
+    static fromJson(json: RatingJson): Rating;
 }

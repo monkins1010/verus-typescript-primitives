@@ -3,6 +3,19 @@
 import { BigNumber } from '../utils/types/BigNumber';
 import { BufferDataVdxfObject } from '../vdxf/index';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
+export interface DataDescriptorJson {
+    version: number;
+    flags?: number;
+    objectdata?: string | {
+        ['message']: string;
+    } | object;
+    label?: string;
+    mimetype?: string;
+    salt?: string;
+    epk?: string;
+    ivk?: string;
+    ssk?: string;
+}
 export declare class DataDescriptor implements SerializableEntity {
     static VERSION_INVALID: import("bn.js");
     static VERSION_FIRST: import("bn.js");
@@ -52,10 +65,7 @@ export declare class DataDescriptor implements SerializableEntity {
     CalcFlags(): BigNumber;
     SetFlags(): void;
     isValid(): boolean;
-    toJson(): {
-        version: string;
-        flags: string;
-    };
+    toJson(): DataDescriptorJson;
 }
 export declare class VDXFDataDescriptor extends BufferDataVdxfObject {
     dataDescriptor: DataDescriptor;

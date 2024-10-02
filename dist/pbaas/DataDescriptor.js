@@ -206,8 +206,8 @@ class DataDescriptor {
     }
     toJson() {
         const retval = {
-            version: this.version.toString(),
-            flags: this.flags.toString()
+            version: this.version.toNumber(),
+            flags: this.flags.toNumber()
         };
         let isText = false;
         if (this.mimeType) {

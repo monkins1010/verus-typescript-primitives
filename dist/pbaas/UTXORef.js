@@ -33,8 +33,14 @@ class UTXORef {
     toJson() {
         return {
             hash: this.hash.toString('hex'),
-            n: this.n.toString(10)
+            n: this.n.toNumber()
         };
+    }
+    static fromJson(data) {
+        return new UTXORef({
+            hash: Buffer.from(data.hash, 'hex'),
+            n: new bn_js_1.BN(data.n, 10)
+        });
     }
 }
 exports.UTXORef = UTXORef;

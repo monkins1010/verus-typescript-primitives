@@ -4,12 +4,21 @@ import varint from '../utils/varint'
 import varuint from '../utils/varuint'
 import bufferutils from '../utils/bufferutils'
 const { BufferReader, BufferWriter } = bufferutils
-import { DataDescriptor } from './DataDescriptor';
+import { DataDescriptor, DataDescriptorJson } from './DataDescriptor';
 import { EHashTypes } from './DataDescriptor';
 import { VdxfUniValue } from '.';
 import { BufferDataVdxfObject } from '../vdxf/index';
 import * as VDXF_Data from '../vdxf/vdxfdatakeys';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
+
+export interface MMRDescriptorJson {
+  version: number;
+  objecthashtype?: number;
+  mmrhashtype?: number;
+  mmrroot?: DataDescriptorJson;
+  mmrhashes?: DataDescriptorJson;
+  datadescriptors?: DataDescriptorJson[];
+}
 
 export class MMRDescriptor implements SerializableEntity {
   static VERSION_INVALID = new BN(0);
@@ -46,7 +55,7 @@ export class MMRDescriptor implements SerializableEntity {
     }
   }
 
-  static fromJson(data: any): MMRDescriptor {
+  static fromJson(data: MMRDescriptorJson): MMRDescriptor {
 
     const newMMRDescriptor = new MMRDescriptor();
 
@@ -128,11 +137,11 @@ export class MMRDescriptor implements SerializableEntity {
     return this.version >= MMRDescriptor.FIRST_VERSION && this.version <= MMRDescriptor.LAST_VERSION;
   }
 
-  toJson() {
+  toJson():MMRDescriptorJson {
 
     const retval = {
-      version: this.version.toString(),
-      objecthashtype: this.objectHashType,
+      version: this.version.toNumber(),
+      objecthashtype: this.objectHashType.valueOf(),
       mmrhashtype: this.mmrHashType,
       mmrroot: this.mmrRoot.toJson(),
       mmrhashes: this.mmrHashes.toJson(),

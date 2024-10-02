@@ -3,6 +3,14 @@
 import { BigNumber } from '../utils/types/BigNumber';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
 import { UTXORef } from './UTXORef';
+export interface PBaaSEvidenceRefJson {
+    version: number;
+    flags: number;
+    output: any;
+    objectnum: number;
+    subobject: number;
+    systemid: string;
+}
 export declare class PBaaSEvidenceRef implements SerializableEntity {
     version: BigNumber;
     flags: BigNumber;
@@ -27,5 +35,6 @@ export declare class PBaaSEvidenceRef implements SerializableEntity {
     toBuffer(): Buffer;
     fromBuffer(buffer: Buffer, offset?: number): number;
     isValid(): boolean;
-    toJson(): any;
+    toJson(): PBaaSEvidenceRefJson;
+    static fromJson(json: PBaaSEvidenceRefJson): PBaaSEvidenceRef;
 }

@@ -11,6 +11,10 @@ import { IdentityMultimapRef } from './IdentityMultimapRef';
 import { URLRef } from './URLRef';
 
 const { BufferReader, BufferWriter } = bufferutils
+
+export interface CrossChainDataRefJson {
+  ref: PBaaSEvidenceRef | IdentityMultimapRef | URLRef;
+}
 export class CrossChainDataRef implements SerializableEntity {
   ref: PBaaSEvidenceRef | IdentityMultimapRef | URLRef;
 
@@ -69,6 +73,17 @@ export class CrossChainDataRef implements SerializableEntity {
   }
 
   toJson() {
-    return this.ref.toJson();
+    return {...this.ref.toJson(), type: this.which()};
+  }
+
+  static fromJson(data: any) {
+    if (data.type == CrossChainDataRef.TYPE_CROSSCHAIN_DATAREF) {
+      return new CrossChainDataRef(PBaaSEvidenceRef.fromJson(data));
+    } else if (data.type == CrossChainDataRef.TYPE_IDENTITY_DATAREF) {
+      return new CrossChainDataRef(IdentityMultimapRef.fromJson(data));
+    } else if (data.type == CrossChainDataRef.TYPE_URL_REF) {
+      return new CrossChainDataRef(URLRef.fromJson(data));
+    }
+      else throw new Error("Invalid CrossChainDataRef type");
   }
 }

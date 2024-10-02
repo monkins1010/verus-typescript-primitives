@@ -9,13 +9,13 @@ import { SerializableEntity } from '../utils/types/SerializableEntity';
 import varint from '../utils/varint';
 import { isHexString } from '../utils/string';
 import { CurrencyValueMap } from './CurrencyValueMap';
-import { Rating } from './Rating';
-import { TransferDestination } from './TransferDestination';
-import { ContentMultiMapRemove } from './ContentMultiMapRemove';
+import { Rating, RatingJson } from './Rating';
+import { TransferDestination, TransferDestinationJson } from './TransferDestination';
+import { ContentMultiMapRemove, ContentMultiMapRemoveJson } from './ContentMultiMapRemove';
 import { CrossChainDataRef } from './CrossChainDataRef';
 import { SignatureData } from './SignatureData';
 import { DataDescriptor } from './DataDescriptor';
-import { MMRDescriptor } from './MMRDescriptor';
+import { MMRDescriptor, MMRDescriptorJson } from './MMRDescriptor';
 import { BufferDataVdxfObject } from '../index';
 import * as VDXF_Data from '../vdxf/vdxfdatakeys';
 
@@ -284,13 +284,7 @@ export class VdxfUniValue implements SerializableEntity {
       }
       else if (objTypeKey == VDXF_Data.DataRatingsKey.vdxfid) {
 
-        const version = new BN((oneValValues[k] as { version: number }).version);
-        const trust_level = new BN((oneValValues[k] as { trust_level: number }).trust_level);
-
-        const destinations = Object.keys((oneValValues[k] as { rating: BigNumber }).rating);
-        const values = Object.values(oneValValues[k]);
-
-        const oneRatingMap = new Rating({ ratings: new Map(destinations.map((key, index) => [key, Buffer.from(values[index], 'hex')])), version, trust_level });
+        const oneRatingMap = Rating.fromJson(oneValValues[k] as RatingJson);
 
         let length = 20;
         length += varint.encodingLength(oneRatingMap.version);
@@ -309,7 +303,7 @@ export class VdxfUniValue implements SerializableEntity {
       }
       else if (objTypeKey == VDXF_Data.DataTransferDestinationKey.vdxfid) {
 
-        const transferDest = new TransferDestination(oneValValues[k]);
+        const transferDest = TransferDestination.fromJson(oneValValues[k] as TransferDestinationJson);
 
         let length = 20;
         length += varint.encodingLength(transferDest.typeNoFlags());
@@ -328,7 +322,7 @@ export class VdxfUniValue implements SerializableEntity {
       }
       else if (objTypeKey == VDXF_Data.ContentMultiMapRemoveKey.vdxfid) {
 
-        const transferDest = new ContentMultiMapRemove(oneValValues[k]);
+        const transferDest = ContentMultiMapRemove.fromJson(oneValValues[k] as ContentMultiMapRemoveJson);
 
         let length = 20;
         length += varint.encodingLength(transferDest.version);
@@ -347,7 +341,7 @@ export class VdxfUniValue implements SerializableEntity {
       }
       else if (objTypeKey == VDXF_Data.CrossChainDataRefKey.vdxfid) {
 
-        const transferDest = new CrossChainDataRef(oneValValues[k]);
+        const transferDest = CrossChainDataRef.fromJson(oneValValues[k]);
 
         let length = 20;
         length += varint.encodingLength(VDXF_OBJECT_DEFAULT_VERSION);
@@ -385,7 +379,7 @@ export class VdxfUniValue implements SerializableEntity {
       }
       else if (objTypeKey == VDXF_Data.MMRDescriptorKey.vdxfid) {
 
-        const descr = MMRDescriptor.fromJson(oneValValues[k]);
+        const descr = MMRDescriptor.fromJson(oneValValues[k] as MMRDescriptorJson);
 
         let length = 20;
         length += varint.encodingLength(descr.version);

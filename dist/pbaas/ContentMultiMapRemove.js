@@ -49,6 +49,14 @@ class ContentMultiMapRemove {
         }
         return reader.offset;
     }
+    static fromJson(data) {
+        return new ContentMultiMapRemove({
+            version: new bn_js_1.BN(data.version),
+            action: new bn_js_1.BN(data.action),
+            entry_key: data.entrykey,
+            value_hash: Buffer.from(data.valuehash, 'hex')
+        });
+    }
 }
 exports.ContentMultiMapRemove = ContentMultiMapRemove;
 ContentMultiMapRemove.VERSION_INVALID = new bn_js_1.BN(0);

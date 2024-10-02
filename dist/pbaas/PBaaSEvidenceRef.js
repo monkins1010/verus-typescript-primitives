@@ -70,16 +70,25 @@ class PBaaSEvidenceRef {
             (this.flags.and(PBaaSEvidenceRef.FLAG_ISEVIDENCE).gt(new bn_js_1.BN(0)));
     }
     toJson() {
-        let retval;
-        retval.version = this.version.toString(10);
-        retval.flags = this.flags.toString(10);
-        retval.output = this.output.toJson();
-        if (this.flags.and(PBaaSEvidenceRef.FLAG_HAS_SYSTEM).gt(new bn_js_1.BN(0))) {
-            retval.systemid = this.system_id;
-        }
-        retval.objectnum = this.object_num.toString(10);
-        retval.subobject = this.sub_object.toString(10);
+        let retval = {
+            version: this.version.toNumber(),
+            flags: this.flags.toNumber(),
+            output: this.output.toJson(),
+            objectnum: this.object_num.toNumber(),
+            subobject: this.sub_object.toNumber(),
+            systemid: this.system_id || ""
+        };
         return retval;
+    }
+    static fromJson(json) {
+        return new PBaaSEvidenceRef({
+            version: new bn_js_1.BN(json.version),
+            flags: new bn_js_1.BN(json.flags),
+            output: UTXORef_1.UTXORef.fromJson(json.output),
+            object_num: new bn_js_1.BN(json.objectnum),
+            sub_object: new bn_js_1.BN(json.subobject),
+            system_id: json.systemid
+        });
     }
 }
 exports.PBaaSEvidenceRef = PBaaSEvidenceRef;

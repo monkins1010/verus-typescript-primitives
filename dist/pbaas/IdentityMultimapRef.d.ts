@@ -2,6 +2,15 @@
 /// <reference types="bn.js" />
 import { BigNumber } from '../utils/types/BigNumber';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
+export interface IdentityMultimapRefJson {
+    version: number;
+    flags: number;
+    vdxfkey: string;
+    startheight: number;
+    endheight: number;
+    datahash: string;
+    systemid: string;
+}
 export declare class IdentityMultimapRef implements SerializableEntity {
     version: BigNumber;
     flags: BigNumber;
@@ -26,4 +35,5 @@ export declare class IdentityMultimapRef implements SerializableEntity {
     hasDataHash(): boolean;
     hasSystemID(): boolean;
     toJson(): void;
+    static fromJson(data: IdentityMultimapRefJson): IdentityMultimapRef;
 }

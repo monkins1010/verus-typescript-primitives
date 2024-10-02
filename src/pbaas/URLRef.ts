@@ -65,4 +65,11 @@ export class URLRef implements SerializableEntity {
       url: this.url
     }
   }
+
+  static fromJson(data: { version: string, url: string }): URLRef {
+    return new URLRef({
+      version: new BN(data.version, 10),
+      url: data.url
+    });
+  }
 }

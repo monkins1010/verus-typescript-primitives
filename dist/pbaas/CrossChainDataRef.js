@@ -53,7 +53,20 @@ class CrossChainDataRef {
             (typeof (this.ref) == typeof (URLRef_1.URLRef) && this.ref.isValid());
     }
     toJson() {
-        return this.ref.toJson();
+        return Object.assign(Object.assign({}, this.ref.toJson()), { type: this.which() });
+    }
+    static fromJson(data) {
+        if (data.type == CrossChainDataRef.TYPE_CROSSCHAIN_DATAREF) {
+            return new CrossChainDataRef(PBaaSEvidenceRef_1.PBaaSEvidenceRef.fromJson(data));
+        }
+        else if (data.type == CrossChainDataRef.TYPE_IDENTITY_DATAREF) {
+            return new CrossChainDataRef(IdentityMultimapRef_1.IdentityMultimapRef.fromJson(data));
+        }
+        else if (data.type == CrossChainDataRef.TYPE_URL_REF) {
+            return new CrossChainDataRef(URLRef_1.URLRef.fromJson(data));
+        }
+        else
+            throw new Error("Invalid CrossChainDataRef type");
     }
 }
 exports.CrossChainDataRef = CrossChainDataRef;

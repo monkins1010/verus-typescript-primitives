@@ -102,8 +102,8 @@ class MMRDescriptor {
     }
     toJson() {
         const retval = {
-            version: this.version.toString(),
-            objecthashtype: this.objectHashType,
+            version: this.version.toNumber(),
+            objecthashtype: this.objectHashType.valueOf(),
             mmrhashtype: this.mmrHashType,
             mmrroot: this.mmrRoot.toJson(),
             mmrhashes: this.mmrHashes.toJson(),

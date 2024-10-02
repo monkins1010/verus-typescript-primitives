@@ -105,6 +105,17 @@ class IdentityMultimapRef {
         retval.startheight = this.height_start.toString(10);
         retval.endheight = this.height_end.toString(10);
     }
+    static fromJson(data) {
+        return new IdentityMultimapRef({
+            version: new bn_js_1.BN(data.version),
+            flags: new bn_js_1.BN(data.flags),
+            key: data.vdxfkey,
+            height_start: new bn_js_1.BN(data.startheight),
+            height_end: new bn_js_1.BN(data.endheight),
+            data_hash: Buffer.from(data.datahash, 'hex'),
+            system_id: data.systemid
+        });
+    }
 }
 exports.IdentityMultimapRef = IdentityMultimapRef;
 IdentityMultimapRef.FLAG_NO_DELETION = new bn_js_1.BN(1);
