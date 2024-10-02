@@ -7,8 +7,6 @@ const varuint_1 = require("../../utils/varuint");
 const Context_1 = require("./Context");
 const Hash160_1 = require("./Hash160");
 const Attestation_1 = require("./Attestation");
-const address_1 = require("../../utils/address");
-const vdxf_1 = require("../../constants/vdxf");
 class RedirectUri extends __1.VDXFObject {
     constructor(uri = "", vdxfkey = "") {
         super(vdxfkey);
@@ -186,8 +184,7 @@ class Challenge extends __1.VDXFObject {
                 this.requested_access = [];
                 const requestedAccessLength = reader.readCompactSize();
                 for (let i = 0; i < requestedAccessLength; i++) {
-                    const _vdxfkey = (0, address_1.toBase58Check)(reader.buffer.slice(reader.offset, reader.offset + vdxf_1.HASH160_BYTE_LENGTH), vdxf_1.I_ADDR_VERSION);
-                    const _perm = new RequestedPermission(_vdxfkey);
+                    const _perm = new RequestedPermission();
                     reader.offset = _perm.fromBuffer(reader.buffer, reader.offset);
                     this.requested_access.push(_perm);
                 }

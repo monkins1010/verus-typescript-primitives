@@ -10,14 +10,14 @@ const vdxf_1 = require("../../constants/vdxf");
 const __1 = require("../../");
 const { BufferReader, BufferWriter } = bufferutils_1.default;
 const createHash = require("create-hash");
-const vdxfDataKeys_1 = require("../vdxfDataKeys");
+const vdxfdatakeys_1 = require("../vdxfdatakeys");
 class SaltedData extends __1.VDXFData {
     constructor(data, salt = Buffer.alloc(0)) {
         super(data);
         if (salt.length != 0) {
             this.salt = salt;
         }
-        this.vdxfkey = (0, vdxfDataKeys_1.SaltedDataKey)().vdxfid;
+        this.vdxfkey = vdxfdatakeys_1.SaltedDataKey.vdxfid;
     }
     static fromJson(data) {
         const saltedData = new SaltedData();

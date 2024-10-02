@@ -1,6 +1,6 @@
-import { DataDescriptor } from "../../vdxf/classes/DataDescriptor";
-import { MMRDescriptor } from "../../vdxf/classes/DataDescriptor";
-import { SignatureData } from "../../vdxf/classes/SignatureData";
+import { DataDescriptor } from "../../pbaas/DataDescriptor";
+import { MMRDescriptor } from "../../pbaas/MMRDescriptor";
+import { SignatureData } from "../../pbaas/SignatureData";
 
 describe('Create a personal info request', () => {
   test('serialize datadescriptor with nested datadescriptor', async () => {

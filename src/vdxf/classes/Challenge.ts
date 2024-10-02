@@ -325,10 +325,7 @@ export class Challenge extends VDXFObject implements ChallengeInterface {
 
         for (let i = 0; i < requestedAccessLength; i++) {
 
-          const _vdxfkey = toBase58Check(reader.buffer.slice(reader.offset,
-            reader.offset + HASH160_BYTE_LENGTH),
-            I_ADDR_VERSION);
-          const _perm = new RequestedPermission(_vdxfkey);
+          const _perm = new RequestedPermission();
           reader.offset = _perm.fromBuffer(reader.buffer, reader.offset);
           this.requested_access.push(_perm);
         }

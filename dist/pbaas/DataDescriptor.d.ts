@@ -1,8 +1,9 @@
 /// <reference types="bn.js" />
 /// <reference types="node" />
-import { BigNumber } from '../../utils/types/BigNumber';
-import { BufferDataVdxfObject } from '../index';
-export declare class DataDescriptor {
+import { BigNumber } from '../utils/types/BigNumber';
+import { BufferDataVdxfObject } from '../vdxf/index';
+import { SerializableEntity } from '../utils/types/SerializableEntity';
+export declare class DataDescriptor implements SerializableEntity {
     static VERSION_INVALID: import("bn.js");
     static VERSION_FIRST: import("bn.js");
     static FIRST_VERSION: import("bn.js");
@@ -38,7 +39,7 @@ export declare class DataDescriptor {
     });
     static fromJson(data: any): DataDescriptor;
     DecodeHashVector(): Array<Buffer>;
-    byteLength(): number;
+    getByteLength(): number;
     toBuffer(): Buffer;
     fromBuffer(buffer: Buffer, offset?: number): number;
     HasEncryptedData(): boolean;
@@ -59,7 +60,7 @@ export declare class DataDescriptor {
 export declare class VDXFDataDescriptor extends BufferDataVdxfObject {
     dataDescriptor: DataDescriptor;
     constructor(dataDescriptor?: DataDescriptor, vdxfkey?: string, version?: BigNumber);
-    static fromDataVdfxObject(data: BufferDataVdxfObject): VDXFDataDescriptor;
+    static fromDataVdxfObject(data: BufferDataVdxfObject): VDXFDataDescriptor;
     dataByteLength(): number;
     toDataBuffer(): Buffer;
     fromDataBuffer(buffer: Buffer, offset?: number): number;
@@ -81,53 +82,3 @@ export declare enum EHashTypes {
     HASH_SHA256 = 5,
     HASH_LASTTYPE = 5
 }
-export declare class MMRDescriptor {
-    static VERSION_INVALID: import("bn.js");
-    static FIRST_VERSION: import("bn.js");
-    static LAST_VERSION: import("bn.js");
-    static DEFAULT_VERSION: import("bn.js");
-    version: BigNumber;
-    objectHashType: EHashTypes;
-    mmrHashType: EHashTypes;
-    mmrRoot: DataDescriptor;
-    mmrHashes: DataDescriptor;
-    dataDescriptors: DataDescriptor[];
-    constructor(data?: {
-        version?: BigNumber;
-        objectHashType?: EHashTypes;
-        mmrHashType?: EHashTypes;
-        mmrRoot?: DataDescriptor;
-        mmrHashes?: DataDescriptor;
-        dataDescriptors?: DataDescriptor[];
-    });
-    static fromJson(data: any): MMRDescriptor;
-    byteLength(): number;
-    toBuffer(): Buffer;
-    fromBuffer(buffer: Buffer, offset?: number): number;
-    HasData(): boolean;
-    isValid(): boolean;
-    toJson(): {
-        version: string;
-        objecthashtype: EHashTypes;
-        mmrhashtype: EHashTypes;
-        mmrroot: {
-            version: string;
-            flags: string;
-        };
-        mmrhashes: {
-            version: string;
-            flags: string;
-        };
-        datadescriptors: {
-            version: string;
-            flags: string;
-        }[];
-    };
-}
-export declare const VectorEncodeVDXFUni: (obj: any) => Buffer;
-export declare const VDXFDataToUniValue: (buffer: Buffer, offset?: number, pSuccess?: any) => {
-    objectUni: any;
-    offset: number;
-    pSuccess: any;
-};
-export declare const VDXFDataToUniValueArray: (buffer: Buffer, offset?: number) => any;

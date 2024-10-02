@@ -4,7 +4,7 @@ exports.AttestationProvisioningData = exports.AttestationViewRequest = exports.A
 const bufferutils_1 = require("../../utils/bufferutils");
 const address_1 = require("../../utils/address");
 const vdxf_1 = require("../../constants/vdxf");
-const DataDescriptor_1 = require("./DataDescriptor");
+const DataDescriptor_1 = require("../../pbaas/DataDescriptor");
 const __1 = require("../");
 const varuint_1 = require("../../utils/varuint");
 const index_1 = require("../index");

@@ -17,7 +17,7 @@ import { Attestation, LoginConsentRequest } from "../../vdxf/classes";
 import { RedirectUri, RequestedPermission } from "../../vdxf/classes/Challenge";
 import { Context } from "../../vdxf/classes/Context";
 import { Subject } from "../../vdxf/classes/Challenge";
-import { DataDescriptor } from "../../vdxf/classes/DataDescriptor";
+import { DataDescriptor } from "../../pbaas/DataDescriptor";
 import { toBase58Check, fromBase58Check } from '../../utils/address';
 
 describe('Serializes and deserializes attestation request', () => {

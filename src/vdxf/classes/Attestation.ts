@@ -1,7 +1,7 @@
 import bufferutils from '../../utils/bufferutils'
 import { toBase58Check, fromBase58Check } from '../../utils/address';
 import { I_ADDR_VERSION } from '../../constants/vdxf';
-import { DataDescriptor } from './DataDescriptor';
+import { DataDescriptor } from '../../pbaas/DataDescriptor';
 import { ATTESTATION_VIEW_REQUEST, ATTESTATION_PROVISION_TYPE } from '../';
 import varuint from '../../utils/varuint';
 import { BufferDataVdxfObject } from '../index';

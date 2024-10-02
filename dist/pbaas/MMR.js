@@ -2,14 +2,15 @@
 // Licence MIT
 // Adapted to Verus Blake2b MMR. 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetMMRProofIndex = exports.CMerkleMountainView = exports.CMMRProof = exports.CMMRBranch = exports.CMerkleMountainRange = exports.CMMRNode = exports.CLayer = void 0;
+exports.MerkleMountainView = exports.MMRProof = exports.MMRBranch = exports.MerkleMountainRange = exports.MMRNode = exports.MMRLayer = void 0;
 var blake2b = require('blake2b');
 const bn_js_1 = require("bn.js");
-const varuint_1 = require("../../utils/varuint");
-const bufferutils_1 = require("../../utils/bufferutils");
+const varuint_1 = require("../utils/varuint");
+const bufferutils_1 = require("../utils/bufferutils");
+const mmr_1 = require("../utils/mmr");
 const { BufferReader, BufferWriter } = bufferutils_1.default;
 const BRANCH_MMRBLAKE_NODE = 2;
-class CLayer {
+class MMRLayer {
     constructor() { this.vSize = 0; }
     size() {
         return this.vSize;
@@ -34,10 +35,10 @@ class CLayer {
         this.vSize = 0;
     }
 }
-exports.CLayer = CLayer;
+exports.MMRLayer = MMRLayer;
 ;
 //template <typename NODE_TYPE, typename UNDERLYING>
-class COverlayNodeLayer {
+class OverlayNodeLayer {
     constructor(NodeSource) {
         this.nodeSource = NodeSource;
         this.vSize = 0;
@@ -61,7 +62,7 @@ class COverlayNodeLayer {
     resize(newSize) { this.vSize = newSize; }
 }
 ;
-class CMMRNode {
+class MMRNode {
     constructor(Hash) {
         if (Hash) {
             this.hash = Hash;
@@ -71,37 +72,33 @@ class CMMRNode {
         var out = Buffer.allocUnsafe(32);
         return blake2b(out.length, null, null, Buffer.from("VerusDefaultHash")).update(input).digest(out);
     }
-    HashObj(obj, onbjR) {
+    hashObj(obj, onbjR) {
         if (!onbjR)
             return this.digest(obj);
         else
             return this.digest(Buffer.concat([obj, onbjR]));
     }
     // add a right to this left and create a parent node
-    CreateParentNode(nRight) {
-        return new CMMRNode(this.digest(Buffer.concat([this.hash, nRight.hash])));
+    createParentNode(nRight) {
+        return new MMRNode(this.digest(Buffer.concat([this.hash, nRight.hash])));
     }
-    GetProofHash(opposite) {
+    getProofHash(opposite) {
         return [this.hash];
     }
     // leaf nodes that track additional data, such as block power, may need a hash added to the path
     // at the very beginning
-    GetLeafHash() { return []; }
-    GetExtraHashCount() {
+    getLeafHash() { return []; }
+    getExtraHashCount() {
         // how many extra proof hashes per layer are added with this node
         return 0;
     }
 }
-exports.CMMRNode = CMMRNode;
+exports.MMRNode = MMRNode;
 ;
-function loggingIdentity(arg) {
-    console.log(arg.length);
-    return arg;
-}
 //template <typename NODE_TYPE=CDefaultMMRNode, typename LAYER_TYPE=CChunkedLayer<NODE_TYPE>, typename LAYER0_TYPE=LAYER_TYPE>
-class CMerkleMountainRange {
+class MerkleMountainRange {
     constructor() {
-        this.layer0 = new CLayer();
+        this.layer0 = new MMRLayer();
         this.vSize = 0;
         this.upperNodes = new Array();
         this._leafLength = 0;
@@ -113,7 +110,7 @@ class CMerkleMountainRange {
         return Buffer.from([]);
     }
     fromBuffer(bufferIn) {
-        return new CMerkleMountainRange();
+        return new MerkleMountainRange();
     }
     add(leaf) {
         this.layer0.push_back(leaf);
@@ -123,17 +120,17 @@ class CMerkleMountainRange {
             let newSizeAbove = layerSize >> 1;
             // expand vector of vectors if we are adding a new layer
             if (height == this.upperNodes.length) {
-                this.upperNodes.push(new CLayer());
+                this.upperNodes.push(new MMRLayer());
             }
             let curSizeAbove = this.upperNodes[height].size();
             // if we need to add an element to the vector above us, do it
             if (!(layerSize & 1) && newSizeAbove > curSizeAbove) {
                 let idx = layerSize - 2;
                 if (height > 0) {
-                    this.upperNodes[height].push_back(this.upperNodes[height - 1].getIndex(idx).CreateParentNode(this.upperNodes[height - 1].getIndex(idx + 1)));
+                    this.upperNodes[height].push_back(this.upperNodes[height - 1].getIndex(idx).createParentNode(this.upperNodes[height - 1].getIndex(idx + 1)));
                 }
                 else {
-                    this.upperNodes[height].push_back(this.layer0.getIndex(idx).CreateParentNode(this.layer0.getIndex(idx + 1)));
+                    this.upperNodes[height].push_back(this.layer0.getIndex(idx).createParentNode(this.layer0.getIndex(idx + 1)));
                 }
             }
             layerSize = newSizeAbove;
@@ -164,8 +161,8 @@ class CMerkleMountainRange {
         return null;
     }
 }
-exports.CMerkleMountainRange = CMerkleMountainRange;
-class CMMRBranch {
+exports.MerkleMountainRange = MerkleMountainRange;
+class MMRBranch {
     constructor(branchType = BRANCH_MMRBLAKE_NODE, nIndex = 0, nSize = 0, branch = new Array()) {
         this.branchType = branchType;
         this.nIndex = nIndex;
@@ -211,7 +208,7 @@ class CMMRBranch {
         return blake2b(out.length, null, null, Buffer.from("VerusDefaultHash")).update(input).digest(out);
     }
     safeCheck(hash) {
-        let index = (0, exports.GetMMRProofIndex)(this.nIndex, this.nSize, 0);
+        let index = (0, mmr_1.GetMMRProofIndex)(this.nIndex, this.nSize, 0);
         let joined = Buffer.allocUnsafe(64);
         let hashInProgress = hash;
         for (let i = 0; i < this.branch.length; i++) {
@@ -229,8 +226,8 @@ class CMMRBranch {
         return hashInProgress;
     }
 }
-exports.CMMRBranch = CMMRBranch;
-class CMMRProof {
+exports.MMRBranch = MMRBranch;
+class MMRProof {
     setProof(proof) {
         if (!this.proofSequence) {
             this.proofSequence = new Array();
@@ -258,16 +255,16 @@ class CMMRProof {
         let proofSequenceLength = reader.readCompactSize();
         this.proofSequence = new Array();
         for (let i = 0; i < proofSequenceLength; i++) {
-            let proof = new CMMRBranch();
+            let proof = new MMRBranch();
             reader.offset = proof.fromBuffer(reader.buffer, reader.offset);
             this.setProof(proof);
         }
         return reader.offset;
     }
 }
-exports.CMMRProof = CMMRProof;
+exports.MMRProof = MMRProof;
 //template <typename NODE_TYPE, typename LAYER_TYPE=CChunkedLayer<NODE_TYPE>, typename LAYER0_TYPE=LAYER_TYPE, typename HASHALGOWRITER=CBLAKE2bWriter>
-class CMerkleMountainView {
+class MerkleMountainView {
     constructor(mountainRange, viewSize = 0) {
         this.mmr = mountainRange;
         let maxSize = this.mmr.size();
@@ -287,7 +284,7 @@ class CMerkleMountainView {
         // zero if empty or the size of the zeroeth layer
         return this.sizes.length == 0 ? 0 : this.sizes[0];
     }
-    CalcPeaks(force = false) {
+    calcPeaks(force = false) {
         // if we don't yet have calculated peaks, calculate them
         if (force || (this.peaks.length == 0 && this.size() != 0)) {
             // reset the peak merkle tree, in case this is forced
@@ -322,15 +319,15 @@ class CMerkleMountainView {
     maxsize() {
         return this.mmr.size() - 1;
     }
-    GetPeaks() {
-        this.CalcPeaks();
+    getPeaks() {
+        this.calcPeaks();
         return this.peaks;
     }
-    GetRoot() {
+    getRoot() {
         let rootHash = Buffer.allocUnsafe(32);
         if (this.size() > 0 && this.peakMerkle.length == 0) {
             // get peaks and hash to a root
-            this.CalcPeaks();
+            this.calcPeaks();
             let layerNum = 0, layerSize = this.peaks.length;
             // with an odd number of elements below, the edge passes through
             for (let passThrough = !!(layerSize & 1); layerNum == 0 || layerSize > 1; passThrough = !!(layerSize & 1), layerNum++) {
@@ -339,10 +336,10 @@ class CMerkleMountainView {
                 let layerIndex = layerNum ? layerNum - 1 : 0; // layerNum is base 1
                 for (i = 0; i < (layerSize >> 1); i++) {
                     if (layerNum > 0) {
-                        this.peakMerkle[this.peakMerkle.length - 1].push(this.peakMerkle[layerIndex][i << 1].CreateParentNode(this.peakMerkle[layerIndex][(i << 1) + 1]));
+                        this.peakMerkle[this.peakMerkle.length - 1].push(this.peakMerkle[layerIndex][i << 1].createParentNode(this.peakMerkle[layerIndex][(i << 1) + 1]));
                     }
                     else {
-                        this.peakMerkle[this.peakMerkle.length - 1].push(this.peaks[i << 1].CreateParentNode(this.peaks[(i << 1) + 1]));
+                        this.peakMerkle[this.peakMerkle.length - 1].push(this.peaks[i << 1].createParentNode(this.peaks[(i << 1) + 1]));
                     }
                 }
                 if (passThrough) {
@@ -364,9 +361,9 @@ class CMerkleMountainView {
         }
         return rootHash;
     }
-    GetRootNode() {
+    getRootNode() {
         // ensure merkle tree is calculated
-        let root = this.GetRoot();
+        let root = this.getRoot();
         if (root.length > 0) {
             return this.peakMerkle[this.peakMerkle.length - 1][0];
         }
@@ -375,7 +372,7 @@ class CMerkleMountainView {
         }
     }
     // return hash of the element at "index"
-    GetHash(index) {
+    getHash(index) {
         if (index < this.size()) {
             return this.mmr.layer0[index].hash;
         }
@@ -383,18 +380,18 @@ class CMerkleMountainView {
             return Buffer.allocUnsafe(32);
         }
     }
-    GetBranchType() {
+    getBranchType() {
         return BRANCH_MMRBLAKE_NODE;
     }
     // return a proof of the element at "pos"
-    GetProof(retProof, pos) {
+    getProof(retProof, pos) {
         // find a path from the indicated position to the root in the current view
-        let retBranch = new CMMRBranch();
+        let retBranch = new MMRBranch();
         if (pos < this.size()) {
             // just make sure the peakMerkle tree is calculated
-            this.GetRoot();
+            this.getRoot();
             // if we have leaf information, add it
-            let toAdd = this.mmr.layer0.getIndex(pos).GetLeafHash();
+            let toAdd = this.mmr.layer0.getIndex(pos).getLeafHash();
             if (toAdd.length > 0) {
                 retBranch.branch.splice(retBranch.branch.length, 0, toAdd[0]);
             }
@@ -416,7 +413,7 @@ class CMerkleMountainView {
                         /* for (auto &oneNode : peaks)
                         {
                             printf("peaknode: ");
-                            for (auto oneHash : oneNode.GetProofHash(oneNode))
+                            for (auto oneHash : oneNode.getProofHash(oneNode))
                             {
                                 printf("%s:", oneHash.GetHex().c_str());
                             }
@@ -469,7 +466,7 @@ class CMerkleMountainView {
                     }
                 }
             }
-            retBranch.branchType = this.GetBranchType();
+            retBranch.branchType = this.getBranchType();
             retBranch.nSize = this.size();
             retBranch.nIndex = pos;
             retProof.setProof(retBranch);
@@ -480,92 +477,9 @@ class CMerkleMountainView {
     // return a vector of the bits, either 1 or 0 in each byte, to represent both the size
     // of the proof by the size of the vector, and the expected bit in each position for the given
     // position in a Merkle Mountain View of the specified size
-    GetProofBits(pos, mmvSize) {
+    getProofBits(pos, mmvSize) {
         //NOTE: Not implmented.
     }
     ;
 }
-exports.CMerkleMountainView = CMerkleMountainView;
-const GetMMRProofIndex = (pos, mmvSize, extraHashes) => {
-    let index = new bn_js_1.BN(0);
-    let layerSizes = [];
-    let merkleSizes = [];
-    let peakIndexes = [];
-    let bitPos = 0;
-    //start at the beginning
-    //create a simulation of a mmr based on size
-    if (!(pos > 0 && pos < mmvSize))
-        return new bn_js_1.BN(0);
-    //create an array of all the sizes
-    while (mmvSize) {
-        layerSizes.push(mmvSize);
-        mmvSize = mmvSize >> 1;
-    }
-    for (let height = 0; height < layerSizes.length; height++) {
-        if (height == layerSizes.length - 1 || layerSizes[height] & 1) {
-            peakIndexes.push(height);
-        }
-    }
-    //array flip peak indexes
-    peakIndexes.reverse();
-    let layerNum = 0;
-    let layerSize = peakIndexes.length;
-    for (let passThrough = (layerSize & 1); layerNum == 0 || layerSize > 1; passThrough = (layerSize & 1), layerNum++) {
-        layerSize = (layerSize >> 1) + passThrough;
-        if (layerSize) {
-            merkleSizes.push(layerSize);
-        }
-    }
-    //flip the merklesizes
-    for (let i = 0; i < extraHashes; i++) {
-        bitPos++;
-    }
-    let p = pos;
-    for (let l = 0; l < layerSizes.length; l++) {
-        if (p & 1) {
-            index = index.or(new bn_js_1.BN(1).shln(bitPos++));
-            p >>= 1;
-            for (let i = 0; i < extraHashes; i++) {
-                bitPos++;
-            }
-        }
-        else {
-            if (layerSizes[l] > (p + 1)) {
-                bitPos++;
-                p >>= 1;
-                for (let i = 0; i < extraHashes; i++) {
-                    bitPos++;
-                }
-            }
-            else {
-                for (p = 0; p < peakIndexes.length; p++) {
-                    if (peakIndexes[p] == l) {
-                        break;
-                    }
-                }
-                for (let layerNum = -1, layerSize = peakIndexes.length; layerNum == -1 || layerSize > 1; layerSize = merkleSizes[++layerNum]) {
-                    if (p < (layerSize - 1) || (p & 1)) {
-                        if (p & 1) {
-                            // hash with the one before us
-                            index = index.or(new bn_js_1.BN(1).shln(bitPos++));
-                            for (let i = 0; i < extraHashes; i++) {
-                                bitPos++;
-                            }
-                        }
-                        else {
-                            // hash with the one in front of us
-                            bitPos++;
-                            for (let i = 0; i < extraHashes; i++) {
-                                bitPos++;
-                            }
-                        }
-                    }
-                    p >>= 1;
-                }
-                break;
-            }
-        }
-    }
-    return index;
-};
-exports.GetMMRProofIndex = GetMMRProofIndex;
+exports.MerkleMountainView = MerkleMountainView;

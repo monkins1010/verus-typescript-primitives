@@ -6,11 +6,11 @@ import { BN } from 'bn.js';
 import { BigNumber } from '../../utils/types/BigNumber';
 import { I_ADDR_VERSION } from '../../constants/vdxf';
 import { VDXFData } from '../../';
-import { EHashTypes } from './DataDescriptor';
+import { EHashTypes } from '../../pbaas/DataDescriptor';
 const { BufferReader, BufferWriter } = bufferutils
 const createHash = require("create-hash");
 import { VERUS_DATA_SIGNATURE_PREFIX } from "../../constants/vdxf";
-import { SaltedDataKey } from '../vdxfDataKeys';
+import { SaltedDataKey } from '../vdxfdatakeys';
 
 export class SaltedData extends VDXFData {
 
@@ -27,7 +27,7 @@ export class SaltedData extends VDXFData {
         if (salt.length != 0) {
             this.salt = salt;
         }
-        this.vdxfkey = SaltedDataKey().vdxfid;
+        this.vdxfkey = SaltedDataKey.vdxfid;
 
     }
 
