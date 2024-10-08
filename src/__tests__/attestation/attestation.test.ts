@@ -34,37 +34,18 @@ describe('Serializes and deserializes attestation request', () => {
       challenge: {
         challenge_id: "iMqzCkWdebC19xbjkLfVdDkkGP9Ni1oxoN",
         requested_access: [
-          new RequestedPermission(IDENTITY_VIEW.vdxfid, ""),
-          new RequestedPermission(PROFILE_DATA_VIEW_REQUEST.vdxfid, ""),
+          new RequestedPermission(IDENTITY_VIEW.vdxfid, [IDENTITY_PERSONALDETAILS.vdxfid, IDENTITY_CONTACTDETAILS.vdxfid, IDENTITY_LOCATION.vdxfid, IDENTITY_BANKINGDETAILS.vdxfid, IDENTITY_DOCUMENTS.vdxfid]),
+          new RequestedPermission(PROFILE_DATA_VIEW_REQUEST.vdxfid, ""), // change to array
           new RequestedPermission(LOGIN_CONSENT_PERSONALINFO_WEBHOOK_VDXF_KEY.vdxfid, ""),
+          new RequestedPermission(LOGIN_CONSENT_REDIRECT_VDXF_KEY.vdxfid, ""),
         ],
-        redirect_uris: [],
+        redirect_uris: [],  // this contains the webhook
         subject: [new Subject(
-          IDENTITY_PERSONALDETAILS.vdxfid,
-          PROFILE_DATA_VIEW_REQUEST.vdxfid
-        ),
-        new Subject(
-          IDENTITY_CONTACTDETAILS.vdxfid,
-          PROFILE_DATA_VIEW_REQUEST.vdxfid
-        ),
-        new Subject(
-          IDENTITY_LOCATION.vdxfid,
-          PROFILE_DATA_VIEW_REQUEST.vdxfid
-        ),
-        new Subject(
-          IDENTITY_BANKINGDETAILS.vdxfid,
-          PROFILE_DATA_VIEW_REQUEST.vdxfid
-        ),
-        new Subject(
-          IDENTITY_DOCUMENTS.vdxfid,
-          PROFILE_DATA_VIEW_REQUEST.vdxfid
-        ),
-        new Subject(
-          "https://example.com/sendpersonaldata",
+          "https://example.com/sendpersonaldata",  //this doesnt need to be in subject put in redirect_uris
           LOGIN_CONSENT_PERSONALINFO_WEBHOOK_VDXF_KEY.vdxfid
         ),
         ],
-        provisioning_info: [],
+        provisioning_info: [], //<ATTESTATION_VDXF_KEY><ATTESTATION_TYPE_KEY_1><ATTESTATION_TYPE_KEY_2><ATTESTATION_TYPE_KEY_3><ATTESTATION_TYPE_KEY_4>
         created_at: Number((Date.now() / 1000).toFixed(0)),
       }
     });

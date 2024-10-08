@@ -196,7 +196,7 @@ export class VDXFData extends VDXFObject {
   
     toJson() {
       return {
-        data: this.data,
+        data: this.data.toString("hex"),
         vdxfkey: this.vdxfkey,
       };
     }

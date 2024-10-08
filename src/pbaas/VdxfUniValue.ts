@@ -107,7 +107,7 @@ export class VdxfUniValue implements SerializableEntity {
 
       if (this.version.gt(VDXF_UNI_VALUE_VERSION_CURRENT)) throw new Error("Unknown VDXFUniValue version");
 
-      if (dataTypeKey == DATA_TYPE_STRING.vdxfid) {
+      if (dataTypeKey == DATA_TYPE_STRING.vdxfid) { // change to const buf = VdxfUniValue.fromJson(json).toBuffer()
         reader.readVarInt();
 
         const slice = reader.readVarSlice();

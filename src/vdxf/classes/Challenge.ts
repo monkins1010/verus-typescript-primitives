@@ -14,7 +14,8 @@ import { Hash160 } from "./Hash160";
 import { Attestation } from "./Attestation";
 import { fromBase58Check, toBase58Check } from '../../utils/address';
 import { HASH160_BYTE_LENGTH, I_ADDR_VERSION } from '../../constants/vdxf';
-import { BufferDataVdxfObject } from '../index'
+import { BufferDataVdxfObject, VDXFData } from '../index'
+
 
 export class RedirectUri extends VDXFObject {
   uri: string;
@@ -139,7 +140,7 @@ export class Challenge extends VDXFObject implements ChallengeInterface {
     super(vdxfkey);
 
     this.challenge_id = challenge.challenge_id;
-    this.requested_access = challenge.requested_access ? challenge.requested_access.map((x) => new RequestedPermission(x.vdxfkey, x.data)) : challenge.requested_access;
+    this.requested_access = challenge.requested_access ? challenge.requested_access.map((x) => new RequestedPermission(x.vdxfkey, x.dataAsArray)) : challenge.requested_access;
     this.requested_access_audience = challenge.requested_access_audience;
     this.subject = challenge.subject
       ? challenge.subject.map((x) => new Subject(x.data, x.vdxfkey))
@@ -414,8 +415,56 @@ export class Challenge extends VDXFObject implements ChallengeInterface {
   }
 }
 
-export class RequestedPermission extends Utf8DataVdxfObject {
-  constructor(vdxfkey: string = "", data: string = "") {
-    super(data, vdxfkey);
+export class RequestedPermission extends VDXFObject {
+
+  dataAsArray: Array<Hash160>;
+
+  constructor(vdxfkey?: string, data?: Array<Hash160>) {
+    super(vdxfkey);
+
+    if (data && data.length > 0) {
+      this.dataAsArray = data;
+    }
   }
+
+  dataByteLength(): number {
+
+    let length = 0;
+
+    length += varuint.encodingLength(this.dataAsArray.length);
+
+    for (let i = 0; i < this.dataAsArray.length; i++) {
+      length += this.dataAsArray[i].hash.length;
+    }
+
+    return length;
+  }
+
+  toDataBuffer(): Buffer {
+    const buffer = Buffer.alloc(this.dataByteLength());
+    const writer = new bufferutils.BufferWriter(buffer);
+
+    writer.writeCompactSize(this.dataAsArray.length);
+
+    for (let i = 0; i < this.dataAsArray.length; i++) {
+      writer.writeSlice(this.dataAsArray[i].toBuffer());
+    }
+
+    return writer.buffer;
+  }
+  
+
+  fromDataBuffer(buffer: Buffer, offset?: number): number {
+    const reader = new bufferutils.BufferReader(buffer, offset);
+    const numKeys = reader.readCompactSize();
+
+    this.dataAsArray = [];
+
+    for (let i = 0; i < numKeys; i++) {
+      this.dataAsArray.push(new Hash160(reader.readSlice(20)));
+    }
+
+    return reader.offset;
+  }
+
 }
