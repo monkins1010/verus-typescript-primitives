@@ -7,6 +7,7 @@ const varuint_1 = require("../../utils/varuint");
 const Context_1 = require("./Context");
 const Hash160_1 = require("./Hash160");
 const Attestation_1 = require("./Attestation");
+const address_1 = require("../../utils/address");
 class RedirectUri extends __1.VDXFObject {
     constructor(uri = "", vdxfkey = "") {
         super(vdxfkey);
@@ -263,15 +264,18 @@ class RequestedPermission extends __1.VDXFObject {
                 this.data = data;
             }
             else {
-                this.data = data.map((x) => new Hash160_1.Hash160(x));
+                this.data = data.map((x) => new Hash160_1.Hash160((0, address_1.fromBase58Check)(x).hash));
             }
+        }
+        else {
+            this.data = [];
         }
     }
     dataByteLength() {
         let length = 0;
         length += varuint_1.default.encodingLength(this.data.length);
         for (let i = 0; i < this.data.length; i++) {
-            length += this.data[i].hash.length;
+            length += 20;
         }
         return length;
     }
@@ -286,6 +290,7 @@ class RequestedPermission extends __1.VDXFObject {
     }
     fromDataBuffer(buffer, offset) {
         const reader = new bufferutils_1.default.BufferReader(buffer, offset);
+        const contextLength = reader.readCompactSize();
         const numKeys = reader.readCompactSize();
         this.data = [];
         for (let i = 0; i < numKeys; i++) {

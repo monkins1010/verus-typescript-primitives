@@ -426,8 +426,10 @@ export class RequestedPermission extends VDXFObject {
       if (data[0] instanceof Hash160) {
         this.data = data as Array<Hash160>;
       } else {
-      this.data = data.map((x) => new Hash160(x));
+      this.data = data.map((x) => new Hash160(fromBase58Check(x).hash));
       }
+    } else {
+      this.data = [];
     }
   }
 
@@ -438,7 +440,7 @@ export class RequestedPermission extends VDXFObject {
     length += varuint.encodingLength(this.data.length);
 
     for (let i = 0; i < this.data.length; i++) {
-      length += this.data[i].hash.length;
+      length += 20;
     }
 
     return length;
@@ -460,6 +462,7 @@ export class RequestedPermission extends VDXFObject {
 
   fromDataBuffer(buffer: Buffer, offset?: number): number {
     const reader = new bufferutils.BufferReader(buffer, offset);
+    const contextLength = reader.readCompactSize();
     const numKeys = reader.readCompactSize();
 
     this.data = [];

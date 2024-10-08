@@ -67,9 +67,7 @@ class ContentMultiMapRemove {
     }
     isValid() {
         if (this.version.gte(ContentMultiMapRemove.VERSION_FIRST) &&
-            this.version.lte(ContentMultiMapRemove.VERSION_LAST) &&
-            this.action.gte(ContentMultiMapRemove.ACTION_FIRST) &&
-            this.action.lte(ContentMultiMapRemove.ACTION_LAST)) {
+            this.version.lte(ContentMultiMapRemove.VERSION_LAST)) {
             return (this.action.eq(ContentMultiMapRemove.ACTION_CLEAR_MAP) ||
                 (this.entry_key && (this.entry_key.length > 0) &&
                     (this.action.eq(ContentMultiMapRemove.ACTION_REMOVE_ALL_KEY) || this.value_hash.length > 0)));

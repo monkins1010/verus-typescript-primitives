@@ -58,7 +58,6 @@ export class VdxfUniValue implements SerializableEntity {
 
       // if we just have serialized data 
       if (key === "") {
-        length += varuint.encodingLength(Buffer.from(value as string, "hex").length)
         length += Buffer.from(value as string, "hex").length;
         continue;
       }
@@ -91,25 +90,26 @@ export class VdxfUniValue implements SerializableEntity {
       length += HASH160_BYTE_LENGTH;
 
       if (key == VDXF_Data.DataStringKey.vdxfid) {
-        const encodedLength = varuint.encodingLength(Buffer.from(value as string, "utf-8").length)
-        length += varuint.encodingLength(1);
-        length += varuint.encodingLength(encodedLength + Buffer.from(value as string, "utf-8").length);
-        length += encodedLength;
-        length += Buffer.from(value as string, "utf-8").length;
+        const valBuf = Buffer.from(value as string, "utf-8");
+        length += varint.encodingLength(new BN(1));
+        // NOTE: 3 is from ss type + ver + vdxfIdVersion 
+        length += varuint.encodingLength(valBuf.length + 3);
+        length += varuint.encodingLength(valBuf.length);
+        length += valBuf.length;
       }
       else if (key == VDXF_Data.DataByteVectorKey.vdxfid) {
-        const encodedLength = varuint.encodingLength(Buffer.from(value as string, "hex").length)
-        length += varuint.encodingLength(1);
-        length += varuint.encodingLength(encodedLength + Buffer.from(value as string, "hex").length);
-        length += encodedLength;
-        length += Buffer.from(value as string, "hex").length;
+        const valBuf = Buffer.from(value as string, "hex");
+        length += varint.encodingLength(new BN(1));
+        length += varuint.encodingLength(valBuf.length + 3);
+        length += varuint.encodingLength(valBuf.length)
+        length += valBuf.length;
       }
       else if (key == VDXF_Data.DataCurrencyMapKey.vdxfid) {
 
         const destinations = Object.keys(value);
         const values = Object.values(value);
         const oneCurMap = new CurrencyValueMap({ value_map: new Map(destinations.map((key, index) => [key, new BN(values[index])])), multivalue: true });
-        length += varuint.encodingLength(1);
+        length += varint.encodingLength(new BN(1));
         length += varuint.encodingLength(oneCurMap.getByteLength());
         length += oneCurMap.getByteLength();
       }
@@ -118,7 +118,7 @@ export class VdxfUniValue implements SerializableEntity {
         const oneRatingMap = new Rating(value as Rating);
 
         length += varint.encodingLength(oneRatingMap.version);
-        length += varuint.encodingLength(oneRatingMap.getByteLength());
+        length += varuint.encodingLength(oneRatingMap.getByteLength() + 3);
         length += oneRatingMap.getByteLength();
       }
       else if (key == VDXF_Data.DataTransferDestinationKey.vdxfid) {
@@ -126,7 +126,7 @@ export class VdxfUniValue implements SerializableEntity {
         const transferDest = new TransferDestination(value as TransferDestination);
 
         length += varint.encodingLength(transferDest.typeNoFlags());
-        length += varuint.encodingLength(transferDest.getByteLength());
+        length += varuint.encodingLength(transferDest.getByteLength() + 3);
         length += transferDest.getByteLength();
       }
       else if (key == VDXF_Data.ContentMultiMapRemoveKey.vdxfid) {
@@ -134,7 +134,7 @@ export class VdxfUniValue implements SerializableEntity {
         const transferDest = new ContentMultiMapRemove(value as ContentMultiMapRemove);
 
         length += varint.encodingLength(transferDest.version);
-        length += varuint.encodingLength(transferDest.getByteLength());
+        length += varuint.encodingLength(transferDest.getByteLength() + 3);
         length += transferDest.getByteLength();
       }
       else if (key == VDXF_Data.CrossChainDataRefKey.vdxfid) {
@@ -142,7 +142,7 @@ export class VdxfUniValue implements SerializableEntity {
         const transferDest = new CrossChainDataRef(value);
 
         length += varint.encodingLength(VDXF_OBJECT_DEFAULT_VERSION);
-        length += varuint.encodingLength(transferDest.getByteLength());
+        length += varuint.encodingLength(transferDest.getByteLength() + 3);
         length += transferDest.getByteLength();
       }
       else if (key == VDXF_Data.DataDescriptorKey.vdxfid) {
@@ -150,7 +150,7 @@ export class VdxfUniValue implements SerializableEntity {
         const descr = new DataDescriptor(value as DataDescriptor);
 
         length += varint.encodingLength(descr.version);
-        length += varuint.encodingLength(descr.getByteLength());
+        length += varuint.encodingLength(descr.getByteLength() + 3);
         length += descr.getByteLength();
       }
       else if (key == VDXF_Data.MMRDescriptorKey.vdxfid) {
@@ -158,7 +158,7 @@ export class VdxfUniValue implements SerializableEntity {
         const descr = new MMRDescriptor(value as MMRDescriptor);
 
         length += varint.encodingLength(descr.version);
-        length += varuint.encodingLength(descr.getByteLength());
+        length += varuint.encodingLength(descr.getByteLength() + 3);
         length += descr.getByteLength();
       }
       else if (key == VDXF_Data.SignatureDataKey.vdxfid) {
@@ -166,27 +166,25 @@ export class VdxfUniValue implements SerializableEntity {
         const sigData = new SignatureData(value as SignatureData);
 
         length += varint.encodingLength(sigData.version);
-        length += varuint.encodingLength(sigData.getByteLength());
+        length += varuint.encodingLength(sigData.getByteLength() + 3);
         length += sigData.getByteLength();
       } else {
         throw new Error("contentmap invalid or unrecognized vdxfkey for object type: " + key);
       }
 
-      return length;
     }
+    return length;
   }
 
-  toBuffer() {
+  toBuffer(): Buffer {
     const writer = new BufferWriter(Buffer.alloc(this.getByteLength()));
 
     for (const key of this.values.keys()) {
       const value = this.values.get(key);
       if (key === "") {
-        writer.writeVarSlice(value as Buffer);
+        writer.writeSlice(value as Buffer);
         continue;
       }
-      writer.writeSlice(fromBase58Check(key).hash)
-      writer.writeVarInt(this.version);
 
       if (key == VDXF_Data.DataByteKey.vdxfid) {
         const oneByte = Buffer.from(value as string, "hex");
@@ -233,12 +231,12 @@ export class VdxfUniValue implements SerializableEntity {
       }
       else if (key == VDXF_Data.DataStringKey.vdxfid) {
 
-        const encodedLength = varuint.encodingLength(Buffer.from(value as string, "utf-8").length)
+        const valBuf = Buffer.from(value as string, "utf-8");
 
         writer.writeSlice(fromBase58Check(key).hash);
         writer.writeVarInt(new BN(1));
-        writer.writeCompactSize(encodedLength + Buffer.from(value as string, "utf-8").length);
-        writer.writeVarSlice(Buffer.from(value as string, "utf-8"));
+        writer.writeCompactSize(valBuf.length + 3);
+        writer.writeVarSlice(valBuf);
       }
       else if (key == VDXF_Data.DataByteVectorKey.vdxfid) {
 
@@ -351,13 +349,13 @@ export class VdxfUniValue implements SerializableEntity {
       else {
         // add the remaining data as a hex string
         reader.offset = reader.offset - HASH160_BYTE_LENGTH;
-        this.values.set("", reader.readSlice(bytesLeft + HASH160_BYTE_LENGTH).toString('hex'));
+        this.values.set("", reader.readSlice(bytesLeft + HASH160_BYTE_LENGTH));
         bytesLeft = 0;
         break;
       }
     }
     if (bytesLeft && bytesLeft <= HASH160_BYTE_LENGTH) {
-      this.values.set("", reader.readSlice(bytesLeft).toString('hex'));
+      this.values.set("", reader.readSlice(bytesLeft));
     }
     return reader.offset;
   }
@@ -381,7 +379,7 @@ export class VdxfUniValue implements SerializableEntity {
         objSize = reader.readCompactSize();
         reader.offset = oneCurrencyMap.fromBuffer(reader.buffer, reader.offset);
         if (oneCurrencyMap.isValid()) {
-          objectUni = { [checkVal]: oneCurrencyMap };
+          objectUni = { key: checkVal, value: oneCurrencyMap };
         }
       }
       else if (checkVal == VDXF_Data.DataRatingsKey.vdxfid) {
@@ -390,7 +388,7 @@ export class VdxfUniValue implements SerializableEntity {
         objSize = reader.readCompactSize();
         reader.offset = oneRatingObj.fromBuffer(reader.buffer, reader.offset);
         if (oneRatingObj.isValid()) {
-          objectUni = { [checkVal]: oneRatingObj };
+          objectUni = { key: checkVal, oneRatingObj };
         }
       }
       else if (checkVal == VDXF_Data.DataTransferDestinationKey.vdxfid) {
@@ -399,7 +397,7 @@ export class VdxfUniValue implements SerializableEntity {
         objSize = reader.readCompactSize();
         reader.offset = oneTransferDest.fromBuffer(reader.buffer, reader.offset);
         if (oneTransferDest.isValid()) {
-          objectUni = { [checkVal]: oneTransferDest };
+          objectUni = { key: checkVal, value: oneTransferDest };
         }
       }
       else if (checkVal == VDXF_Data.ContentMultiMapRemoveKey.vdxfid) {
@@ -408,22 +406,22 @@ export class VdxfUniValue implements SerializableEntity {
         objSize = reader.readCompactSize();
         reader.offset = contentMap.fromBuffer(reader.buffer, reader.offset);
         if (contentMap.isValid()) {
-          objectUni = { [checkVal]: contentMap };
+          objectUni = { key: checkVal, value: contentMap };
         }
       }
       else if (checkVal == VDXF_Data.DataStringKey.vdxfid) {
         let stringVal: string;
         version = reader.readVarInt();
         objSize = reader.readCompactSize();
-        stringVal = reader.readVarSlice.toString();
-        objectUni = { [checkVal]: stringVal };
+        stringVal = reader.readVarSlice().toString('utf8');
+        objectUni = { key: checkVal, value: stringVal };
       }
       else if (checkVal == VDXF_Data.DataByteVectorKey.vdxfid) {
         let vecVal: Buffer;
         version = reader.readVarInt();
         objSize = reader.readCompactSize();
         vecVal = reader.readVarSlice();
-        objectUni = { [checkVal]: vecVal.toString('hex') };
+        objectUni = { key: checkVal, value: vecVal.toString('hex') };
       }
       else if (checkVal == VDXF_Data.CrossChainDataRefKey.vdxfid) {
         const dataRef = new CrossChainDataRef();
@@ -431,7 +429,7 @@ export class VdxfUniValue implements SerializableEntity {
         objSize = reader.readCompactSize();
         reader.offset = dataRef.fromBuffer(reader.buffer, reader.offset);
         if (dataRef.isValid()) {
-          objectUni = { [checkVal]: dataRef };
+          objectUni = { key: checkVal, value: dataRef };
         }
       }
       else if (checkVal == VDXF_Data.DataDescriptorKey.vdxfid) {
@@ -440,7 +438,7 @@ export class VdxfUniValue implements SerializableEntity {
         objSize = reader.readCompactSize();
         reader.offset = dataDescriptor.fromBuffer(reader.buffer, reader.offset);
         if (dataDescriptor.isValid()) {
-          objectUni = { [checkVal]: dataDescriptor };
+          objectUni = { key: checkVal, value: dataDescriptor };
         }
       }
       else if (checkVal == VDXF_Data.MMRDescriptorKey.vdxfid) {
@@ -449,7 +447,7 @@ export class VdxfUniValue implements SerializableEntity {
         objSize = reader.readCompactSize();
         reader.offset = mmrDescriptor.fromBuffer(reader.buffer, reader.offset);
         if (mmrDescriptor.isValid()) {
-          objectUni = { [checkVal]: mmrDescriptor };
+          objectUni = { key: checkVal, value: mmrDescriptor };
         }
       }
       else if (checkVal == VDXF_Data.SignatureDataKey.vdxfid) {
@@ -458,7 +456,7 @@ export class VdxfUniValue implements SerializableEntity {
         objSize = reader.readCompactSize();
         reader.offset = sigData.fromBuffer(reader.buffer, reader.offset);
         if (sigData.isValid()) {
-          objectUni = { [checkVal]: sigData };
+          objectUni = { key: checkVal, value: sigData };
         }
       }
 
@@ -511,7 +509,7 @@ export class VdxfUniValue implements SerializableEntity {
 
     if (obj.serializedBase64) {
       try {
-        map.set("", Buffer.from(obj.serializedHex, "base64"))
+        map.set("", Buffer.from(obj.serializedBase64, "base64"))
         return new VdxfUniValue({
           values: map
         });
@@ -521,7 +519,7 @@ export class VdxfUniValue implements SerializableEntity {
     }
 
     if (obj.message) {
-      map.set("", Buffer.from(obj.serializedHex, "utf-8"))
+      map.set("", Buffer.from(obj.message, "utf-8"))
       return new VdxfUniValue({
         values: map
       });
