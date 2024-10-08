@@ -57,6 +57,25 @@ class ContentMultiMapRemove {
             value_hash: Buffer.from(data.valuehash, 'hex')
         });
     }
+    toJson() {
+        return {
+            version: this.version.toNumber(),
+            action: this.action.toNumber(),
+            entrykey: this.entry_key,
+            valuehash: this.value_hash.toString('hex')
+        };
+    }
+    isValid() {
+        if (this.version.gte(ContentMultiMapRemove.VERSION_FIRST) &&
+            this.version.lte(ContentMultiMapRemove.VERSION_LAST) &&
+            this.action.gte(ContentMultiMapRemove.ACTION_FIRST) &&
+            this.action.lte(ContentMultiMapRemove.ACTION_LAST)) {
+            return (this.action.eq(ContentMultiMapRemove.ACTION_CLEAR_MAP) ||
+                (this.entry_key && (this.entry_key.length > 0) &&
+                    (this.action.eq(ContentMultiMapRemove.ACTION_REMOVE_ALL_KEY) || this.value_hash.length > 0)));
+        }
+        return false;
+    }
 }
 exports.ContentMultiMapRemove = ContentMultiMapRemove;
 ContentMultiMapRemove.VERSION_INVALID = new bn_js_1.BN(0);

@@ -2,7 +2,7 @@ import { ApiRequest } from "../../ApiRequest";
 import { ApiPrimitiveJson, RequestParams } from "../../ApiPrimitive";
 import { DataDescriptor } from "../../../utils/types/DataDescriptor";
 import { SignData } from "../../../utils/types/SignData";
-export declare type signDataArgs = {
+export declare type SignDataArgs = {
     address?: string;
     filename?: string;
     message?: string;
@@ -23,8 +23,8 @@ export declare type signDataArgs = {
     createmmr?: boolean;
 };
 export declare class SignDataRequest extends ApiRequest {
-    data: signDataArgs;
-    constructor(chain: string, signableItems: signDataArgs);
+    data: SignDataArgs;
+    constructor(chain: string, signableItems: SignDataArgs);
     getParams(): RequestParams;
     static fromJson(object: ApiPrimitiveJson): SignDataRequest;
     toJson(): ApiPrimitiveJson;

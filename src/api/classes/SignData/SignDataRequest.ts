@@ -4,7 +4,7 @@ import { SIGN_DATA } from "../../../constants/cmds";
 import { DataDescriptor } from "../../../utils/types/DataDescriptor";
 import { SignData } from "../../../utils/types/SignData";
 
-export type signDataArgs = {
+export type SignDataArgs = {
   address?: string;
   filename?: string;
   message?: string;
@@ -26,9 +26,9 @@ export type signDataArgs = {
 }
 
 export class SignDataRequest extends ApiRequest {
-  data: signDataArgs;
+  data: SignDataArgs;
 
-  constructor(chain: string, signableItems: signDataArgs) {
+  constructor(chain: string, signableItems: SignDataArgs) {
     super(chain, SIGN_DATA);
     this.data = signableItems;
   }
@@ -42,7 +42,7 @@ export class SignDataRequest extends ApiRequest {
   static fromJson(object: ApiPrimitiveJson): SignDataRequest {
     return new SignDataRequest(
       object.chain as string,
-      object.data as signDataArgs
+      object.data as SignDataArgs
     );
   }
 

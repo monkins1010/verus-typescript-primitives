@@ -23,7 +23,7 @@ export declare class ContentMultiMapRemove implements SerializableEntity {
     static ACTION_REMOVE_ALL_KEY: import("bn.js");
     static ACTION_CLEAR_MAP: import("bn.js");
     static ACTION_LAST: import("bn.js");
-    constructor(data: {
+    constructor(data?: {
         version?: BigNumber;
         action?: BigNumber;
         entry_key?: string;
@@ -33,4 +33,6 @@ export declare class ContentMultiMapRemove implements SerializableEntity {
     toBuffer(): Buffer;
     fromBuffer(buffer: Buffer, offset?: number): number;
     static fromJson(data: ContentMultiMapRemoveJson): ContentMultiMapRemove;
+    toJson(): ContentMultiMapRemoveJson;
+    isValid(): boolean;
 }

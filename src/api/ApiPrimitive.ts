@@ -3,7 +3,7 @@ import { IdentityDefinition } from "../identity/IdentityDefinition";
 import { OfferForMaking } from "../offers/OfferForMaking";
 import { ListedOffer } from "../offers/OfferList";
 import { RawTransaction } from "../transaction/RawTransaction";
-import { signDataArgs } from "./classes/SignData/SignDataRequest";
+import { SignDataArgs } from "./classes/SignData/SignDataRequest";
 
 export type ApiPrimitive =
   | string
@@ -17,7 +17,7 @@ export type ApiPrimitive =
   | IdentityDefinition
   | BlockInfo
   | RawTransaction
-  | signDataArgs;
+  | SignDataArgs;
 
 export type ApiPrimitiveJson = { [key: string]: ApiPrimitive | undefined };
 

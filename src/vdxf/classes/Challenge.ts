@@ -140,7 +140,7 @@ export class Challenge extends VDXFObject implements ChallengeInterface {
     super(vdxfkey);
 
     this.challenge_id = challenge.challenge_id;
-    this.requested_access = challenge.requested_access ? challenge.requested_access.map((x) => new RequestedPermission(x.vdxfkey, x.dataAsArray)) : challenge.requested_access;
+    this.requested_access = challenge.requested_access ? challenge.requested_access.map((x) => new RequestedPermission(x.vdxfkey, x.data)) : challenge.requested_access;
     this.requested_access_audience = challenge.requested_access_audience;
     this.subject = challenge.subject
       ? challenge.subject.map((x) => new Subject(x.data, x.vdxfkey))
@@ -417,13 +417,17 @@ export class Challenge extends VDXFObject implements ChallengeInterface {
 
 export class RequestedPermission extends VDXFObject {
 
-  dataAsArray: Array<Hash160>;
+  data: Array<Hash160>;
 
-  constructor(vdxfkey?: string, data?: Array<Hash160>) {
+  constructor(vdxfkey?: string, data?: Array<Hash160> | Array<string>) {
     super(vdxfkey);
 
     if (data && data.length > 0) {
-      this.dataAsArray = data;
+      if (data[0] instanceof Hash160) {
+        this.data = data as Array<Hash160>;
+      } else {
+      this.data = data.map((x) => new Hash160(x));
+      }
     }
   }
 
@@ -431,10 +435,10 @@ export class RequestedPermission extends VDXFObject {
 
     let length = 0;
 
-    length += varuint.encodingLength(this.dataAsArray.length);
+    length += varuint.encodingLength(this.data.length);
 
-    for (let i = 0; i < this.dataAsArray.length; i++) {
-      length += this.dataAsArray[i].hash.length;
+    for (let i = 0; i < this.data.length; i++) {
+      length += this.data[i].hash.length;
     }
 
     return length;
@@ -444,10 +448,10 @@ export class RequestedPermission extends VDXFObject {
     const buffer = Buffer.alloc(this.dataByteLength());
     const writer = new bufferutils.BufferWriter(buffer);
 
-    writer.writeCompactSize(this.dataAsArray.length);
+    writer.writeCompactSize(this.data.length);
 
-    for (let i = 0; i < this.dataAsArray.length; i++) {
-      writer.writeSlice(this.dataAsArray[i].toBuffer());
+    for (let i = 0; i < this.data.length; i++) {
+      writer.writeSlice(this.data[i].toBuffer());
     }
 
     return writer.buffer;
@@ -458,10 +462,10 @@ export class RequestedPermission extends VDXFObject {
     const reader = new bufferutils.BufferReader(buffer, offset);
     const numKeys = reader.readCompactSize();
 
-    this.dataAsArray = [];
+    this.data = [];
 
     for (let i = 0; i < numKeys; i++) {
-      this.dataAsArray.push(new Hash160(reader.readSlice(20)));
+      this.data.push(new Hash160(reader.readSlice(20)));
     }
 
     return reader.offset;

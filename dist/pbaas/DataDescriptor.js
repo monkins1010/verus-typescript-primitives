@@ -49,7 +49,7 @@ class DataDescriptor {
             if (data.version != null)
                 newDataDescriptor.version = new bn_js_1.BN(data.version);
             if (data.objectdata != null)
-                newDataDescriptor.objectdata = _1.VdxfUniValue.vectorEncodeVDXFUni(data.objectdata);
+                newDataDescriptor.objectdata = _1.VdxfUniValue.fromJson(data.objectdata).toBuffer();
             if (data.label != null)
                 newDataDescriptor.label = data.label;
             if (data.mimetype != null)
@@ -215,13 +215,14 @@ class DataDescriptor {
             if (this.mimeType.startsWith("text/"))
                 isText = true;
         }
-        let processedObject = _1.VdxfUniValue.VDXFDataToUniValueArray(this.objectdata);
-        if (isText && typeof processedObject === 'string' || processedObject instanceof String) {
-            let objectDataUni = { message: Buffer.from(processedObject, 'hex').toString('utf-8') };
+        let processedObject = new _1.VdxfUniValue();
+        processedObject.fromBuffer(this.objectdata);
+        if (isText && typeof processedObject.values.get("") === 'string') {
+            let objectDataUni = { message: Buffer.from(processedObject.values.get(""), 'hex').toString('utf-8') };
             retval['objectdata'] = objectDataUni;
         }
         else {
-            retval['objectdata'] = processedObject;
+            retval['objectdata'] = processedObject.toJson();
         }
         if (this.label)
             retval['label'] = this.label;

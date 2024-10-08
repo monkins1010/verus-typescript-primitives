@@ -9,6 +9,11 @@ import { SerializableEntity } from '../utils/types/SerializableEntity';
 
 const { BufferReader, BufferWriter } = bufferutils
 
+export interface URLRefJson {
+  version: string;
+  url: string;
+}
+
 export class URLRef implements SerializableEntity {
 
   static FIRST_VERSION = new BN(1);
@@ -66,7 +71,7 @@ export class URLRef implements SerializableEntity {
     }
   }
 
-  static fromJson(data: { version: string, url: string }): URLRef {
+  static fromJson(data: URLRefJson): URLRef {
     return new URLRef({
       version: new BN(data.version, 10),
       url: data.url

@@ -1,6 +1,7 @@
 /// <reference types="node" />
 import { Utf8DataVdxfObject, VDXFObject, Utf8OrBase58Object } from "../";
 import { Context } from "./Context";
+import { Hash160 } from "./Hash160";
 import { Attestation } from "./Attestation";
 export declare class RedirectUri extends VDXFObject {
     uri: string;
@@ -76,6 +77,10 @@ export declare class Challenge extends VDXFObject implements ChallengeInterface 
         skip: boolean;
     };
 }
-export declare class RequestedPermission extends Utf8DataVdxfObject {
-    constructor(vdxfkey?: string, data?: string);
+export declare class RequestedPermission extends VDXFObject {
+    data: Array<Hash160>;
+    constructor(vdxfkey?: string, data?: Array<Hash160> | Array<string>);
+    dataByteLength(): number;
+    toDataBuffer(): Buffer;
+    fromDataBuffer(buffer: Buffer, offset?: number): number;
 }

@@ -42,7 +42,9 @@ export class SignatureData implements SerializableEntity {
   static DEFAULT_VERSION = new BN(1);
   static TYPE_VERUSID_DEFAULT = new BN(1);
 
-  constructor(data?) {
+  constructor(data?: { version?: BigNumber, system_ID?: string, hash_type?: BigNumber, signature_hash?: Buffer, 
+    identity_ID?: string, sig_type?: BigNumber, vdxf_keys?: Array<string>, vdxf_key_names?: Array<string>, 
+    bound_hashes?: Array<Buffer>, signature_as_vch?: Buffer }) {
 
     if (data) {
       this.version = data.version || new BN(1, 10);

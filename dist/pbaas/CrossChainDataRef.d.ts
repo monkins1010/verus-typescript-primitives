@@ -1,11 +1,15 @@
 /// <reference types="node" />
 import { SerializableEntity } from '../utils/types/SerializableEntity';
-import { PBaaSEvidenceRef } from './PBaaSEvidenceRef';
-import { IdentityMultimapRef } from './IdentityMultimapRef';
-import { URLRef } from './URLRef';
-export interface CrossChainDataRefJson {
-    ref: PBaaSEvidenceRef | IdentityMultimapRef | URLRef;
-}
+import { PBaaSEvidenceRef, PBaaSEvidenceRefJson } from './PBaaSEvidenceRef';
+import { IdentityMultimapRef, IdentityMultimapRefJson } from './IdentityMultimapRef';
+import { URLRef, URLRefJson } from './URLRef';
+export declare type CrossChainDataRefJson = (PBaaSEvidenceRefJson & {
+    type: number;
+}) | (IdentityMultimapRefJson & {
+    type: number;
+}) | (URLRefJson & {
+    type: number;
+});
 export declare class CrossChainDataRef implements SerializableEntity {
     ref: PBaaSEvidenceRef | IdentityMultimapRef | URLRef;
     static TYPE_CROSSCHAIN_DATAREF: number;
@@ -32,5 +36,5 @@ export declare class CrossChainDataRef implements SerializableEntity {
         version: string;
         url: string;
     };
-    static fromJson(data: any): CrossChainDataRef;
+    static fromJson(data: CrossChainDataRefJson): CrossChainDataRef;
 }

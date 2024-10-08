@@ -255,9 +255,43 @@ class Challenge extends __1.VDXFObject {
     }
 }
 exports.Challenge = Challenge;
-class RequestedPermission extends __1.Utf8DataVdxfObject {
-    constructor(vdxfkey = "", data = "") {
-        super(data, vdxfkey);
+class RequestedPermission extends __1.VDXFObject {
+    constructor(vdxfkey, data) {
+        super(vdxfkey);
+        if (data && data.length > 0) {
+            if (data[0] instanceof Hash160_1.Hash160) {
+                this.data = data;
+            }
+            else {
+                this.data = data.map((x) => new Hash160_1.Hash160(x));
+            }
+        }
+    }
+    dataByteLength() {
+        let length = 0;
+        length += varuint_1.default.encodingLength(this.data.length);
+        for (let i = 0; i < this.data.length; i++) {
+            length += this.data[i].hash.length;
+        }
+        return length;
+    }
+    toDataBuffer() {
+        const buffer = Buffer.alloc(this.dataByteLength());
+        const writer = new bufferutils_1.default.BufferWriter(buffer);
+        writer.writeCompactSize(this.data.length);
+        for (let i = 0; i < this.data.length; i++) {
+            writer.writeSlice(this.data[i].toBuffer());
+        }
+        return writer.buffer;
+    }
+    fromDataBuffer(buffer, offset) {
+        const reader = new bufferutils_1.default.BufferReader(buffer, offset);
+        const numKeys = reader.readCompactSize();
+        this.data = [];
+        for (let i = 0; i < numKeys; i++) {
+            this.data.push(new Hash160_1.Hash160(reader.readSlice(20)));
+        }
+        return reader.offset;
     }
 }
 exports.RequestedPermission = RequestedPermission;

@@ -30,7 +30,18 @@ export declare class SignatureData implements SerializableEntity {
     static LAST_VERSION: import("bn.js");
     static DEFAULT_VERSION: import("bn.js");
     static TYPE_VERUSID_DEFAULT: import("bn.js");
-    constructor(data?: any);
+    constructor(data?: {
+        version?: BigNumber;
+        system_ID?: string;
+        hash_type?: BigNumber;
+        signature_hash?: Buffer;
+        identity_ID?: string;
+        sig_type?: BigNumber;
+        vdxf_keys?: Array<string>;
+        vdxf_key_names?: Array<string>;
+        bound_hashes?: Array<Buffer>;
+        signature_as_vch?: Buffer;
+    });
     static fromJson(data: SignatureJsonDataInterface | any): SignatureData;
     static getSignatureHashType(input: Buffer): number;
     getByteLength(): number;

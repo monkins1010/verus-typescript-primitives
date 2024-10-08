@@ -35,16 +35,15 @@ describe('Serializes and deserializes attestation request', () => {
         challenge_id: "iMqzCkWdebC19xbjkLfVdDkkGP9Ni1oxoN",
         requested_access: [
           new RequestedPermission(IDENTITY_VIEW.vdxfid, [IDENTITY_PERSONALDETAILS.vdxfid, IDENTITY_CONTACTDETAILS.vdxfid, IDENTITY_LOCATION.vdxfid, IDENTITY_BANKINGDETAILS.vdxfid, IDENTITY_DOCUMENTS.vdxfid]),
-          new RequestedPermission(PROFILE_DATA_VIEW_REQUEST.vdxfid, ""), // change to array
-          new RequestedPermission(LOGIN_CONSENT_PERSONALINFO_WEBHOOK_VDXF_KEY.vdxfid, ""),
-          new RequestedPermission(LOGIN_CONSENT_REDIRECT_VDXF_KEY.vdxfid, ""),
+          new RequestedPermission(PROFILE_DATA_VIEW_REQUEST.vdxfid), // change to array
+          new RequestedPermission(LOGIN_CONSENT_PERSONALINFO_WEBHOOK_VDXF_KEY.vdxfid),
+          new RequestedPermission(LOGIN_CONSENT_REDIRECT_VDXF_KEY.vdxfid),
         ],
-        redirect_uris: [],  // this contains the webhook
-        subject: [new Subject(
-          "https://example.com/sendpersonaldata",  //this doesnt need to be in subject put in redirect_uris
-          LOGIN_CONSENT_PERSONALINFO_WEBHOOK_VDXF_KEY.vdxfid
-        ),
+        redirect_uris: [new RedirectUri(
+          "https://example.com/sendpersonaldata",
+          LOGIN_CONSENT_PERSONALINFO_WEBHOOK_VDXF_KEY.vdxfid)
         ],
+        subject: [],
         provisioning_info: [], //<ATTESTATION_VDXF_KEY><ATTESTATION_TYPE_KEY_1><ATTESTATION_TYPE_KEY_2><ATTESTATION_TYPE_KEY_3><ATTESTATION_TYPE_KEY_4>
         created_at: Number((Date.now() / 1000).toFixed(0)),
       }
@@ -67,7 +66,7 @@ describe('Serializes and deserializes attestation request', () => {
       },
       challenge: {
         challenge_id: "iKNufKJdLX3Xg8qFru9AuLBvivAEJ88PW4",
-        requested_access: [new RequestedPermission(IDENTITY_VIEW.vdxfid, "")],
+        requested_access: [new RequestedPermission(IDENTITY_VIEW.vdxfid)],
         session_id: "iRQZGW36o3RcVR1xyVT1qWdAKdxp3wUyrh",
         redirect_uris: [
           new RedirectUri(
@@ -111,8 +110,8 @@ describe('Serializes and deserializes attestation request', () => {
     });
 
     const attestationitem = Buffer.concat([fromBase58Check(ATTESTATION_PROVISION_TYPE.vdxfid).hash,
-      Buffer.from([0x01]), 
-      attestationDataDescriptor.toBuffer()]);
+    Buffer.from([0x01]),
+    attestationDataDescriptor.toBuffer()]);
 
     const attestationObject = new Attestation(attestationitem.toString('hex'), ATTESTATION_PROVISION_OBJECT.vdxfid);
 
@@ -125,7 +124,7 @@ describe('Serializes and deserializes attestation request', () => {
       },
       challenge: {
         challenge_id: "iKNufKJdLX3Xg8qFru9AuLBvivAEJ88PW4",
-        requested_access: [new RequestedPermission(IDENTITY_VIEW.vdxfid, "")],
+        requested_access: [new RequestedPermission(IDENTITY_VIEW.vdxfid)],
         session_id: "iRQZGW36o3RcVR1xyVT1qWdAKdxp3wUyrh",
         redirect_uris: [
           new RedirectUri(
@@ -138,7 +137,7 @@ describe('Serializes and deserializes attestation request', () => {
         context: new Context({
           ["i4KyLCxWZXeSkw15dF95CUKytEK3HU7em9"]: "test",
         }),
-        attestations: [ attestationObject]
+        attestations: [attestationObject]
       },
     });
 

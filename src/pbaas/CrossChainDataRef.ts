@@ -6,15 +6,17 @@ import { BN } from 'bn.js';
 import { BigNumber } from '../utils/types/BigNumber';
 import { I_ADDR_VERSION } from '../constants/vdxf';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
-import { PBaaSEvidenceRef } from './PBaaSEvidenceRef';
-import { IdentityMultimapRef } from './IdentityMultimapRef';
-import { URLRef } from './URLRef';
+import { PBaaSEvidenceRef, PBaaSEvidenceRefJson } from './PBaaSEvidenceRef';
+import { IdentityMultimapRef, IdentityMultimapRefJson } from './IdentityMultimapRef';
+import { URLRef, URLRefJson } from './URLRef';
 
 const { BufferReader, BufferWriter } = bufferutils
 
-export interface CrossChainDataRefJson {
-  ref: PBaaSEvidenceRef | IdentityMultimapRef | URLRef;
-}
+export type CrossChainDataRefJson = 
+    | (PBaaSEvidenceRefJson & { type: number })
+    | (IdentityMultimapRefJson & { type: number })
+    | (URLRefJson & { type: number });
+
 export class CrossChainDataRef implements SerializableEntity {
   ref: PBaaSEvidenceRef | IdentityMultimapRef | URLRef;
 
@@ -76,13 +78,13 @@ export class CrossChainDataRef implements SerializableEntity {
     return {...this.ref.toJson(), type: this.which()};
   }
 
-  static fromJson(data: any) {
+  static fromJson(data: CrossChainDataRefJson) {
     if (data.type == CrossChainDataRef.TYPE_CROSSCHAIN_DATAREF) {
-      return new CrossChainDataRef(PBaaSEvidenceRef.fromJson(data));
+      return new CrossChainDataRef(PBaaSEvidenceRef.fromJson(data as PBaaSEvidenceRefJson));
     } else if (data.type == CrossChainDataRef.TYPE_IDENTITY_DATAREF) {
-      return new CrossChainDataRef(IdentityMultimapRef.fromJson(data));
+      return new CrossChainDataRef(IdentityMultimapRef.fromJson(data as IdentityMultimapRefJson));
     } else if (data.type == CrossChainDataRef.TYPE_URL_REF) {
-      return new CrossChainDataRef(URLRef.fromJson(data));
+      return new CrossChainDataRef(URLRef.fromJson(data as URLRefJson));
     }
       else throw new Error("Invalid CrossChainDataRef type");
   }

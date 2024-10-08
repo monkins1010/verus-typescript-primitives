@@ -98,7 +98,7 @@ export class DataDescriptor implements SerializableEntity  {
     if (data != null) {
       if (data.flags != null) newDataDescriptor.flags = new BN(data.flags)
       if (data.version != null) newDataDescriptor.version = new BN(data.version)
-      if (data.objectdata != null) newDataDescriptor.objectdata = VdxfUniValue.vectorEncodeVDXFUni(data.objectdata)
+      if (data.objectdata != null) newDataDescriptor.objectdata = VdxfUniValue.fromJson(data.objectdata).toBuffer();
       if (data.label != null) newDataDescriptor.label = data.label;
       if (data.mimetype != null) newDataDescriptor.mimeType = data.mimetype;
       if (data.salt != null) newDataDescriptor.salt = Buffer.from(data.salt, 'hex');
@@ -310,15 +310,17 @@ export class DataDescriptor implements SerializableEntity  {
       if (this.mimeType.startsWith("text/")) isText = true;
     }
 
-    let processedObject = VdxfUniValue.VDXFDataToUniValueArray(this.objectdata)
+    let processedObject = new VdxfUniValue();
+    
+    processedObject.fromBuffer(this.objectdata)
 
-    if (isText && typeof processedObject === 'string' || processedObject instanceof String) {
+    if (isText && typeof processedObject.values.get("") === 'string') {
 
-      let objectDataUni = { message: Buffer.from(processedObject, 'hex').toString('utf-8') };
+      let objectDataUni = { message: Buffer.from(processedObject.values.get("") as string, 'hex').toString('utf-8') };
       retval['objectdata'] = objectDataUni;
 
     } else {
-      retval['objectdata'] = processedObject;
+      retval['objectdata'] = processedObject.toJson();
     }
 
     if (this.label) retval['label'] = this.label;

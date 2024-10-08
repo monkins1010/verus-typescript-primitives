@@ -32,7 +32,7 @@ export class ContentMultiMapRemove implements SerializableEntity {
   static ACTION_CLEAR_MAP = new BN(4);
   static ACTION_LAST = new BN(4);
 
-  constructor (data: { version?: BigNumber, action?: BigNumber, entry_key?: string, value_hash?: Buffer}) {
+  constructor(data?: { version?: BigNumber, action?: BigNumber, entry_key?: string, value_hash?: Buffer }) {
     this.version = data.version || new BN(1, 10);
     this.action = data.action || new BN(0, 10);
     this.entry_key = data.entry_key || "";
@@ -44,24 +44,24 @@ export class ContentMultiMapRemove implements SerializableEntity {
 
     byteLength += 4; // version uint32
     byteLength + 4; // action uint32
-    if (this.action != ContentMultiMapRemove.ACTION_CLEAR_MAP){
+    if (this.action != ContentMultiMapRemove.ACTION_CLEAR_MAP) {
       byteLength += 20
-      if (this.action != ContentMultiMapRemove.ACTION_REMOVE_ALL_KEY){
+      if (this.action != ContentMultiMapRemove.ACTION_REMOVE_ALL_KEY) {
         byteLength += 32
       }
     }
     return byteLength
   }
 
-  toBuffer () {
+  toBuffer() {
     const bufferWriter = new BufferWriter(Buffer.alloc(this.getByteLength()))
 
     bufferWriter.writeUInt32(this.version.toNumber());
     bufferWriter.writeUInt32(this.action.toNumber());
-    
-    if (this.action != ContentMultiMapRemove.ACTION_CLEAR_MAP){
+
+    if (this.action != ContentMultiMapRemove.ACTION_CLEAR_MAP) {
       bufferWriter.writeSlice(fromBase58Check(this.entry_key).hash);
-      if (this.action != ContentMultiMapRemove.ACTION_REMOVE_ALL_KEY){
+      if (this.action != ContentMultiMapRemove.ACTION_REMOVE_ALL_KEY) {
         bufferWriter.writeSlice(this.value_hash);
       }
     }
@@ -69,15 +69,15 @@ export class ContentMultiMapRemove implements SerializableEntity {
     return bufferWriter.buffer
   }
 
-  fromBuffer (buffer: Buffer, offset: number = 0) {
+  fromBuffer(buffer: Buffer, offset: number = 0) {
     const reader = new BufferReader(buffer, offset);
-    
+
     this.version = new BN(reader.readUInt32());
     this.action = new BN(reader.readUInt32());
 
-    if (this.action != ContentMultiMapRemove.ACTION_CLEAR_MAP){
+    if (this.action != ContentMultiMapRemove.ACTION_CLEAR_MAP) {
       this.entry_key = toBase58Check(reader.readSlice(20), I_ADDR_VERSION)
-      if (this.action != ContentMultiMapRemove.ACTION_REMOVE_ALL_KEY){
+      if (this.action != ContentMultiMapRemove.ACTION_REMOVE_ALL_KEY) {
         this.value_hash = reader.readSlice(32)
       }
     }
@@ -91,5 +91,26 @@ export class ContentMultiMapRemove implements SerializableEntity {
       entry_key: data.entrykey,
       value_hash: Buffer.from(data.valuehash, 'hex')
     })
+  }
+
+  toJson(): ContentMultiMapRemoveJson {
+    return {
+      version: this.version.toNumber(),
+      action: this.action.toNumber(),
+      entrykey: this.entry_key,
+      valuehash: this.value_hash.toString('hex')
+    }
+  }
+
+  isValid() {
+
+    if (this.version.gte(ContentMultiMapRemove.VERSION_FIRST) &&
+      this.version.lte(ContentMultiMapRemove.VERSION_LAST)) {
+        return (this.action.eq(ContentMultiMapRemove.ACTION_CLEAR_MAP) || 
+          (this.entry_key && (this.entry_key.length > 0) && 
+            (this.action.eq(ContentMultiMapRemove.ACTION_REMOVE_ALL_KEY) || this.value_hash.length > 0)
+          ));
+    }
+    return false;
   }
 }

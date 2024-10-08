@@ -65,7 +65,7 @@ export declare class VDXFData extends VDXFObject {
     toDataBuffer(): Buffer;
     fromDataBuffer(buffer: Buffer, offset?: number): number;
     toJson(): {
-        data: Buffer;
+        data: string;
         vdxfkey: string;
     };
 }

@@ -2,6 +2,10 @@
 /// <reference types="node" />
 import { BigNumber } from '../utils/types/BigNumber';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
+export interface URLRefJson {
+    version: string;
+    url: string;
+}
 export declare class URLRef implements SerializableEntity {
     static FIRST_VERSION: import("bn.js");
     static LAST_VERSION: import("bn.js");
@@ -19,8 +23,5 @@ export declare class URLRef implements SerializableEntity {
         version: string;
         url: string;
     };
-    static fromJson(data: {
-        version: string;
-        url: string;
-    }): URLRef;
+    static fromJson(data: URLRefJson): URLRef;
 }
