@@ -35,7 +35,7 @@ export declare class MMRDescriptor implements SerializableEntity {
     getByteLength(): number;
     toBuffer(): Buffer;
     fromBuffer(buffer: Buffer, offset?: number): number;
-    HasData(): boolean;
+    hasData(): boolean;
     isValid(): boolean;
     toJson(): MMRDescriptorJson;
 }

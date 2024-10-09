@@ -1,16 +1,16 @@
 import { ApiResponse } from "../../ApiResponse";
-import { Signature } from "../../../utils/types/Signature";
-import { mmrDescriptorParameters } from "../../../utils/types/MmrDescriptor";
-import { DataDescriptor } from "../../../utils/types/DataDescriptor";
+import { SignatureDataInfo } from "../../../utils/types/Signature";
+import { MmrDescriptorParameters } from "../../../utils/types/MmrDescriptor";
+import { DataDescriptorInfo } from "../../../utils/types/DataDescriptor";
 
 export class SignDataResponse extends ApiResponse {
   result: {
-    mmrdescriptor_encrypted?: mmrDescriptorParameters;
-    mmrdescriptor?: mmrDescriptorParameters;
+    mmrdescriptor_encrypted?: MmrDescriptorParameters;
+    mmrdescriptor?: MmrDescriptorParameters;
     signature?: string;
-    signaturedata_encrypted?: DataDescriptor;
+    signaturedata_encrypted?: DataDescriptorInfo;
     signaturedata_ssk?: string;
-    signaturedata?: Signature;
+    signaturedata?: SignatureDataInfo;
     system?: string;
     systemid?: string;
     hashtype?: string;

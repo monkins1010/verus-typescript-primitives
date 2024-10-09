@@ -47,38 +47,6 @@ export class MMRLayer<NODE_TYPE> {
 
 };
 
-//template <typename NODE_TYPE, typename UNDERLYING>
-class OverlayNodeLayer<NODE_TYPE, UNDERLYING> {
-
-  private nodeSource: UNDERLYING;
-  private vSize: number;
-
-  constructor(NodeSource: UNDERLYING) {
-    this.nodeSource = NodeSource;
-    this.vSize = 0;
-  }
-
-  size(): number {
-    return this.vSize;
-  }
-
-  getIndex(idx: number): NODE_TYPE {
-    if (idx < this.vSize) {
-      let retval: NODE_TYPE;
-      return retval;
-    }
-    else {
-      throw new Error("COverlayNodeLayer [] index out of range");
-
-    }
-  }
-
-  // node type must be moveable just to be passed here, but the default overlay has no control over the underlying storage
-  // and only tracks size changes
-  push_back(node: NODE_TYPE) { this.vSize++; }
-  clear() { this.vSize = 0; }
-  resize(newSize: number) { this.vSize = newSize; }
-};
 export class MMRNode {
   hash: Buffer;
 

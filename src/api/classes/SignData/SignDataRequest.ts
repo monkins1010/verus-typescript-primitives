@@ -1,8 +1,8 @@
 import { ApiRequest } from "../../ApiRequest";
 import { ApiPrimitiveJson, RequestParams } from "../../ApiPrimitive";
 import { SIGN_DATA } from "../../../constants/cmds";
-import { DataDescriptor } from "../../../utils/types/DataDescriptor";
-import { SignData } from "../../../utils/types/SignData";
+import { DataDescriptorInfo } from "../../../utils/types/DataDescriptor";
+import { SignDataParameters } from "../../../utils/types/SignData";
 
 export type SignDataArgs = {
   address?: string;
@@ -12,7 +12,7 @@ export type SignDataArgs = {
   messsagebase64?: string;
   datahash?: string;
   vdxfdata?: string;
-  mmrdata?: Array<DataDescriptor | SignData>;
+  mmrdata?: Array<DataDescriptorInfo | SignDataParameters>;
   mmrsalt?: Array<string>;
   mmrhashtype?: string;
   priormmr?: Array<string>;

@@ -1,10 +1,10 @@
-import { DataDescriptor } from './DataDescriptor';
+import { DataDescriptorInfo } from './DataDescriptor';
 
-export type mmrDescriptorParameters = {
+export type MmrDescriptorParameters = {
   version?: number;
   objecthashtype?: number;
   mmrhashtype?: number;
-  mmrroot?: DataDescriptor;
-  mmrhashes?: DataDescriptor;
-  datadescriptors?: DataDescriptor[];
+  mmrroot?: DataDescriptorInfo;
+  mmrhashes?: DataDescriptorInfo;
+  datadescriptors?: DataDescriptorInfo[];
 }

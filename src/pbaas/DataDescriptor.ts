@@ -314,9 +314,13 @@ export class DataDescriptor implements SerializableEntity  {
     
     processedObject.fromBuffer(this.objectdata)
 
-    if (isText && typeof processedObject.values.get("") === 'string') {
-
-      let objectDataUni = { message: Buffer.from(processedObject.values.get("") as string, 'hex').toString('utf-8') };
+    if (isText && ((processedObject.values.get("") === "string") || Buffer.isBuffer(processedObject.values.get("")))) {
+      const objectDataUni = { message: ''};
+      if(processedObject.values.get("") === "string") {
+        objectDataUni.message = processedObject.values.get("") as string;
+      } else {
+        objectDataUni.message = (processedObject.values.get("") as Buffer).toString('utf-8');
+      }
       retval['objectdata'] = objectDataUni;
 
     } else {

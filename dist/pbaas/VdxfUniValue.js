@@ -548,7 +548,7 @@ class VdxfUniValue {
         });
     }
     toJson() {
-        const ret = {};
+        let ret = {};
         for (const key of this.values.keys()) {
             if (key === "") {
                 ret[key] = this.values.get(key).toString('hex');
@@ -565,6 +565,9 @@ class VdxfUniValue {
             else {
                 ret[key] = this.values.get(key).toJson();
             }
+        }
+        if (ret && ret[""] && Object.keys(ret).length == 1) {
+            ret = ret[""];
         }
         return ret;
     }

@@ -129,7 +129,7 @@ export class MMRDescriptor implements SerializableEntity {
     return reader.offset;
   }
 
-  HasData(): boolean {
+  hasData(): boolean {
     return !!(this.mmrHashes.objectdata && this.dataDescriptors);
   }
 

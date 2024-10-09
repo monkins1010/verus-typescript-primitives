@@ -217,8 +217,14 @@ class DataDescriptor {
         }
         let processedObject = new _1.VdxfUniValue();
         processedObject.fromBuffer(this.objectdata);
-        if (isText && typeof processedObject.values.get("") === 'string') {
-            let objectDataUni = { message: Buffer.from(processedObject.values.get(""), 'hex').toString('utf-8') };
+        if (isText && ((processedObject.values.get("") === "string") || Buffer.isBuffer(processedObject.values.get("")))) {
+            const objectDataUni = { message: '' };
+            if (processedObject.values.get("") === "string") {
+                objectDataUni.message = processedObject.values.get("");
+            }
+            else {
+                objectDataUni.message = processedObject.values.get("").toString('utf-8');
+            }
             retval['objectdata'] = objectDataUni;
         }
         else {

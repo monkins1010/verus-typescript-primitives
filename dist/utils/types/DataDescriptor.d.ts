@@ -1,4 +1,4 @@
-export declare type DataDescriptor = {
+export declare type DataDescriptorInfo = {
     version?: number;
     flags?: number;
     objectdata?: string;

@@ -7,10 +7,6 @@ export declare const attestationDataKeys: {
 };
 export declare const IdentityVdxfidMap: {
     [x: string]: {
-        name: string;
-        type: keylist.VDXFKeyInterface;
-    } | {
-        name: string;
-        type: string;
+        EN: string;
     };
 };

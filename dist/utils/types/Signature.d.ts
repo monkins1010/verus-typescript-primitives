@@ -1,4 +1,4 @@
-export declare type Signature = {
+export declare type SignatureDataInfo = {
     version: number;
     systemid: string;
     hashtype: number;

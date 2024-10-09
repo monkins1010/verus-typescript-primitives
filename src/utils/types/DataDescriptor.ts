@@ -1,5 +1,5 @@
 
-export type DataDescriptor = {
+export type DataDescriptorInfo = {
   version?: number,
   flags?: number,
   objectdata?: string,

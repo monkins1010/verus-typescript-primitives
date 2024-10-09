@@ -61,7 +61,7 @@ class CurrencyValueMap {
     }
     isValid() {
         for (let [key, value] of this.value_map) {
-            if (!key) {
+            if (!key || (typeof (key) == 'string' && key.length == 0)) {
                 return false;
             }
         }

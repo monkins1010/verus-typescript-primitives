@@ -94,7 +94,7 @@ class MMRDescriptor {
         }
         return reader.offset;
     }
-    HasData() {
+    hasData() {
         return !!(this.mmrHashes.objectdata && this.dataDescriptors);
     }
     isValid() {

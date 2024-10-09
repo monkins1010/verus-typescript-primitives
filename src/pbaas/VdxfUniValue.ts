@@ -649,7 +649,7 @@ export class VdxfUniValue implements SerializableEntity {
   }
 
   toJson(): VdxfUniValueJson {
-    const ret = {};
+    let ret = {};
 
     for (const key of this.values.keys()) {
       if (key === "") {
@@ -663,6 +663,10 @@ export class VdxfUniValue implements SerializableEntity {
       } else {
         ret[key] = (this.values.get(key) as JsonSerializableObject).toJson();
       }
+    }
+
+    if (ret && ret[""] && Object.keys(ret).length == 1) {
+      ret = ret[""];
     }
 
     return ret;
