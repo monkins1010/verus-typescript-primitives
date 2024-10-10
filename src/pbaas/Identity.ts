@@ -144,6 +144,10 @@ export class Identity extends Principal implements SerializableEntity {
     return length;
   }
 
+  clearContentMultiMap() {
+    this.content_multimap = new ContentMultiMap({ kv_content: new Map() });
+  }
+
   toBuffer() {
     const writer = new BufferWriter(Buffer.alloc(this.getByteLength()));
 
