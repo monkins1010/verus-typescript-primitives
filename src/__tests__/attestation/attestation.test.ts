@@ -34,8 +34,8 @@ describe('Serializes and deserializes attestation request', () => {
       challenge: {
         challenge_id: "iMqzCkWdebC19xbjkLfVdDkkGP9Ni1oxoN",
         requested_access: [
-          new RequestedPermission(IDENTITY_VIEW.vdxfid, [IDENTITY_PERSONALDETAILS.vdxfid, IDENTITY_CONTACTDETAILS.vdxfid, IDENTITY_LOCATION.vdxfid, IDENTITY_BANKINGDETAILS.vdxfid, IDENTITY_DOCUMENTS.vdxfid]),
-          new RequestedPermission(PROFILE_DATA_VIEW_REQUEST.vdxfid), // change to array
+          new RequestedPermission(IDENTITY_VIEW.vdxfid),
+          new RequestedPermission(PROFILE_DATA_VIEW_REQUEST.vdxfid, [IDENTITY_PERSONALDETAILS.vdxfid, IDENTITY_CONTACTDETAILS.vdxfid, IDENTITY_LOCATION.vdxfid, IDENTITY_BANKINGDETAILS.vdxfid, IDENTITY_DOCUMENTS.vdxfid]), 
           new RequestedPermission(LOGIN_CONSENT_PERSONALINFO_WEBHOOK_VDXF_KEY.vdxfid),
           new RequestedPermission(LOGIN_CONSENT_REDIRECT_VDXF_KEY.vdxfid),
         ],

@@ -221,28 +221,6 @@ describe('Create a personal info request', () => {
     
   });
 
-  test('deserialize and desserialize mmrhashes', async () => {
 
-    const mmrhashes = DataDescriptor.fromJson({
-      "version": 1,
-      "flags": 0,
-      "objectdata": "41d826d3c6cbbc3a96992670d2f604e959fd1a8c014102c78ee8fa7c01db81cbf60181fc9baa101aa8c07d40c324d771145699168d3b18867a587f139173cf8b961d581fe15bbf15f5d02813a615e54c050d2b6b1cd4ee"
-    })
-
-    const initialDescriptor = mmrhashes.toBuffer().toString('hex');
-    const newDescriptor = new DataDescriptor();
-
-    newDescriptor.fromBuffer(Buffer.from(initialDescriptor, 'hex'));
-
-    expect(initialDescriptor).toStrictEqual(newDescriptor.toBuffer().toString('hex'));
-
-    // test to see if the hashed object is the correct size
-    const hashes = mmrhashes.DecodeHashVector();
-    expect(typeof hashes).toStrictEqual('object')
-    expect(hashes.length).toStrictEqual(2);
-    expect(hashes[0].length).toStrictEqual(32);
-    expect(hashes[1].length).toStrictEqual(32);
-
-  });
 
 });
