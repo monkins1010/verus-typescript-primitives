@@ -1,5 +1,7 @@
-import { Identity } from "../../../pbaas/Identity";
+import { Identity, IDENTITY_FLAG_TOKENIZED_CONTROL } from "../../../pbaas/Identity";
+import { OptCCParams } from "../../../pbaas/OptCCParams";
 import { IdentityScript } from "../../../pbaas/transaction/IdentityScript";
+import { IDENTITY_RECOVER_ADDR } from "../../../utils/cccustom";
 
 describe('Serializes and deserializes SmartTransactionScripts', () => {
   test('(de)serialize a basic identity registration outscript (v1) from daemon', () => {
@@ -26,6 +28,71 @@ describe('Serializes and deserializes SmartTransactionScripts', () => {
       identityaddress: 'iEHpmxiynXmwZKNgMm7BpXWP3EqCJt663q'
     });
     expect(() => IdentityScript.fromIdentity(script.getIdentity())).toThrowError()
+  });
+
+  test('(de)serialize a basic identity registration outscript for a revoked ID', () => {
+    const idjson = {
+      "contentmap": {
+        "53f36cc8554d2a9b1c86e92e77965607e242a513": "6332bd51fca724077577f93ec7eb185a45bd881268e2d9488c9ef087293e5cc4"
+      },
+      "contentmultimap": {},
+      "flags": 0,
+      "identityaddress": "i8byHmWFAeFMajYdgrXiQ9qZ1Y9FqxJUx1",
+      "minimumsignatures": 1,
+      "name": "VerusPay",
+      "parent": "iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq",
+      "primaryaddresses": [
+        "RSunNQqKnSwpNBRd6kcenScuQEFUWgL3bZ"
+      ],
+      "privateaddress": "zs1wczplx4kegw32h8g0f7xwl57p5tvnprwdmnzmdnsw50chcl26f7tws92wk2ap03ykaq6jyyztfa",
+      "recoveryauthority": "i9ps1xDcr7eM66Fko6aTkeuvvBPZFLEXRN",
+      "revocationauthority": "i98Mnj1YugaRzoURXt4aRhdqQDu7rML9J5",
+      "systemid": "iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq",
+      "timelock": 0,
+      "version": 3
+    }
+
+    const identity = Identity.fromJson(idjson);
+    identity.revoke();
+
+    const idscript = IdentityScript.fromIdentity(identity);
+
+    expect(idscript.masterOptCC.destinations.length).toBe(2);
+    expect(idscript.masterOptCC.destinations[1].toAddress()).toBe("i9ps1xDcr7eM66Fko6aTkeuvvBPZFLEXRN");
+    expect(idscript.paramsOptCC.vdata.length).toBe(2);
+  });
+
+  test('(de)serialize a basic identity registration outscript for a revoked ID with tokenized ID control', () => {
+    const idjson = {
+      "contentmap": {
+        "53f36cc8554d2a9b1c86e92e77965607e242a513": "6332bd51fca724077577f93ec7eb185a45bd881268e2d9488c9ef087293e5cc4"
+      },
+      "contentmultimap": {},
+      "flags": 0,
+      "identityaddress": "i8byHmWFAeFMajYdgrXiQ9qZ1Y9FqxJUx1",
+      "minimumsignatures": 1,
+      "name": "VerusPay",
+      "parent": "iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq",
+      "primaryaddresses": [
+        "RSunNQqKnSwpNBRd6kcenScuQEFUWgL3bZ"
+      ],
+      "privateaddress": "zs1wczplx4kegw32h8g0f7xwl57p5tvnprwdmnzmdnsw50chcl26f7tws92wk2ap03ykaq6jyyztfa",
+      "recoveryauthority": "i9ps1xDcr7eM66Fko6aTkeuvvBPZFLEXRN",
+      "revocationauthority": "i98Mnj1YugaRzoURXt4aRhdqQDu7rML9J5",
+      "systemid": "iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq",
+      "timelock": 0,
+      "version": 3
+    }
+
+    const identity = Identity.fromJson(idjson);
+    identity.flags = identity.flags.xor(IDENTITY_FLAG_TOKENIZED_CONTROL);
+
+    const idscript = IdentityScript.fromIdentity(identity);
+
+    expect(idscript.masterOptCC.destinations.length).toBe(3);
+    expect(OptCCParams.fromChunk(idscript.paramsOptCC.vdata[2]).destinations[1].toAddress()).toBe(IDENTITY_RECOVER_ADDR);
+    expect(OptCCParams.fromChunk(idscript.paramsOptCC.vdata[2]).n.toNumber()).toBe(2);
+    expect(idscript.paramsOptCC.vdata.length).toBe(3);
   });
 
   test('(de)serialize a basic identity registration outscript (v3) from daemon with contentmap', () => {
