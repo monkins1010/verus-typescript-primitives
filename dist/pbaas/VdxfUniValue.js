@@ -273,17 +273,125 @@ class VdxfUniValue {
         let bytesLeft = reader.buffer.length - reader.offset;
         while (bytesLeft > vdxf_1.HASH160_BYTE_LENGTH) // size of uint160
          {
-            let objOut = { value: false };
-            const { objectUni, offset } = this.VDXFDataToUniValue(reader.buffer, reader.offset, objOut);
-            reader.offset = offset;
-            bytesLeft = buffer.length - reader.offset;
-            if (objOut.value) {
+            let pSuccess = { value: false };
+            let objectUni;
+            const initialOffset = reader.offset;
+            try {
+                let checkVal;
+                let version = new bn_js_1.BN(0);
+                let objSize = 0;
+                checkVal = (0, address_1.toBase58Check)(reader.readSlice(vdxf_1.HASH160_BYTE_LENGTH), vdxf_1.I_ADDR_VERSION);
+                if (checkVal == VDXF_Data.DataCurrencyMapKey.vdxfid) {
+                    const oneCurrencyMap = new CurrencyValueMap_1.CurrencyValueMap();
+                    version = reader.readVarInt();
+                    objSize = reader.readCompactSize();
+                    reader.offset = oneCurrencyMap.fromBuffer(reader.buffer, reader.offset);
+                    if (oneCurrencyMap.isValid()) {
+                        objectUni = { key: checkVal, value: oneCurrencyMap };
+                    }
+                }
+                else if (checkVal == VDXF_Data.DataRatingsKey.vdxfid) {
+                    const oneRatingObj = new Rating_1.Rating();
+                    version = reader.readVarInt();
+                    objSize = reader.readCompactSize();
+                    reader.offset = oneRatingObj.fromBuffer(reader.buffer, reader.offset);
+                    if (oneRatingObj.isValid()) {
+                        objectUni = { key: checkVal, value: oneRatingObj };
+                    }
+                }
+                else if (checkVal == VDXF_Data.DataTransferDestinationKey.vdxfid) {
+                    const oneTransferDest = new TransferDestination_1.TransferDestination();
+                    version = reader.readVarInt();
+                    objSize = reader.readCompactSize();
+                    reader.offset = oneTransferDest.fromBuffer(reader.buffer, reader.offset);
+                    if (oneTransferDest.isValid()) {
+                        objectUni = { key: checkVal, value: oneTransferDest };
+                    }
+                }
+                else if (checkVal == VDXF_Data.ContentMultiMapRemoveKey.vdxfid) {
+                    const contentMap = new ContentMultiMapRemove_1.ContentMultiMapRemove();
+                    version = reader.readVarInt();
+                    objSize = reader.readCompactSize();
+                    reader.offset = contentMap.fromBuffer(reader.buffer, reader.offset);
+                    if (contentMap.isValid()) {
+                        objectUni = { key: checkVal, value: contentMap };
+                    }
+                }
+                else if (checkVal == VDXF_Data.DataStringKey.vdxfid) {
+                    let stringVal;
+                    version = reader.readVarInt();
+                    objSize = reader.readCompactSize();
+                    stringVal = reader.readVarSlice().toString('utf8');
+                    objectUni = { key: checkVal, value: stringVal };
+                }
+                else if (checkVal == VDXF_Data.DataByteVectorKey.vdxfid) {
+                    let vecVal;
+                    version = reader.readVarInt();
+                    objSize = reader.readCompactSize();
+                    vecVal = reader.readVarSlice();
+                    objectUni = { key: checkVal, value: vecVal.toString('hex') };
+                }
+                else if (checkVal == VDXF_Data.CrossChainDataRefKey.vdxfid) {
+                    const dataRef = new CrossChainDataRef_1.CrossChainDataRef();
+                    version = reader.readVarInt();
+                    objSize = reader.readCompactSize();
+                    reader.offset = dataRef.fromBuffer(reader.buffer, reader.offset);
+                    if (dataRef.isValid()) {
+                        objectUni = { key: checkVal, value: dataRef };
+                    }
+                }
+                else if (checkVal == VDXF_Data.DataDescriptorKey.vdxfid) {
+                    const dataDescriptor = new DataDescriptor_1.DataDescriptor();
+                    version = reader.readVarInt();
+                    objSize = reader.readCompactSize();
+                    reader.offset = dataDescriptor.fromBuffer(reader.buffer, reader.offset);
+                    if (dataDescriptor.isValid()) {
+                        objectUni = { key: checkVal, value: dataDescriptor };
+                    }
+                }
+                else if (checkVal == VDXF_Data.MMRDescriptorKey.vdxfid) {
+                    const mmrDescriptor = new MMRDescriptor_1.MMRDescriptor();
+                    version = reader.readVarInt();
+                    objSize = reader.readCompactSize();
+                    reader.offset = mmrDescriptor.fromBuffer(reader.buffer, reader.offset);
+                    if (mmrDescriptor.isValid()) {
+                        objectUni = { key: checkVal, value: mmrDescriptor };
+                    }
+                }
+                else if (checkVal == VDXF_Data.SignatureDataKey.vdxfid) {
+                    const sigData = new SignatureData_1.SignatureData();
+                    version = reader.readVarInt();
+                    objSize = reader.readCompactSize();
+                    reader.offset = sigData.fromBuffer(reader.buffer, reader.offset);
+                    if (sigData.isValid()) {
+                        objectUni = { key: checkVal, value: sigData };
+                    }
+                }
+                // if we have an object that we recognized, encode it
+                if (objectUni && objectUni.key && objectUni.value) {
+                    if (pSuccess != null) {
+                        pSuccess.value = true;
+                    }
+                }
+                else {
+                    if (pSuccess != null) {
+                        pSuccess.value = false;
+                    }
+                }
+            }
+            catch (e) {
+                if (pSuccess != null) {
+                    pSuccess.value = false;
+                }
+            }
+            bytesLeft = reader.buffer.length - reader.offset;
+            if ((pSuccess === null || pSuccess === void 0 ? void 0 : pSuccess.value) && (pSuccess === null || pSuccess === void 0 ? void 0 : pSuccess.value)) {
                 this.values.set(objectUni.key, objectUni.value);
             }
             else {
                 // add the remaining data as a hex string
-                reader.offset = reader.offset - vdxf_1.HASH160_BYTE_LENGTH;
-                this.values.set("", reader.readSlice(bytesLeft + vdxf_1.HASH160_BYTE_LENGTH));
+                reader.offset = initialOffset;
+                this.values.set("", reader.readSlice(reader.buffer.length - reader.offset));
                 bytesLeft = 0;
                 break;
             }
@@ -292,119 +400,6 @@ class VdxfUniValue {
             this.values.set("", reader.readSlice(bytesLeft));
         }
         return reader.offset;
-    }
-    VDXFDataToUniValue(buffer, offset = 0, pSuccess = null) {
-        const reader = new BufferReader(buffer, offset);
-        let objectUni;
-        try {
-            let checkVal;
-            let version = new bn_js_1.BN(0);
-            let objSize = 0;
-            checkVal = (0, address_1.toBase58Check)(reader.readSlice(vdxf_1.HASH160_BYTE_LENGTH), vdxf_1.I_ADDR_VERSION);
-            if (checkVal == VDXF_Data.DataCurrencyMapKey.vdxfid) {
-                const oneCurrencyMap = new CurrencyValueMap_1.CurrencyValueMap();
-                version = reader.readVarInt();
-                objSize = reader.readCompactSize();
-                reader.offset = oneCurrencyMap.fromBuffer(reader.buffer, reader.offset);
-                if (oneCurrencyMap.isValid()) {
-                    objectUni = { key: checkVal, value: oneCurrencyMap };
-                }
-            }
-            else if (checkVal == VDXF_Data.DataRatingsKey.vdxfid) {
-                const oneRatingObj = new Rating_1.Rating();
-                version = reader.readVarInt();
-                objSize = reader.readCompactSize();
-                reader.offset = oneRatingObj.fromBuffer(reader.buffer, reader.offset);
-                if (oneRatingObj.isValid()) {
-                    objectUni = { key: checkVal, oneRatingObj };
-                }
-            }
-            else if (checkVal == VDXF_Data.DataTransferDestinationKey.vdxfid) {
-                const oneTransferDest = new TransferDestination_1.TransferDestination();
-                version = reader.readVarInt();
-                objSize = reader.readCompactSize();
-                reader.offset = oneTransferDest.fromBuffer(reader.buffer, reader.offset);
-                if (oneTransferDest.isValid()) {
-                    objectUni = { key: checkVal, value: oneTransferDest };
-                }
-            }
-            else if (checkVal == VDXF_Data.ContentMultiMapRemoveKey.vdxfid) {
-                const contentMap = new ContentMultiMapRemove_1.ContentMultiMapRemove();
-                version = reader.readVarInt();
-                objSize = reader.readCompactSize();
-                reader.offset = contentMap.fromBuffer(reader.buffer, reader.offset);
-                if (contentMap.isValid()) {
-                    objectUni = { key: checkVal, value: contentMap };
-                }
-            }
-            else if (checkVal == VDXF_Data.DataStringKey.vdxfid) {
-                let stringVal;
-                version = reader.readVarInt();
-                objSize = reader.readCompactSize();
-                stringVal = reader.readVarSlice().toString('utf8');
-                objectUni = { key: checkVal, value: stringVal };
-            }
-            else if (checkVal == VDXF_Data.DataByteVectorKey.vdxfid) {
-                let vecVal;
-                version = reader.readVarInt();
-                objSize = reader.readCompactSize();
-                vecVal = reader.readVarSlice();
-                objectUni = { key: checkVal, value: vecVal.toString('hex') };
-            }
-            else if (checkVal == VDXF_Data.CrossChainDataRefKey.vdxfid) {
-                const dataRef = new CrossChainDataRef_1.CrossChainDataRef();
-                version = reader.readVarInt();
-                objSize = reader.readCompactSize();
-                reader.offset = dataRef.fromBuffer(reader.buffer, reader.offset);
-                if (dataRef.isValid()) {
-                    objectUni = { key: checkVal, value: dataRef };
-                }
-            }
-            else if (checkVal == VDXF_Data.DataDescriptorKey.vdxfid) {
-                const dataDescriptor = new DataDescriptor_1.DataDescriptor();
-                version = reader.readVarInt();
-                objSize = reader.readCompactSize();
-                reader.offset = dataDescriptor.fromBuffer(reader.buffer, reader.offset);
-                if (dataDescriptor.isValid()) {
-                    objectUni = { key: checkVal, value: dataDescriptor };
-                }
-            }
-            else if (checkVal == VDXF_Data.MMRDescriptorKey.vdxfid) {
-                const mmrDescriptor = new MMRDescriptor_1.MMRDescriptor();
-                version = reader.readVarInt();
-                objSize = reader.readCompactSize();
-                reader.offset = mmrDescriptor.fromBuffer(reader.buffer, reader.offset);
-                if (mmrDescriptor.isValid()) {
-                    objectUni = { key: checkVal, value: mmrDescriptor };
-                }
-            }
-            else if (checkVal == VDXF_Data.SignatureDataKey.vdxfid) {
-                const sigData = new SignatureData_1.SignatureData();
-                version = reader.readVarInt();
-                objSize = reader.readCompactSize();
-                reader.offset = sigData.fromBuffer(reader.buffer, reader.offset);
-                if (sigData.isValid()) {
-                    objectUni = { key: checkVal, value: sigData };
-                }
-            }
-            // if we have an object that we recognized, encode it
-            if (objectUni) {
-                if (pSuccess != null) {
-                    pSuccess.value = true;
-                }
-            }
-            else {
-                if (pSuccess != null) {
-                    pSuccess.value = false;
-                }
-            }
-        }
-        catch (e) {
-            if (pSuccess != null) {
-                pSuccess.value = false;
-            }
-        }
-        return { objectUni, offset: reader.offset, pSuccess };
     }
     static fromJson(obj) {
         const map = new Map();

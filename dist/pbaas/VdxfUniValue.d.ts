@@ -30,16 +30,6 @@ export declare class VdxfUniValue implements SerializableEntity {
     getByteLength(): number;
     toBuffer(): Buffer;
     fromBuffer(buffer: Buffer, offset?: number): number;
-    VDXFDataToUniValue(buffer: Buffer, offset?: number, pSuccess?: any): {
-        objectUni: {
-            key: string;
-            value: VdxfUniType;
-        };
-        offset: number;
-        pSuccess: {
-            value: boolean;
-        };
-    };
     static fromJson(obj: VdxfUniValueJson): VdxfUniValue;
     toJson(): VdxfUniValueJson;
 }
