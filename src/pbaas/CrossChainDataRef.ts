@@ -13,7 +13,7 @@ import { URLRef, URLRefJson } from './URLRef';
 const { BufferReader, BufferWriter } = bufferutils
 
 export type CrossChainDataRefJson = 
-    | (PBaaSEvidenceRefJson & { type: number })
+    (PBaaSEvidenceRefJson & { type: number })
     | (IdentityMultimapRefJson & { type: number })
     | (URLRefJson & { type: number });
 

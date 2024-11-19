@@ -33,17 +33,17 @@ export class ContentMultiMapRemove implements SerializableEntity {
   static ACTION_LAST = new BN(4);
 
   constructor(data?: { version?: BigNumber, action?: BigNumber, entry_key?: string, value_hash?: Buffer }) {
-    this.version = data.version || new BN(1, 10);
-    this.action = data.action || new BN(0, 10);
-    this.entry_key = data.entry_key || "";
-    this.value_hash = data.value_hash || Buffer.alloc(0);
+    this.version = data?.version || new BN(1, 10);
+    this.action = data?.action || new BN(0, 10);
+    this.entry_key = data?.entry_key || "";
+    this.value_hash = data?.value_hash || Buffer.alloc(0);
   }
 
   getByteLength() {
     let byteLength = 0;
 
     byteLength += 4; // version uint32
-    byteLength + 4; // action uint32
+    byteLength += 4; // action uint32
     if (this.action != ContentMultiMapRemove.ACTION_CLEAR_MAP) {
       byteLength += 20
       if (this.action != ContentMultiMapRemove.ACTION_REMOVE_ALL_KEY) {

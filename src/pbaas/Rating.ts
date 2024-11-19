@@ -39,7 +39,7 @@ export class Rating implements SerializableEntity {
     let byteLength = 0;
 
     byteLength += 4; // version uint32
-    byteLength + 1; // trust_level uint8
+    byteLength += 1; // trust_level uint8
     byteLength += varuint.encodingLength(this.ratings.size);
 
     for (const [key, value] of this.ratings) {

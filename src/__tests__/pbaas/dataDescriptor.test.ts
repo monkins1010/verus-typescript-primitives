@@ -10,7 +10,6 @@ import { TransferDestination, DEST_ID } from "../../pbaas/TransferDestination";
 import * as VDXF_Data from '../../vdxf/vdxfdatakeys';
 import { toBase58Check, fromBase58Check } from '../../utils/address';
 import { BN } from "bn.js";
-import test from "node:test";
 
 describe('Serializes and deserializes dataDescriptors', () => {
 
