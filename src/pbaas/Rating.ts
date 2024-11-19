@@ -10,7 +10,7 @@ const { BufferReader, BufferWriter } = bufferutils
 export interface RatingJson {
   version: number;
   trustlevel: number;
-  ratings: Map<string, string>;
+  ratingsmap: {[key: string]: string};
 }
 export class Rating implements SerializableEntity {
 
@@ -112,8 +112,8 @@ export class Rating implements SerializableEntity {
 
     const ratings = new Map<string, Buffer>();
 
-    for (const key in json.ratings) {
-      ratings.set(key, Buffer.from(json.ratings[key], 'hex'));
+    for (const key in json.ratingsmap) {
+      ratings.set(key, Buffer.from(json.ratingsmap[key], 'hex'));
     }
 
     return new Rating({
