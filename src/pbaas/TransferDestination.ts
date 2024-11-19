@@ -41,7 +41,7 @@ export class TransferDestination implements SerializableEntity {
   fees: BigNumber;
   aux_dests: Array<TransferDestination>;
 
-  constructor(data?: { type?: BigNumber, destination_bytes?: Buffer, gateway_id?: string, gateway_code?: string, fees?: BigNumber, aux_dests?: Array<TransferDestination> }) {
+  constructor (data?: { type?: BigNumber, destination_bytes?: Buffer, gateway_id?: string, gateway_code?: string, fees?: BigNumber, aux_dests?: Array<TransferDestination> }) {
     this.type = DEST_INVALID;
     this.destination_bytes = Buffer.alloc(0);
     this.gateway_id = null;
@@ -126,7 +126,7 @@ export class TransferDestination implements SerializableEntity {
     return length;
   }
 
-  toBuffer() {
+  toBuffer () {
     const writer = new BufferWriter(Buffer.alloc(this.getByteLength()));
 
     writer.writeUInt8(this.type.toNumber());
@@ -150,7 +150,7 @@ export class TransferDestination implements SerializableEntity {
     return writer.buffer
   }
 
-  fromBuffer(buffer: Buffer, offset: number = 0) {
+  fromBuffer (buffer: Buffer, offset: number = 0) {
     const reader = new BufferReader(buffer, offset);
 
     this.type = new BN(reader.readUInt8(), 10);

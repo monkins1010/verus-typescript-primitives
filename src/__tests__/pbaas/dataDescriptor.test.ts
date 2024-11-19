@@ -1,6 +1,8 @@
 import { DataDescriptor, } from "../../pbaas/DataDescriptor";
 import { PBaaSEvidenceRef } from "../../pbaas/PBaaSEvidenceRef";
 import { UTXORef } from "../../pbaas/UTXORef";
+import { URLRef } from "../../pbaas/URLRef";
+import { IdentityMultimapRef } from "../../pbaas/IdentityMultimapRef";
 import { CrossChainDataRef } from "../../pbaas/CrossChainDataRef";
 import { VdxfUniValue } from "../../pbaas/VdxfUniValue";
 import { SignatureData } from "../../pbaas/SignatureData";
@@ -8,6 +10,7 @@ import { TransferDestination, DEST_ID } from "../../pbaas/TransferDestination";
 import * as VDXF_Data from '../../vdxf/vdxfdatakeys';
 import { toBase58Check, fromBase58Check } from '../../utils/address';
 import { BN } from "bn.js";
+import test from "node:test";
 
 describe('Serializes and deserializes dataDescriptors', () => {
 
@@ -149,5 +152,57 @@ describe('Serializes and deserializes dataDescriptors', () => {
     expect(hashes[1].length).toStrictEqual(32);
 
   });
-
+  test('Datadescriptor with URLRef', async () => {
+      
+      const urlRef = new URLRef({ version: new BN(1), url: "https://verus.io" });
+  
+      const urlRefMap = new Map();
+      urlRefMap.set(VDXF_Data.CrossChainDataRefKey.vdxfid, urlRef);
+  
+      const urlRefUniValue = new VdxfUniValue({ values: urlRefMap });
+  
+      const nestedDescriptor = DataDescriptor.fromJson({
+        version: 1,
+        "flags": 2, //FLAG_SALT_PRESENT = 2
+        "objectdata": urlRefUniValue.toBuffer().toString('hex'),
+        "salt": "4f66603f256d3f757b6dc3ea44802d4041d2a1901e06005028fd60b85a5878a2"
+      });
+  
+      const serializedDesc = nestedDescriptor.toBuffer().toString('hex'); // Serialize the request to a hex string
+      const newDescriptor = new DataDescriptor();
+  
+      newDescriptor.fromBuffer(Buffer.from(serializedDesc, 'hex')); // Deserialize the request from the hex string
+      expect(serializedDesc).toStrictEqual(newDescriptor.toBuffer().toString('hex')) // Compare the original serialized request to the new serialized request
+    });
+  test('Datadescriptor with IdentityMultimapRef', async () => {
+      
+      const idMultimap = new IdentityMultimapRef({
+        version: new BN(1),
+        flags: new BN(0),
+        id_ID: "iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq",
+        key: "i4GC1YGEVD21afWudGoFJVdnfjJ5XWnCQv",
+        height_start: new BN(0),
+        height_end: new BN(0),
+        data_hash: Buffer.alloc(0),
+        system_id: "iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq"
+      });
+  
+      const idMultimapMap = new Map();
+      idMultimapMap.set(VDXF_Data.CrossChainDataRefKey.vdxfid, idMultimap);
+  
+      const idMultimapUniValue = new VdxfUniValue({ values: idMultimapMap });
+  
+      const nestedDescriptor = DataDescriptor.fromJson({
+        version: 1,
+        "flags": 2, //FLAG_SALT_PRESENT = 2
+        "objectdata": idMultimapUniValue.toBuffer().toString('hex'),
+        "salt": "4f66603f256d3f757b6dc3ea44802d4041d2a1901e06005028fd60b85a5878a2"
+      });
+  
+      const serializedDesc = nestedDescriptor.toBuffer().toString('hex'); // Serialize the request to a hex string
+      const newDescriptor = new DataDescriptor();
+  
+      newDescriptor.fromBuffer(Buffer.from(serializedDesc, 'hex')); // Deserialize the request from the hex string
+      expect(serializedDesc).toStrictEqual(newDescriptor.toBuffer().toString('hex')) // Compare the original serialized request to the new serialized request
+    });
 });

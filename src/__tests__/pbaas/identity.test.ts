@@ -381,8 +381,6 @@ describe('Serializes and deserializes identity properly', () => {
     expect(() => identity_frombuf.upgradeVersion(Identity.VERSION_VERUSID)).toThrowError();
     expect(() => identity_frombuf.upgradeVersion(new BN(10))).toThrowError();
   });
-
-  
   test('clear ID contentmultimap', async () => {
     const identityJson = {
       "flags": 0,
