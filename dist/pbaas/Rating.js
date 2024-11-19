@@ -16,7 +16,7 @@ class Rating {
     getByteLength() {
         let byteLength = 0;
         byteLength += 4; // version uint32
-        byteLength + 1; // trust_level uint8
+        byteLength += 1; // trust_level uint8
         byteLength += varuint_1.default.encodingLength(this.ratings.size);
         for (const [key, value] of this.ratings) {
             byteLength += 20;

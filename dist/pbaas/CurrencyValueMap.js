@@ -74,5 +74,12 @@ class CurrencyValueMap {
         }
         return value_map;
     }
+    static fromJson(data) {
+        const value_map = new Map();
+        for (let key in data) {
+            value_map.set(key, new bn_js_1.BN(data[key]));
+        }
+        return new CurrencyValueMap({ value_map });
+    }
 }
 exports.CurrencyValueMap = CurrencyValueMap;

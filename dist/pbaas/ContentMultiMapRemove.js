@@ -8,15 +8,15 @@ const vdxf_1 = require("../constants/vdxf");
 const { BufferReader, BufferWriter } = bufferutils_1.default;
 class ContentMultiMapRemove {
     constructor(data) {
-        this.version = data.version || new bn_js_1.BN(1, 10);
-        this.action = data.action || new bn_js_1.BN(0, 10);
-        this.entry_key = data.entry_key || "";
-        this.value_hash = data.value_hash || Buffer.alloc(0);
+        this.version = (data === null || data === void 0 ? void 0 : data.version) || new bn_js_1.BN(1, 10);
+        this.action = (data === null || data === void 0 ? void 0 : data.action) || new bn_js_1.BN(0, 10);
+        this.entry_key = (data === null || data === void 0 ? void 0 : data.entry_key) || "";
+        this.value_hash = (data === null || data === void 0 ? void 0 : data.value_hash) || Buffer.alloc(0);
     }
     getByteLength() {
         let byteLength = 0;
         byteLength += 4; // version uint32
-        byteLength + 4; // action uint32
+        byteLength += 4; // action uint32
         if (this.action != ContentMultiMapRemove.ACTION_CLEAR_MAP) {
             byteLength += 20;
             if (this.action != ContentMultiMapRemove.ACTION_REMOVE_ALL_KEY) {
