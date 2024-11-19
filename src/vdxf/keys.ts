@@ -5,6 +5,10 @@ export interface VDXFKeyInterface {
     name: string;
     namespace: string;
   };
+  bounddata?: {
+    vdxfkey: string;
+  }
+  indexid?: string;
 }
 
 export const VERUSPAY_INVOICE_VDXF_KEY: VDXFKeyInterface = {

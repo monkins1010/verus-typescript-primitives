@@ -6,6 +6,7 @@ const bufferutils_1 = require("../../utils/bufferutils");
 const varuint_1 = require("../../utils/varuint");
 const Context_1 = require("./Context");
 const Hash160_1 = require("./Hash160");
+const address_1 = require("../../utils/address");
 class RedirectUri extends __1.VDXFObject {
     constructor(uri = "", vdxfkey = "") {
         super(vdxfkey);
@@ -50,9 +51,47 @@ class ProvisioningInfo extends __1.Utf8OrBase58Object {
     }
 }
 exports.ProvisioningInfo = ProvisioningInfo;
-class RequestedPermission extends __1.Utf8DataVdxfObject {
-    constructor(vdxfkey = "") {
-        super("", vdxfkey);
+class RequestedPermission extends __1.VDXFObject {
+    constructor(vdxfkey, data) {
+        super(vdxfkey);
+        if (data && data.length > 0) {
+            if (data[0] instanceof Hash160_1.Hash160) {
+                this.data = data;
+            }
+            else {
+                this.data = data.map((x) => new Hash160_1.Hash160((0, address_1.fromBase58Check)(x).hash));
+            }
+        }
+        else {
+            this.data = [];
+        }
+    }
+    dataByteLength() {
+        let length = 0;
+        length += varuint_1.default.encodingLength(this.data.length);
+        for (let i = 0; i < this.data.length; i++) {
+            length += 20;
+        }
+        return length;
+    }
+    toDataBuffer() {
+        const buffer = Buffer.alloc(this.dataByteLength());
+        const writer = new bufferutils_1.default.BufferWriter(buffer);
+        writer.writeCompactSize(this.data.length);
+        for (let i = 0; i < this.data.length; i++) {
+            writer.writeSlice(this.data[i].toBuffer());
+        }
+        return writer.buffer;
+    }
+    fromDataBuffer(buffer, offset) {
+        const reader = new bufferutils_1.default.BufferReader(buffer, offset);
+        const contextLength = reader.readCompactSize();
+        const numKeys = reader.readCompactSize();
+        this.data = [];
+        for (let i = 0; i < numKeys; i++) {
+            this.data.push(new Hash160_1.Hash160(reader.readSlice(20)));
+        }
+        return reader.offset;
     }
 }
 exports.RequestedPermission = RequestedPermission;
@@ -70,7 +109,7 @@ class Challenge extends __1.VDXFObject {
         super(vdxfkey);
         this.challenge_id = challenge.challenge_id;
         this.requested_access = challenge.requested_access
-            ? challenge.requested_access.map((x) => new RequestedPermission(x.vdxfkey))
+            ? challenge.requested_access.map((x) => new RequestedPermission(x.vdxfkey, x.data))
             : challenge.requested_access;
         this.requested_access_audience = challenge.requested_access_audience;
         this.subject = challenge.subject

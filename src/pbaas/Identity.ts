@@ -144,10 +144,6 @@ export class Identity extends Principal implements SerializableEntity {
     return length;
   }
 
-  clearContentMultiMap() {
-    this.content_multimap = new ContentMultiMap({ kv_content: new Map() });
-  }
-
   toBuffer() {
     const writer = new BufferWriter(Buffer.alloc(this.getByteLength()));
 
@@ -201,7 +197,7 @@ export class Identity extends Principal implements SerializableEntity {
     return writer.buffer
   }
 
-  fromBuffer(buffer: Buffer, offset: number = 0, multimapKeylists: Array<Array<string> | null> = []) {
+  fromBuffer(buffer: Buffer, offset: number = 0, parseVdxfObjects: boolean = false) {
     const reader = new BufferReader(buffer, offset);
 
     reader.offset = super.fromBuffer(reader.buffer, reader.offset);
@@ -219,7 +215,7 @@ export class Identity extends Principal implements SerializableEntity {
     if (this.version.gte(IDENTITY_VERSION_PBAAS)) {
       const multimap = new ContentMultiMap();
 
-      reader.offset = multimap.fromBuffer(reader.buffer, reader.offset, multimapKeylists);
+      reader.offset = multimap.fromBuffer(reader.buffer, reader.offset, parseVdxfObjects);
 
       this.content_multimap = multimap;
     }
