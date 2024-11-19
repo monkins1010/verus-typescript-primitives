@@ -81,6 +81,14 @@ exports.LOGIN_CONSENT_WEBHOOK_VDXF_KEY = {
         name: "vrsc::identity.authentication.loginconsent.webhook",
     },
 };
+exports.LOGIN_CONSENT_ATTESTATION_WEBHOOK_VDXF_KEY = {
+    vdxfid: "iEiQe3C68gKvAevZWAx6MLmoSR64hVqfMb",
+    hash160result: "6759ec3006891e89422e59fb613ab2653389497b",
+    qualifiedname: {
+        namespace: "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV",
+        name: "vrsc::identity.attestation.webhook",
+    },
+};
 exports.LOGIN_CONSENT_CONTEXT_VDXF_KEY = {
     vdxfid: "iBMochrKPSQfua5yZYWyd6p4QnREakqU44",
     hash160result: "3b605d4ace1e19dd0bddb2eef63171b1879a7b56",

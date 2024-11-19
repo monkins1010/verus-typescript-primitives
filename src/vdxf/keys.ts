@@ -1,3 +1,4 @@
+import varuint from '../utils/varuint'
 export interface VDXFKeyInterface {
   vdxfid: string;
   hash160result: string;
@@ -98,6 +99,15 @@ export const LOGIN_CONSENT_WEBHOOK_VDXF_KEY: VDXFKeyInterface = {
   qualifiedname: {
     namespace: "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV",
     name: "vrsc::identity.authentication.loginconsent.webhook",
+  },
+};
+
+export const LOGIN_CONSENT_ATTESTATION_WEBHOOK_VDXF_KEY: VDXFKeyInterface = {
+  vdxfid: "iEiQe3C68gKvAevZWAx6MLmoSR64hVqfMb",
+  hash160result: "6759ec3006891e89422e59fb613ab2653389497b",
+  qualifiedname: {
+    namespace: "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV",
+    name: "vrsc::identity.attestation.webhook",
   },
 };
 
@@ -336,11 +346,11 @@ export const SIGNED_SESSION_OBJECT: VDXFKeyInterface = {
 };
 
 export const CURRENCY_ADDRESS: VDXFKeyInterface = {
-  "vdxfid":"iBy2s9cQL9RadMVPjog6bbSV5ityBxTuNR",
-  "hash160result":"4fb4c86b8ce18e596e28f62bc9a78f43d738255d",
+  "vdxfid": "iBy2s9cQL9RadMVPjog6bbSV5ityBxTuNR",
+  "hash160result": "4fb4c86b8ce18e596e28f62bc9a78f43d738255d",
   "qualifiedname": {
-    "namespace":"i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV",
-    "name":"vrsc::currency.address"
+    "namespace": "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV",
+    "name": "vrsc::currency.address"
   }
 }
 

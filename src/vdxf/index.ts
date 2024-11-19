@@ -67,7 +67,7 @@ export class VDXFObject implements VDXFObjectInterface {
   toDataBuffer() {
     return Buffer.alloc(0);
   }
-  
+
   fromDataBuffer(buffer: Buffer, offset: number = 0) {
     return offset;
   }
@@ -262,7 +262,7 @@ export class Utf8OrBase58Object extends VDXFObject {
     } else {
       this.data = reader.readVarSlice().toString('utf-8')
     }
-    
+
     return reader.offset
   }
 

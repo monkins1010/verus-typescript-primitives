@@ -46,7 +46,7 @@ export declare class Response extends VDXFObject {
                     provisioning_info: import("./Challenge").ProvisioningInfo[];
                     alt_auth_factors: import("./Challenge").AltAuthFactor[];
                     session_id: string;
-                    attestations: import("./Challenge").Attestation[];
+                    attestations: import("./Attestation").Attestation[];
                     redirect_uris: {
                         uri: string;
                         vdxfkey: string;

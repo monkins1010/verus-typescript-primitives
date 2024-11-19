@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { VDXFObject } from "..";
-import { Attestation } from "./Challenge";
+import { Attestation } from "./Attestation";
 import { Context } from "./Context";
 import { Request, RequestInterface } from "./Request";
 export interface DecisionInterface {
@@ -18,7 +18,7 @@ export declare class Decision extends VDXFObject {
     request: Request;
     created_at: number;
     skipped?: boolean;
-    attestations: Array<any>;
+    attestations: Array<Attestation>;
     salt?: string;
     constructor(decision?: DecisionInterface, vdxfkey?: string);
     dataByteLength(): number;
