@@ -1,15 +1,15 @@
-import varint from '../../utils/varint'
-import varuint from '../../utils/varuint'
-import { fromBase58Check, toBase58Check } from "../../utils/address";
-import bufferutils from '../../utils/bufferutils'
+import varint from '../utils/varint'
+import varuint from '../utils/varuint'
+import { fromBase58Check, toBase58Check } from "../utils/address";
+import bufferutils from '../utils/bufferutils'
 import { BN } from 'bn.js';
-import { BigNumber } from '../../utils/types/BigNumber';
-import { I_ADDR_VERSION } from '../../constants/vdxf';
-import { VDXFData } from '../index';
+import { BigNumber } from '../utils/types/BigNumber';
+import { I_ADDR_VERSION } from '../constants/vdxf';
+import { VDXFData } from '../vdxf/index';
 const { BufferReader, BufferWriter } = bufferutils
 const createHash = require("create-hash");
-import { VERUS_DATA_SIGNATURE_PREFIX } from "../../constants/vdxf";
-import { SaltedDataKey } from '../vdxfdatakeys';
+import { VERUS_DATA_SIGNATURE_PREFIX } from "../constants/vdxf";
+import { SaltedDataKey } from '../vdxf/vdxfdatakeys';
 
 export class SaltedData extends VDXFData {
 
