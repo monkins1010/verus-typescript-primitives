@@ -5,7 +5,7 @@ import bufferutils from '../../utils/bufferutils'
 import { BN } from 'bn.js';
 import { BigNumber } from '../../utils/types/BigNumber';
 import { I_ADDR_VERSION } from '../../constants/vdxf';
-import { VDXFData } from '../../';
+import { VDXFData } from '../index';
 const { BufferReader, BufferWriter } = bufferutils
 const createHash = require("create-hash");
 import { VERUS_DATA_SIGNATURE_PREFIX } from "../../constants/vdxf";

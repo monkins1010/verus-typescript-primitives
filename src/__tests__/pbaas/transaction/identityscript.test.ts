@@ -1,5 +1,7 @@
-import { Identity } from "../../../pbaas/Identity";
+import { Identity, IDENTITY_FLAG_TOKENIZED_CONTROL } from "../../../pbaas/Identity";
+import { OptCCParams } from "../../../pbaas/OptCCParams";
 import { IdentityScript } from "../../../pbaas/transaction/IdentityScript";
+import { IDENTITY_RECOVER_ADDR } from "../../../utils/cccustom";
 
 describe('Serializes and deserializes SmartTransactionScripts', () => {
   test('(de)serialize a basic identity registration outscript (v1) from daemon', () => {
@@ -27,6 +29,73 @@ describe('Serializes and deserializes SmartTransactionScripts', () => {
     });
     expect(() => IdentityScript.fromIdentity(script.getIdentity())).toThrowError()
   });
+
+  
+  test('(de)serialize a basic identity registration outscript for a revoked ID', () => {
+    const idjson = {
+      "contentmap": {
+        "53f36cc8554d2a9b1c86e92e77965607e242a513": "6332bd51fca724077577f93ec7eb185a45bd881268e2d9488c9ef087293e5cc4"
+      },
+      "contentmultimap": {},
+      "flags": 0,
+      "identityaddress": "i8byHmWFAeFMajYdgrXiQ9qZ1Y9FqxJUx1",
+      "minimumsignatures": 1,
+      "name": "VerusPay",
+      "parent": "iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq",
+      "primaryaddresses": [
+        "RSunNQqKnSwpNBRd6kcenScuQEFUWgL3bZ"
+      ],
+      "privateaddress": "zs1wczplx4kegw32h8g0f7xwl57p5tvnprwdmnzmdnsw50chcl26f7tws92wk2ap03ykaq6jyyztfa",
+      "recoveryauthority": "i9ps1xDcr7eM66Fko6aTkeuvvBPZFLEXRN",
+      "revocationauthority": "i98Mnj1YugaRzoURXt4aRhdqQDu7rML9J5",
+      "systemid": "iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq",
+      "timelock": 0,
+      "version": 3
+    }
+
+    const identity = Identity.fromJson(idjson);
+    identity.revoke();
+
+    const idscript = IdentityScript.fromIdentity(identity);
+
+    expect(idscript.masterOptCC.destinations.length).toBe(2);
+    expect(idscript.masterOptCC.destinations[1].toAddress()).toBe("i9ps1xDcr7eM66Fko6aTkeuvvBPZFLEXRN");
+    expect(idscript.paramsOptCC.vdata.length).toBe(2);
+  });
+
+  test('(de)serialize a basic identity registration outscript for a revoked ID with tokenized ID control', () => {
+    const idjson = {
+      "contentmap": {
+        "53f36cc8554d2a9b1c86e92e77965607e242a513": "6332bd51fca724077577f93ec7eb185a45bd881268e2d9488c9ef087293e5cc4"
+      },
+      "contentmultimap": {},
+      "flags": 0,
+      "identityaddress": "i8byHmWFAeFMajYdgrXiQ9qZ1Y9FqxJUx1",
+      "minimumsignatures": 1,
+      "name": "VerusPay",
+      "parent": "iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq",
+      "primaryaddresses": [
+        "RSunNQqKnSwpNBRd6kcenScuQEFUWgL3bZ"
+      ],
+      "privateaddress": "zs1wczplx4kegw32h8g0f7xwl57p5tvnprwdmnzmdnsw50chcl26f7tws92wk2ap03ykaq6jyyztfa",
+      "recoveryauthority": "i9ps1xDcr7eM66Fko6aTkeuvvBPZFLEXRN",
+      "revocationauthority": "i98Mnj1YugaRzoURXt4aRhdqQDu7rML9J5",
+      "systemid": "iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq",
+      "timelock": 0,
+      "version": 3
+    }
+
+    const identity = Identity.fromJson(idjson);
+    identity.flags = identity.flags.xor(IDENTITY_FLAG_TOKENIZED_CONTROL);
+
+    const idscript = IdentityScript.fromIdentity(identity);
+
+    expect(idscript.masterOptCC.destinations.length).toBe(3);
+    expect(OptCCParams.fromChunk(idscript.paramsOptCC.vdata[2]).destinations[1].toAddress()).toBe(IDENTITY_RECOVER_ADDR);
+    expect(OptCCParams.fromChunk(idscript.paramsOptCC.vdata[2]).n.toNumber()).toBe(2);
+    expect(idscript.paramsOptCC.vdata.length).toBe(3);
+  });
+
 
   test('(de)serialize a basic identity registration outscript (v3) from daemon with contentmap', () => {
     const scriptString = "470403000103150438411ff17100e15b6df8dd72fecbe4fa4964dfea15043e006293b9e3341262eed040048d3a2260367f47150445a96c0179cbb19221c0e8625a2ed691d762fd37cc4d360104030e0101150438411ff17100e15b6df8dd72fecbe4fa4964dfea4ce103000000000000000114c165bce63e47698278f859ee75c35c78eb23e8df01000000a6ef9ea235635e328124ff3429db9f9e91b64e2d085665727573506179000113a542e2075696772ee9861c9b2a4d55c86cf353c45c3e2987f09e8c48d9e2681288bd455a18ebc73ef977750724a7fc51bd32633e006293b9e3341262eed040048d3a2260367f4745a96c0179cbb19221c0e8625a2ed691d762fd370176041f9ab6ca1d155ce87a7c677e9e0d16c9846e6ee62db670751f8be3ead27cb740aa7595d0be24b741a9a6ef9ea235635e328124ff3429db9f9e91b64e2d000000001b04030f010115043e006293b9e3341262eed040048d3a2260367f471b0403100101150445a96c0179cbb19221c0e8625a2ed691d762fd3775";

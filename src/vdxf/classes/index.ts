@@ -32,6 +32,7 @@ export {
   RequestedPermission,
   Audience,
   AltAuthFactor,
+  Attestation,
 } from "./Challenge";
 export {
   ProvisioningTxid

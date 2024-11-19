@@ -11,7 +11,6 @@ import { BN } from "bn.js";
 import { BigNumber } from "../utils/types/BigNumber";
 export * from './keys'
 export * from './scopes'
-export * from './identitydatakeys'
 export * from './vdxfdatakeys'
 
 export interface VDXFObjectInterface {
@@ -67,7 +66,7 @@ export class VDXFObject implements VDXFObjectInterface {
   toDataBuffer() {
     return Buffer.alloc(0);
   }
-
+  
   fromDataBuffer(buffer: Buffer, offset: number = 0) {
     return offset;
   }
@@ -117,8 +116,10 @@ export class VDXFObject implements VDXFObjectInterface {
     }
     
     writer.writeVarInt(new BN(this.version, 10));
-         
-    writer.writeVarSlice(this.toDataBuffer());    
+
+    if (dataLength) {      
+      writer.writeVarSlice(this.toDataBuffer());
+    }
 
     return writer.buffer;
   }

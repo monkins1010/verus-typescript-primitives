@@ -1,6 +1,6 @@
 /// <reference types="node" />
 /// <reference types="bn.js" />
-import { VDXFData } from '../../';
+import { VDXFData } from '../index';
 export declare class SaltedData extends VDXFData {
     salt: Buffer;
     static VERSION_INVALID: import("bn.js");

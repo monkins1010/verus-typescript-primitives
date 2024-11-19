@@ -4,7 +4,6 @@ import { VDXFKeyInterface } from './keys';
 import { BigNumber } from "../utils/types/BigNumber";
 export * from './keys';
 export * from './scopes';
-export * from './identitydatakeys';
 export * from './vdxfdatakeys';
 export interface VDXFObjectInterface {
     vdxfkey: string;

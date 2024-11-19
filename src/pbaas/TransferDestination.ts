@@ -3,7 +3,7 @@ import { BN } from 'bn.js';
 import { BigNumber } from '../utils/types/BigNumber';
 import varuint from '../utils/varuint';
 import { fromBase58Check, toBase58Check } from '../utils/address';
-import { I_ADDR_VERSION, R_ADDR_VERSION } from '../constants/vdxf';
+import { I_ADDR_VERSION, R_ADDR_VERSION, HASH160_BYTE_LENGTH } from '../constants/vdxf';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
 const { BufferReader, BufferWriter } = bufferutils
 
@@ -23,8 +23,6 @@ export const LAST_VALID_TYPE_NO_FLAGS = DEST_RAW
 export const FLAG_DEST_AUX = new BN(64, 10)
 export const FLAG_DEST_GATEWAY = new BN(128, 10)
 export const FLAG_MASK = FLAG_DEST_AUX.add(FLAG_DEST_GATEWAY)
-
-const UINT160_BYTE_SIZE = 20;
 
 export type TransferDestinationJson = {
   type: string;
@@ -109,7 +107,7 @@ export class TransferDestination implements SerializableEntity {
       if (this.gateway_code) {
         length += fromBase58Check(this.gateway_code).hash.length; // gateway_code
       } else {
-        length += UINT160_BYTE_SIZE
+        length += HASH160_BYTE_LENGTH
       }
       length += 8 // fees int64
     }
@@ -139,7 +137,7 @@ export class TransferDestination implements SerializableEntity {
       if (this.gateway_code) {
         writer.writeSlice(fromBase58Check(this.gateway_code).hash);
       } else {
-        writer.writeSlice(Buffer.alloc(UINT160_BYTE_SIZE));
+        writer.writeSlice(Buffer.alloc(HASH160_BYTE_LENGTH));
       }
       writer.writeInt64(this.fees);
     }

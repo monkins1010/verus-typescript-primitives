@@ -5,16 +5,12 @@ import {
   ID_SYSTEMID_VDXF_KEY,
   Utf8DataVdxfObject,
   VDXFObject,
-  Utf8OrBase58Object
+  Utf8OrBase58Object,
 } from "../";
 import bufferutils from "../../utils/bufferutils";
 import varuint from "../../utils/varuint";
 import { Context } from "./Context";
 import { Hash160 } from "./Hash160";
-import { fromBase58Check, toBase58Check } from '../../utils/address';
-import { HASH160_BYTE_LENGTH, I_ADDR_VERSION } from '../../constants/vdxf';
-import { BufferDataVdxfObject, VDXFData } from '../index'
-
 
 export class RedirectUri extends VDXFObject {
   uri: string;
@@ -69,9 +65,15 @@ export class ProvisioningInfo extends Utf8OrBase58Object {
   }
 }
 
-export class Audience extends Utf8DataVdxfObject { }
+export class RequestedPermission extends Utf8DataVdxfObject {
+  constructor(vdxfkey: string = "") {
+    super("", vdxfkey);
+  }
+}
 
-export class AltAuthFactor extends Utf8DataVdxfObject { }
+export class Audience extends Utf8DataVdxfObject {}
+
+export class AltAuthFactor extends Utf8DataVdxfObject {}
 
 export class Attestation extends Utf8DataVdxfObject {}
 
@@ -122,7 +124,7 @@ export interface ChallengeInterface {
 export class Challenge extends VDXFObject implements ChallengeInterface {
   challenge_id: string;
   requested_access?: Array<RequestedPermission> | null;
-  requested_access_audience?: Array<Audience> | null;
+  requested_access_audience?: Array<RequestedPermission> | null;
   subject?: Array<Subject>;
   provisioning_info?: Array<ProvisioningInfo>;
   alt_auth_factors?: Array<AltAuthFactor> | null;
@@ -141,7 +143,9 @@ export class Challenge extends VDXFObject implements ChallengeInterface {
     super(vdxfkey);
 
     this.challenge_id = challenge.challenge_id;
-    this.requested_access = challenge.requested_access ? challenge.requested_access.map((x) => new RequestedPermission(x.vdxfkey, x.data)) : challenge.requested_access;
+    this.requested_access = challenge.requested_access
+      ? challenge.requested_access.map((x) => new RequestedPermission(x.vdxfkey))
+      : challenge.requested_access;
     this.requested_access_audience = challenge.requested_access_audience;
     this.subject = challenge.subject
       ? challenge.subject.map((x) => new Subject(x.data, x.vdxfkey))
@@ -219,10 +223,6 @@ export class Challenge extends VDXFObject implements ChallengeInterface {
       length += varuint.encodingLength(_alt_auth_factors.length);
 
       length += varuint.encodingLength(_attestations.length);
-      length += _attestations.reduce(
-        (sum, current) => sum + current.byteLength(),
-        0
-      );
 
       length += varuint.encodingLength(_redirect_uris.length);
       length += _redirect_uris.reduce(
@@ -326,7 +326,6 @@ export class Challenge extends VDXFObject implements ChallengeInterface {
         const requestedAccessLength = reader.readCompactSize();
 
         for (let i = 0; i < requestedAccessLength; i++) {
-
           const _perm = new RequestedPermission();
           reader.offset = _perm.fromBuffer(reader.buffer, reader.offset);
           this.requested_access.push(_perm);
@@ -412,65 +411,4 @@ export class Challenge extends VDXFObject implements ChallengeInterface {
       skip: this.skip,
     };
   }
-}
-
-export class RequestedPermission extends VDXFObject {
-
-  data: Array<Hash160>;
-
-  constructor(vdxfkey?: string, data?: Array<Hash160> | Array<string>) {
-    super(vdxfkey);
-
-    if (data && data.length > 0) {
-      if (data[0] instanceof Hash160) {
-        this.data = data as Array<Hash160>;
-      } else {
-      this.data = data.map((x) => new Hash160(fromBase58Check(x).hash));
-      }
-    } else {
-      this.data = [];
-    }
-  }
-
-  dataByteLength(): number {
-
-    let length = 0;
-
-    length += varuint.encodingLength(this.data.length);
-
-    for (let i = 0; i < this.data.length; i++) {
-      length += 20;
-    }
-
-    return length;
-  }
-
-  toDataBuffer(): Buffer {
-    const buffer = Buffer.alloc(this.dataByteLength());
-    const writer = new bufferutils.BufferWriter(buffer);
-
-    writer.writeCompactSize(this.data.length);
-
-    for (let i = 0; i < this.data.length; i++) {
-      writer.writeSlice(this.data[i].toBuffer());
-    }
-
-    return writer.buffer;
-  }
-  
-
-  fromDataBuffer(buffer: Buffer, offset?: number): number {
-    const reader = new bufferutils.BufferReader(buffer, offset);
-    const contextLength = reader.readCompactSize();
-    const numKeys = reader.readCompactSize();
-
-    this.data = [];
-
-    for (let i = 0; i < numKeys; i++) {
-      this.data.push(new Hash160(reader.readSlice(20)));
-    }
-
-    return reader.offset;
-  }
-
 }

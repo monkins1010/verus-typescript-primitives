@@ -7,11 +7,11 @@ const address_1 = require("../../utils/address");
 const bufferutils_1 = require("../../utils/bufferutils");
 const bn_js_1 = require("bn.js");
 const vdxf_1 = require("../../constants/vdxf");
-const __1 = require("../../");
+const index_1 = require("../index");
 const { BufferReader, BufferWriter } = bufferutils_1.default;
 const createHash = require("create-hash");
 const vdxfdatakeys_1 = require("../vdxfdatakeys");
-class SaltedData extends __1.VDXFData {
+class SaltedData extends index_1.VDXFData {
     constructor(data, salt = Buffer.alloc(0)) {
         super(data);
         if (salt.length != 0) {
