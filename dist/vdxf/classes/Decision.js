@@ -4,7 +4,7 @@ exports.Decision = void 0;
 const __1 = require("..");
 const bufferutils_1 = require("../../utils/bufferutils");
 const varuint_1 = require("../../utils/varuint");
-const Attestation_1 = require("./Attestation");
+const Challenge_1 = require("./Challenge");
 const Context_1 = require("./Context");
 const Hash160_1 = require("./Hash160");
 const Request_1 = require("./Request");
@@ -85,7 +85,7 @@ class Decision extends __1.VDXFObject {
                 this.attestations = [];
                 const attestationsLength = reader.readCompactSize();
                 for (let i = 0; i < attestationsLength; i++) {
-                    const _att = new Attestation_1.Attestation();
+                    const _att = new Challenge_1.Attestation();
                     reader.offset = _att.fromBuffer(reader.buffer, reader.offset);
                     this.attestations.push(_att);
                 }
