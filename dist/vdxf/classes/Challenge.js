@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RequestedPermission = exports.AttestationRequest = exports.Challenge = exports.AltAuthFactor = exports.Audience = exports.ProvisioningInfo = exports.Subject = exports.RedirectUri = void 0;
+exports.RequestedPermission = exports.Challenge = exports.Attestation = exports.AltAuthFactor = exports.Audience = exports.ProvisioningInfo = exports.Subject = exports.RedirectUri = void 0;
 const __1 = require("../");
 const bufferutils_1 = require("../../utils/bufferutils");
 const varuint_1 = require("../../utils/varuint");
@@ -51,63 +51,20 @@ class ProvisioningInfo extends __1.Utf8OrBase58Object {
     }
 }
 exports.ProvisioningInfo = ProvisioningInfo;
-class RequestedPermission extends __1.VDXFObject {
-    constructor(vdxfkey, data) {
-        super(vdxfkey);
-        if (data && data.length > 0) {
-            if (data[0] instanceof Hash160_1.Hash160) {
-                this.data = data;
-            }
-            else {
-                this.data = data.map((x) => new Hash160_1.Hash160((0, address_1.fromBase58Check)(x).hash));
-            }
-        }
-        else {
-            this.data = [];
-        }
-    }
-    dataByteLength() {
-        let length = 0;
-        length += varuint_1.default.encodingLength(this.data.length);
-        for (let i = 0; i < this.data.length; i++) {
-            length += 20;
-        }
-        return length;
-    }
-    toDataBuffer() {
-        const buffer = Buffer.alloc(this.dataByteLength());
-        const writer = new bufferutils_1.default.BufferWriter(buffer);
-        writer.writeCompactSize(this.data.length);
-        for (let i = 0; i < this.data.length; i++) {
-            writer.writeSlice(this.data[i].toBuffer());
-        }
-        return writer.buffer;
-    }
-    fromDataBuffer(buffer, offset) {
-        const reader = new bufferutils_1.default.BufferReader(buffer, offset);
-        const contextLength = reader.readCompactSize();
-        const numKeys = reader.readCompactSize();
-        this.data = [];
-        for (let i = 0; i < numKeys; i++) {
-            this.data.push(new Hash160_1.Hash160(reader.readSlice(20)));
-        }
-        return reader.offset;
-    }
-}
-exports.RequestedPermission = RequestedPermission;
 class Audience extends __1.Utf8DataVdxfObject {
 }
 exports.Audience = Audience;
 class AltAuthFactor extends __1.Utf8DataVdxfObject {
 }
 exports.AltAuthFactor = AltAuthFactor;
+class Attestation extends __1.Utf8DataVdxfObject {
+}
+exports.Attestation = Attestation;
 class Challenge extends __1.VDXFObject {
     constructor(challenge = { challenge_id: "", created_at: 0 }, vdxfkey = __1.LOGIN_CONSENT_CHALLENGE_VDXF_KEY.vdxfid) {
         super(vdxfkey);
         this.challenge_id = challenge.challenge_id;
-        this.requested_access = challenge.requested_access
-            ? challenge.requested_access.map((x) => new RequestedPermission(x.vdxfkey, x.data))
-            : challenge.requested_access;
+        this.requested_access = challenge.requested_access ? challenge.requested_access.map((x) => new RequestedPermission(x.vdxfkey, x.data)) : challenge.requested_access;
         this.requested_access_audience = challenge.requested_access_audience;
         this.subject = challenge.subject
             ? challenge.subject.map((x) => new Subject(x.data, x.vdxfkey))
@@ -145,7 +102,7 @@ class Challenge extends __1.VDXFObject {
         const _subject = this.subject ? this.subject : [];
         const _provisioning_info = this.provisioning_info ? this.provisioning_info : [];
         const _alt_auth_factors = [];
-        const _attestations = this.attestations ? this.attestations : [];
+        const _attestations = [];
         const _redirect_uris = this.redirect_uris ? this.redirect_uris : [];
         const _context = this.context ? this.context : new Context_1.Context({});
         length += _challenge_id.byteLength();
@@ -188,7 +145,7 @@ class Challenge extends __1.VDXFObject {
         const _subject = this.subject ? this.subject : [];
         const _provisioning_info = this.provisioning_info ? this.provisioning_info : [];
         const _alt_auth_factors = [];
-        const _attestations = this.attestations ? this.attestations : [];
+        const _attestations = [];
         const _redirect_uris = this.redirect_uris ? this.redirect_uris : [];
         const _context = this.context ? this.context : new Context_1.Context({});
         writer.writeSlice(_challenge_id.toBuffer());
@@ -230,8 +187,7 @@ class Challenge extends __1.VDXFObject {
                 this.requested_access = [];
                 const requestedAccessLength = reader.readCompactSize();
                 for (let i = 0; i < requestedAccessLength; i++) {
-                    const _vdxfkey = (0, address_1.toBase58Check)(reader.buffer.slice(reader.offset, reader.offset + vdxf_1.HASH160_BYTE_LENGTH), vdxf_1.I_ADDR_VERSION);
-                    const _perm = new RequestedPermission("", _vdxfkey);
+                    const _perm = new RequestedPermission();
                     reader.offset = _perm.fromBuffer(reader.buffer, reader.offset);
                     this.requested_access.push(_perm);
                 }
@@ -261,10 +217,8 @@ class Challenge extends __1.VDXFObject {
                 }
                 this.attestations = [];
                 const attestationsLength = reader.readCompactSize();
-                for (let i = 0; i < attestationsLength; i++) {
-                    const _att = new Attestation_1.Attestation();
-                    reader.offset = _att.fromBuffer(reader.buffer, reader.offset);
-                    this.attestations.push(_att);
+                if (attestationsLength > 0) {
+                    throw new Error("Attestations currently unsupported");
                 }
                 this.redirect_uris = [];
                 const urisLength = reader.readCompactSize();
@@ -302,108 +256,47 @@ class Challenge extends __1.VDXFObject {
     }
 }
 exports.Challenge = Challenge;
-class AttestationRequest extends __1.VDXFObject {
+class RequestedPermission extends __1.VDXFObject {
+    constructor(vdxfkey, data) {
+        super(vdxfkey);
+        if (data && data.length > 0) {
+            if (data[0] instanceof Hash160_1.Hash160) {
+                this.data = data;
+            }
+            else {
+                this.data = data.map((x) => new Hash160_1.Hash160((0, address_1.fromBase58Check)(x).hash));
+            }
+        }
+        else {
+            this.data = [];
+        }
+    }
     dataByteLength() {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
         let length = 0;
-        length += varuint_1.default.encodingLength((_b = (_a = this.data.accepted_attestors) === null || _a === void 0 ? void 0 : _a.length) !== null && _b !== void 0 ? _b : 0);
-        length += (_d = (_c = this.data.accepted_attestors) === null || _c === void 0 ? void 0 : _c.reduce((sum, current) => sum + current.byteLength(), 0)) !== null && _d !== void 0 ? _d : 0;
-        length += varuint_1.default.encodingLength((_f = (_e = this.data.attestation_keys) === null || _e === void 0 ? void 0 : _e.length) !== null && _f !== void 0 ? _f : 0);
-        length += (_h = (_g = this.data.attestation_keys) === null || _g === void 0 ? void 0 : _g.reduce((sum, current) => sum + current.byteLength(), 0)) !== null && _h !== void 0 ? _h : 0;
-        length += varuint_1.default.encodingLength((_k = (_j = this.data.attestor_filters) === null || _j === void 0 ? void 0 : _j.length) !== null && _k !== void 0 ? _k : 0);
-        length += (_m = (_l = this.data.attestor_filters) === null || _l === void 0 ? void 0 : _l.reduce((sum, current) => sum + current.byteLength(), 0)) !== null && _m !== void 0 ? _m : 0;
+        length += varuint_1.default.encodingLength(this.data.length);
+        for (let i = 0; i < this.data.length; i++) {
+            length += 20;
+        }
         return length;
     }
     toDataBuffer() {
-        const writer = new bufferutils_1.default.BufferWriter(Buffer.alloc(this.dataByteLength()));
-        writer.writeArray(this.data.accepted_attestors.map((x) => x.toBuffer()));
-        writer.writeArray(this.data.attestation_keys.map((x) => x.toBuffer()));
-        writer.writeArray(this.data.attestor_filters.map((x) => x.toBuffer()));
+        const buffer = Buffer.alloc(this.dataByteLength());
+        const writer = new bufferutils_1.default.BufferWriter(buffer);
+        writer.writeCompactSize(this.data.length);
+        for (let i = 0; i < this.data.length; i++) {
+            writer.writeSlice(this.data[i].toBuffer());
+        }
         return writer.buffer;
     }
     fromDataBuffer(buffer, offset) {
         const reader = new bufferutils_1.default.BufferReader(buffer, offset);
-        reader.readVarInt(); //skip data length
-        function readHash160Array(arr) {
-            const length = reader.readVarInt();
-            for (let i = 0; i < length.toNumber(); i++) {
-                const member = new Hash160_1.Hash160();
-                reader.offset = member.fromBuffer(reader.buffer, false, reader.offset);
-                arr.push(member);
-            }
-            if (length.toNumber() === 0)
-                arr = [];
+        const contextLength = reader.readCompactSize();
+        const numKeys = reader.readCompactSize();
+        this.data = [];
+        for (let i = 0; i < numKeys; i++) {
+            this.data.push(new Hash160_1.Hash160(reader.readSlice(20)));
         }
-        readHash160Array(this.data.accepted_attestors);
-        readHash160Array(this.data.attestation_keys);
-        readHash160Array(this.data.attestor_filters);
         return reader.offset;
-    }
-    static initializeData(data) {
-        var retData;
-        if (typeof data === 'object') {
-            retData = {
-                accepted_attestors: (data.accepted_attestors || []).map((x) => typeof x === 'string' ? Hash160_1.Hash160.fromAddress(x) : x),
-                attestation_keys: (data.attestation_keys || []).map((x) => typeof x === 'string' ? Hash160_1.Hash160.fromAddress(x) : x),
-                attestor_filters: (data.attestor_filters || []).map((x) => typeof x === 'string' ? Hash160_1.Hash160.fromAddress(x) : x)
-            };
-        }
-        else {
-            retData = {
-                accepted_attestors: [],
-                attestation_keys: [],
-                attestor_filters: []
-            };
-        }
-        return retData;
-    }
-    toJson() {
-        const { accepted_attestors, attestation_keys, attestor_filters } = this.data;
-        return {
-            vdxfkey: this.vdxfkey,
-            data: {
-                accepted_attestors: (accepted_attestors === null || accepted_attestors === void 0 ? void 0 : accepted_attestors.map((x) => x.toAddress())) || [],
-                attestation_keys: (attestation_keys === null || attestation_keys === void 0 ? void 0 : attestation_keys.map((x) => x.toAddress())) || [],
-                attestor_filters: (attestor_filters === null || attestor_filters === void 0 ? void 0 : attestor_filters.map((x) => x.toAddress())) || []
-            }
-        };
-    }
-}
-exports.AttestationRequest = AttestationRequest;
-class RequestedPermission extends __1.VDXFObject {
-    constructor(data = "", vdxfkey = "") {
-        super(vdxfkey);
-        if (vdxfkey)
-            this.addPrototypes(data);
-    }
-    addPrototypes(data) {
-        var classType;
-        switch (this.vdxfkey) {
-            case __1.ATTESTATION_READ_REQUEST.vdxfid:
-                classType = AttestationRequest;
-                this.data = AttestationRequest.initializeData(data);
-                break;
-            case __1.IDENTITY_AGREEMENT.vdxfid:
-                classType = index_1.BufferDataVdxfObject;
-                this.data = data;
-                this.encoding = "utf-8";
-                break;
-            case __1.IDENTITY_VIEW.vdxfid:
-                classType = index_1.BufferDataVdxfObject;
-                this.data = data;
-                this.encoding = "utf-8";
-                break;
-            default:
-                throw new Error("Invalid vdxfkey");
-        }
-        const prototypes = ['dataByteLength', 'toDataBuffer', 'fromDataBuffer', 'toJson'];
-        prototypes.forEach(name => {
-            Object.defineProperty(this, name, Object.getOwnPropertyDescriptor(classType.prototype, name));
-        });
-    }
-    fromDataBuffer(buffer, offset) {
-        this.addPrototypes("");
-        return this.fromDataBuffer(buffer, offset);
     }
 }
 exports.RequestedPermission = RequestedPermission;
