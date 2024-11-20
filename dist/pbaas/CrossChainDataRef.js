@@ -45,12 +45,19 @@ class CrossChainDataRef {
             this.ref = new URLRef_1.URLRef();
         }
         offset = this.ref.fromBuffer(buffer, reader.offset);
-        return reader.offset;
+        return offset;
     }
     isValid() {
-        return (typeof (this.ref) == typeof (PBaaSEvidenceRef_1.PBaaSEvidenceRef) && this.ref.isValid()) ||
-            (typeof (this.ref) == typeof (IdentityMultimapRef_1.IdentityMultimapRef) && this.ref.isValid()) ||
-            (typeof (this.ref) == typeof (URLRef_1.URLRef) && this.ref.isValid());
+        switch (this.which()) {
+            case CrossChainDataRef.TYPE_CROSSCHAIN_DATAREF:
+                return this.ref.isValid();
+            case CrossChainDataRef.TYPE_IDENTITY_DATAREF:
+                return this.ref.isValid();
+            case CrossChainDataRef.TYPE_URL_REF:
+                return this.ref.isValid();
+            default:
+                return false;
+        }
     }
     toJson() {
         return Object.assign(Object.assign({}, this.ref.toJson()), { type: this.which() });

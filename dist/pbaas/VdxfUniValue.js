@@ -282,7 +282,7 @@ class VdxfUniValue {
                 let objSize = 0;
                 checkVal = (0, address_1.toBase58Check)(reader.readSlice(vdxf_1.HASH160_BYTE_LENGTH), vdxf_1.I_ADDR_VERSION);
                 if (checkVal == VDXF_Data.DataCurrencyMapKey.vdxfid) {
-                    const oneCurrencyMap = new CurrencyValueMap_1.CurrencyValueMap();
+                    const oneCurrencyMap = new CurrencyValueMap_1.CurrencyValueMap({ multivalue: true });
                     version = reader.readVarInt();
                     objSize = reader.readCompactSize();
                     reader.offset = oneCurrencyMap.fromBuffer(reader.buffer, reader.offset);

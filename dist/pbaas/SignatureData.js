@@ -36,10 +36,10 @@ class SignatureData {
             signatureData.identity_ID = data.identityid;
             signatureData.sig_type = new bn_js_1.BN(data.signaturetype);
             if (signatureData.hash_type == new bn_js_1.BN(DataDescriptor_1.EHashTypes.HASH_SHA256)) {
-                signatureData.signature_hash = Buffer.from(data.signaturehash, 'hex').reverse();
+                signatureData.signature_hash = Buffer.from(data.signaturehash, 'hex');
             }
             else {
-                signatureData.signature_hash = Buffer.from(data.signaturehash, 'hex');
+                signatureData.signature_hash = Buffer.from(data.signaturehash, 'hex').reverse();
             }
             signatureData.signature_as_vch = Buffer.from(data.signature, 'base64');
             signatureData.vdxf_keys = data.vdxfkeys || [];

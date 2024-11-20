@@ -5,7 +5,9 @@ import { SerializableEntity } from '../utils/types/SerializableEntity';
 export interface RatingJson {
     version: number;
     trustlevel: number;
-    ratings: Map<string, string>;
+    ratingsmap: {
+        [key: string]: string;
+    };
 }
 export declare class Rating implements SerializableEntity {
     static VERSION_INVALID: import("bn.js");

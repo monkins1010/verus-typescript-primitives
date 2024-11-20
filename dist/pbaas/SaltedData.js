@@ -18,6 +18,7 @@ class SaltedData extends index_1.VDXFData {
             this.salt = salt;
         }
         this.vdxfkey = vdxfdatakeys_1.SaltedDataKey.vdxfid;
+        this.version = SaltedData.DEFAULT_VERSION;
     }
     static fromJson(data) {
         const saltedData = new SaltedData();

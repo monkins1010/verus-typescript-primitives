@@ -19,5 +19,5 @@ export declare class CurrencyValueMap implements SerializableEntity {
     };
     static fromJson(data: {
         [key: string]: string;
-    }): CurrencyValueMap;
+    }, multivalue?: boolean): CurrencyValueMap;
 }
