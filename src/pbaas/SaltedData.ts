@@ -27,6 +27,7 @@ export class SaltedData extends VDXFData {
             this.salt = salt;
         }
         this.vdxfkey = SaltedDataKey.vdxfid;
+        this.version = SaltedData.DEFAULT_VERSION;
 
     }
 
