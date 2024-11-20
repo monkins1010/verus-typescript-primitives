@@ -381,4 +381,32 @@ describe('Serializes and deserializes identity properly', () => {
     expect(() => identity_frombuf.upgradeVersion(Identity.VERSION_VERUSID)).toThrowError();
     expect(() => identity_frombuf.upgradeVersion(new BN(10))).toThrowError();
   });
+  test('clear ID contentmultimap', async () => {
+    const identityJson = {
+      "flags": 0,
+      "identityaddress": "iPsFBfFoCcxtuZNzE8yxPQhXVn4dmytf8j",
+      "minimumsignatures": 1,
+      "name": "Chris",
+      "parent": "iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq",
+      "primaryaddresses": [
+        "RKjVHqM4VF2pCfVcwGzKH7CxvfMUE4H6o8"
+      ],
+      "recoveryauthority": "iPsFBfFoCcxtuZNzE8yxPQhXVn4dmytf8j",
+      "revocationauthority": "iPsFBfFoCcxtuZNzE8yxPQhXVn4dmytf8j",
+      "timelock": 0,
+      "version": Identity.VERSION_VERUSID.toNumber(),
+      "privateaddress": "zs1wczplx4kegw32h8g0f7xwl57p5tvnprwdmnzmdnsw50chcl26f7tws92wk2ap03ykaq6jyyztfa"
+    };
+
+    const identity_frombuf = Identity.fromJson(identityJson);
+
+    identity_frombuf.clearContentMultiMap();
+
+    const identity_buf = identity_frombuf.toBuffer();
+
+    const identity_to_json = new Identity();
+    identity_to_json.fromBuffer(identity_buf);
+
+    expect(identity_frombuf.content_multimap.kv_content.size).toBe(0);
+  });
 });

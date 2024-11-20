@@ -76,7 +76,7 @@ export class CurrencyValueMap implements SerializableEntity {
 
     return reader.offset;
   }
-
+  
   isValid():boolean
   {
     for (let [key, value]  of this.value_map)
@@ -98,5 +98,15 @@ export class CurrencyValueMap implements SerializableEntity {
 
     return value_map;
 
+  }
+
+  static fromJson(data: {[key: string]: string}, multivalue: boolean = false): CurrencyValueMap {
+    const value_map = new Map<string,BigNumber>();
+
+    for (let key in data) {
+      value_map.set(key, new BN(data[key]))
+    }
+
+    return new CurrencyValueMap({ value_map, multivalue })
   }
 }

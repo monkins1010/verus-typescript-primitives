@@ -16,7 +16,7 @@ class Rating {
     getByteLength() {
         let byteLength = 0;
         byteLength += 4; // version uint32
-        byteLength + 1; // trust_level uint8
+        byteLength += 1; // trust_level uint8
         byteLength += varuint_1.default.encodingLength(this.ratings.size);
         for (const [key, value] of this.ratings) {
             byteLength += 20;
@@ -67,8 +67,8 @@ class Rating {
     }
     static fromJson(json) {
         const ratings = new Map();
-        for (const key in json.ratings) {
-            ratings.set(key, Buffer.from(json.ratings[key], 'hex'));
+        for (const key in json.ratingsmap) {
+            ratings.set(key, Buffer.from(json.ratingsmap[key], 'hex'));
         }
         return new Rating({
             version: new bn_js_1.BN(json.version),

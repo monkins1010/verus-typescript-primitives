@@ -28,6 +28,7 @@ __exportStar(require("./utils/varuint"), exports);
 __exportStar(require("./utils/ops"), exports);
 __exportStar(require("./utils/evals"), exports);
 __exportStar(require("./utils/script"), exports);
+__exportStar(require("./utils/cccustom"), exports);
 __exportStar(require("./pbaas/index"), exports);
 __exportStar(require("./identity/IdentityDefinition"), exports);
 __exportStar(require("./currency/CurrencyDefinition"), exports);

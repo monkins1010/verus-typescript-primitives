@@ -85,6 +85,9 @@ class Identity extends Principal_1.Principal {
         }
         return length;
     }
+    clearContentMultiMap() {
+        this.content_multimap = new ContentMultiMap_1.ContentMultiMap({ kv_content: new Map() });
+    }
     toBuffer() {
         const writer = new BufferWriter(Buffer.alloc(this.getByteLength()));
         writer.writeSlice(super.toBuffer());

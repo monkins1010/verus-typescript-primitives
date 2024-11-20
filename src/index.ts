@@ -13,6 +13,7 @@ export * from './utils/varuint'
 export * from './utils/ops'
 export * from './utils/evals'
 export * from './utils/script'
+export * from './utils/cccustom'
 
 export * from './pbaas/index'
 

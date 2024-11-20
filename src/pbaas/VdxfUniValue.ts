@@ -350,7 +350,7 @@ export class VdxfUniValue implements SerializableEntity {
         checkVal = toBase58Check(reader.readSlice(HASH160_BYTE_LENGTH), I_ADDR_VERSION);
 
         if (checkVal == VDXF_Data.DataCurrencyMapKey.vdxfid) {
-          const oneCurrencyMap = new CurrencyValueMap();
+          const oneCurrencyMap = new CurrencyValueMap({multivalue:true});
           version = reader.readVarInt();
           objSize = reader.readCompactSize();
           reader.offset = oneCurrencyMap.fromBuffer(reader.buffer, reader.offset);
