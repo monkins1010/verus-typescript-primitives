@@ -100,13 +100,13 @@ export class CurrencyValueMap implements SerializableEntity {
 
   }
 
-  static fromJson(data: {[key: string]: string}): CurrencyValueMap {
+  static fromJson(data: {[key: string]: string}, multivalue: boolean = false): CurrencyValueMap {
     const value_map = new Map<string,BigNumber>();
 
     for (let key in data) {
       value_map.set(key, new BN(data[key]))
     }
 
-    return new CurrencyValueMap({ value_map })
+    return new CurrencyValueMap({ value_map, multivalue })
   }
 }

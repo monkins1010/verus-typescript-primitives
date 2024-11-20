@@ -72,9 +72,9 @@ export class SignatureData implements SerializableEntity {
       signatureData.sig_type = new BN(data.signaturetype);
 
       if (signatureData.hash_type == new BN(EHashTypes.HASH_SHA256)) {
-        signatureData.signature_hash = Buffer.from(data.signaturehash, 'hex').reverse();
-      } else {
         signatureData.signature_hash = Buffer.from(data.signaturehash, 'hex');
+      } else {
+        signatureData.signature_hash = Buffer.from(data.signaturehash, 'hex').reverse();
       }
 
       signatureData.signature_as_vch = Buffer.from(data.signature, 'base64');

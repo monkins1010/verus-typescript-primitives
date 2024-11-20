@@ -61,9 +61,9 @@ describe('Encodes and decodes VdxfUniValue', () => {
     expect(jsonRating.toBuffer().toString('hex')).toBe(extractedRating.toBuffer().toString('hex'));
   });
 
-  const multimapwithCurrencymap = "c98f1f7e5804ec1b180192f87125aefcc270db25011d011af5b8015c64d39ab44c60ead8317f9f5a9b6c4c"
+  const multimapwithCurrencymap = "c98f1f7e5804ec1b180192f87125aefcc270db25011d011af5b8015c64d39ab44c60ead8317f9f5a9b6c4c00a0724e1809000000f478f668655"
 
-  const multimapwithcrosschaindataref = "d6ae5ac0571b22d161261b87c748f6e0aee0334d011302"
+  const multimapwithcrosschaindataref = "d6ae5ac0571b22d161261b87c748f6e0aee0334d011302011068747470733a2f2f76657275732e696f"
 
   const multimapwithsignaturedata = "2af2a488d317c76af6f764ec2c04009a9e358bb4019901a6ef9ea235635e328124ff3429db9f9e91b64e2d0120b793323968ea80de4df1fb78963cfb8b604b524f6a7c9069293085e076f44d5df478f668655e60f6b49e2424053166ba2cf2413901000000490205d65f00000141205e483e50265341623cd9a089baf4b913f969b5377d588044c09b7d239870d7f7205a4a4581f440db7d01049ebdfe95f5de7a6b07113f9c7f79dc6fd3da69f245"
 
@@ -75,8 +75,8 @@ describe('Encodes and decodes VdxfUniValue', () => {
 
     const currencyMap = v.values.get('iMrGhzkZq5fpWWSa1RambRySFPb7CuvKuX') as CurrencyValueMap;
 
-    const jsonCurrencyMap = {"i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV":"100000"};
-    const currencyMapFromJson = CurrencyValueMap.fromJson(jsonCurrencyMap);
+    const jsonCurrencyMap = {"i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV":"10000000000000"};
+    const currencyMapFromJson = CurrencyValueMap.fromJson(jsonCurrencyMap, true);
 
     expect(currencyMap.toBuffer().toString('hex')).toBe(currencyMapFromJson.toBuffer().toString('hex'));
   });

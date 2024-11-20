@@ -65,13 +65,21 @@ export class CrossChainDataRef implements SerializableEntity {
     }
 
     offset = this.ref.fromBuffer(buffer, reader.offset);
-    return reader.offset;
+    return offset;
   }
 
   isValid(): boolean {
-    return (typeof (this.ref) == typeof (PBaaSEvidenceRef) && this.ref.isValid()) ||
-      (typeof (this.ref) == typeof (IdentityMultimapRef) && this.ref.isValid()) ||
-      (typeof (this.ref) == typeof (URLRef) && this.ref.isValid());
+
+    switch (this.which()) {
+      case CrossChainDataRef.TYPE_CROSSCHAIN_DATAREF:
+        return this.ref.isValid();
+      case CrossChainDataRef.TYPE_IDENTITY_DATAREF:
+        return this.ref.isValid();
+      case CrossChainDataRef.TYPE_URL_REF:
+        return this.ref.isValid();
+      default:
+        return false;
+    }
   }
 
   toJson() {
