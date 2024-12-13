@@ -1,22 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PartialIdentity = exports.PARTIAL_ID_CONTAINS_FLAGS = exports.PARTIAL_ID_CONTAINS_MINSIGS = exports.PARTIAL_ID_CONTAINS_CONTENT_MAP = exports.PARTIAL_ID_CONTAINS_PRIV_ADDRS = exports.PARTIAL_ID_CONTAINS_SYSTEM_ID = exports.PARTIAL_ID_CONTAINS_UNLOCK_AFTER = exports.PARTIAL_ID_CONTAINS_RECOVERY = exports.PARTIAL_ID_CONTAINS_REVOCATION = exports.PARTIAL_ID_CONTAINS_PRIMARY_ADDRS = exports.PARTIAL_ID_CONTAINS_CONTENT_MULTIMAP = exports.PARTIAL_ID_CONTAINS_PARENT = void 0;
+exports.PartialIdentity = void 0;
 const Identity_1 = require("./Identity");
 const bn_js_1 = require("bn.js");
 const varint_1 = require("../utils/varint");
 const bufferutils_1 = require("../utils/bufferutils");
 const { BufferReader, BufferWriter } = bufferutils_1.default;
-exports.PARTIAL_ID_CONTAINS_PARENT = new bn_js_1.BN("1", 10);
-exports.PARTIAL_ID_CONTAINS_CONTENT_MULTIMAP = new bn_js_1.BN("2", 10);
-exports.PARTIAL_ID_CONTAINS_PRIMARY_ADDRS = new bn_js_1.BN("4", 10);
-exports.PARTIAL_ID_CONTAINS_REVOCATION = new bn_js_1.BN("8", 10);
-exports.PARTIAL_ID_CONTAINS_RECOVERY = new bn_js_1.BN("16", 10);
-exports.PARTIAL_ID_CONTAINS_UNLOCK_AFTER = new bn_js_1.BN("32", 10);
-exports.PARTIAL_ID_CONTAINS_SYSTEM_ID = new bn_js_1.BN("64", 10);
-exports.PARTIAL_ID_CONTAINS_PRIV_ADDRS = new bn_js_1.BN("128", 10);
-exports.PARTIAL_ID_CONTAINS_CONTENT_MAP = new bn_js_1.BN("256", 10);
-exports.PARTIAL_ID_CONTAINS_MINSIGS = new bn_js_1.BN("512", 10);
-exports.PARTIAL_ID_CONTAINS_FLAGS = new bn_js_1.BN("1024", 10);
 class PartialIdentity extends Identity_1.Identity {
     constructor(data) {
         super(data);
@@ -45,84 +34,70 @@ class PartialIdentity extends Identity_1.Identity {
             this.toggleContainsPrimaryAddresses();
     }
     serializeFlags() {
-        return !!(this.contains.and(exports.PARTIAL_ID_CONTAINS_FLAGS).toNumber());
+        return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_FLAGS).toNumber());
     }
     serializePrimaryAddresses() {
-        return !!(this.contains.and(exports.PARTIAL_ID_CONTAINS_PRIMARY_ADDRS).toNumber());
+        return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_PRIMARY_ADDRS).toNumber());
     }
     serializeMinSigs() {
-        return !!(this.contains.and(exports.PARTIAL_ID_CONTAINS_MINSIGS).toNumber());
+        return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_MINSIGS).toNumber());
     }
     serializeParent() {
-        return !!(this.contains.and(exports.PARTIAL_ID_CONTAINS_PARENT).toNumber());
+        return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_PARENT).toNumber());
     }
     serializeSystemId() {
-        return !!(this.contains.and(exports.PARTIAL_ID_CONTAINS_SYSTEM_ID).toNumber());
+        return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_SYSTEM_ID).toNumber());
     }
     serializeContentMap() {
-        return !!(this.contains.and(exports.PARTIAL_ID_CONTAINS_CONTENT_MAP).toNumber());
+        return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_CONTENT_MAP).toNumber());
     }
     serializeContentMultiMap() {
-        return !!(this.contains.and(exports.PARTIAL_ID_CONTAINS_CONTENT_MULTIMAP).toNumber());
+        return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_CONTENT_MULTIMAP).toNumber());
     }
     serializeRevocation() {
-        return !!(this.contains.and(exports.PARTIAL_ID_CONTAINS_REVOCATION).toNumber());
+        return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_REVOCATION).toNumber());
     }
     serializeRecovery() {
-        return !!(this.contains.and(exports.PARTIAL_ID_CONTAINS_RECOVERY).toNumber());
+        return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_RECOVERY).toNumber());
     }
     serializePrivateAddresses() {
-        return !!(this.contains.and(exports.PARTIAL_ID_CONTAINS_PRIV_ADDRS).toNumber());
+        return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_PRIV_ADDRS).toNumber());
     }
     serializeUnlockAfter() {
-        return !!(this.contains.and(exports.PARTIAL_ID_CONTAINS_UNLOCK_AFTER).toNumber());
+        return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_UNLOCK_AFTER).toNumber());
     }
     toggleContainsParent() {
-        this.contains = this.contains.xor(exports.PARTIAL_ID_CONTAINS_PARENT);
+        this.contains = this.contains.xor(PartialIdentity.PARTIAL_ID_CONTAINS_PARENT);
     }
     toggleContainsSystemId() {
-        this.contains = this.contains.xor(exports.PARTIAL_ID_CONTAINS_SYSTEM_ID);
+        this.contains = this.contains.xor(PartialIdentity.PARTIAL_ID_CONTAINS_SYSTEM_ID);
     }
     toggleContainsContentMap() {
-        this.contains = this.contains.xor(exports.PARTIAL_ID_CONTAINS_CONTENT_MAP);
+        this.contains = this.contains.xor(PartialIdentity.PARTIAL_ID_CONTAINS_CONTENT_MAP);
     }
     toggleContainsContentMultiMap() {
-        this.contains = this.contains.xor(exports.PARTIAL_ID_CONTAINS_CONTENT_MULTIMAP);
+        this.contains = this.contains.xor(PartialIdentity.PARTIAL_ID_CONTAINS_CONTENT_MULTIMAP);
     }
     toggleContainsRevocation() {
-        this.contains = this.contains.xor(exports.PARTIAL_ID_CONTAINS_REVOCATION);
+        this.contains = this.contains.xor(PartialIdentity.PARTIAL_ID_CONTAINS_REVOCATION);
     }
     toggleContainsRecovery() {
-        this.contains = this.contains.xor(exports.PARTIAL_ID_CONTAINS_RECOVERY);
+        this.contains = this.contains.xor(PartialIdentity.PARTIAL_ID_CONTAINS_RECOVERY);
     }
     toggleContainsPrivateAddresses() {
-        this.contains = this.contains.xor(exports.PARTIAL_ID_CONTAINS_PRIV_ADDRS);
+        this.contains = this.contains.xor(PartialIdentity.PARTIAL_ID_CONTAINS_PRIV_ADDRS);
     }
     toggleContainsUnlockAfter() {
-        this.contains = this.contains.xor(exports.PARTIAL_ID_CONTAINS_UNLOCK_AFTER);
+        this.contains = this.contains.xor(PartialIdentity.PARTIAL_ID_CONTAINS_UNLOCK_AFTER);
     }
     toggleContainsFlags() {
-        this.contains = this.contains.xor(exports.PARTIAL_ID_CONTAINS_FLAGS);
+        this.contains = this.contains.xor(PartialIdentity.PARTIAL_ID_CONTAINS_FLAGS);
     }
     toggleContainsMinSigs() {
-        this.contains = this.contains.xor(exports.PARTIAL_ID_CONTAINS_MINSIGS);
+        this.contains = this.contains.xor(PartialIdentity.PARTIAL_ID_CONTAINS_MINSIGS);
     }
     toggleContainsPrimaryAddresses() {
-        this.contains = this.contains.xor(exports.PARTIAL_ID_CONTAINS_PRIMARY_ADDRS);
-    }
-    // Function to toggle all flags
-    toggleAllContains() {
-        this.toggleContainsParent();
-        this.toggleContainsSystemId();
-        this.toggleContainsContentMap();
-        this.toggleContainsContentMultiMap();
-        this.toggleContainsRevocation();
-        this.toggleContainsRecovery();
-        this.toggleContainsPrivateAddresses();
-        this.toggleContainsUnlockAfter();
-        this.toggleContainsFlags();
-        this.toggleContainsMinSigs();
-        this.toggleContainsPrimaryAddresses();
+        this.contains = this.contains.xor(PartialIdentity.PARTIAL_ID_CONTAINS_PRIMARY_ADDRS);
     }
     getPartialIdentityByteLength() {
         let length = 0;
@@ -147,3 +122,14 @@ class PartialIdentity extends Identity_1.Identity {
     }
 }
 exports.PartialIdentity = PartialIdentity;
+PartialIdentity.PARTIAL_ID_CONTAINS_PARENT = new bn_js_1.BN("1", 10);
+PartialIdentity.PARTIAL_ID_CONTAINS_CONTENT_MULTIMAP = new bn_js_1.BN("2", 10);
+PartialIdentity.PARTIAL_ID_CONTAINS_PRIMARY_ADDRS = new bn_js_1.BN("4", 10);
+PartialIdentity.PARTIAL_ID_CONTAINS_REVOCATION = new bn_js_1.BN("8", 10);
+PartialIdentity.PARTIAL_ID_CONTAINS_RECOVERY = new bn_js_1.BN("16", 10);
+PartialIdentity.PARTIAL_ID_CONTAINS_UNLOCK_AFTER = new bn_js_1.BN("32", 10);
+PartialIdentity.PARTIAL_ID_CONTAINS_SYSTEM_ID = new bn_js_1.BN("64", 10);
+PartialIdentity.PARTIAL_ID_CONTAINS_PRIV_ADDRS = new bn_js_1.BN("128", 10);
+PartialIdentity.PARTIAL_ID_CONTAINS_CONTENT_MAP = new bn_js_1.BN("256", 10);
+PartialIdentity.PARTIAL_ID_CONTAINS_MINSIGS = new bn_js_1.BN("512", 10);
+PartialIdentity.PARTIAL_ID_CONTAINS_FLAGS = new bn_js_1.BN("1024", 10);

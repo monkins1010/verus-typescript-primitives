@@ -3,19 +3,19 @@
 import { BigNumber } from '../utils/types/BigNumber';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
 import { Identity, VerusIDInitData } from './Identity';
-export declare const PARTIAL_ID_CONTAINS_PARENT: import("bn.js");
-export declare const PARTIAL_ID_CONTAINS_CONTENT_MULTIMAP: import("bn.js");
-export declare const PARTIAL_ID_CONTAINS_PRIMARY_ADDRS: import("bn.js");
-export declare const PARTIAL_ID_CONTAINS_REVOCATION: import("bn.js");
-export declare const PARTIAL_ID_CONTAINS_RECOVERY: import("bn.js");
-export declare const PARTIAL_ID_CONTAINS_UNLOCK_AFTER: import("bn.js");
-export declare const PARTIAL_ID_CONTAINS_SYSTEM_ID: import("bn.js");
-export declare const PARTIAL_ID_CONTAINS_PRIV_ADDRS: import("bn.js");
-export declare const PARTIAL_ID_CONTAINS_CONTENT_MAP: import("bn.js");
-export declare const PARTIAL_ID_CONTAINS_MINSIGS: import("bn.js");
-export declare const PARTIAL_ID_CONTAINS_FLAGS: import("bn.js");
 export declare class PartialIdentity extends Identity implements SerializableEntity {
     contains: BigNumber;
+    static PARTIAL_ID_CONTAINS_PARENT: import("bn.js");
+    static PARTIAL_ID_CONTAINS_CONTENT_MULTIMAP: import("bn.js");
+    static PARTIAL_ID_CONTAINS_PRIMARY_ADDRS: import("bn.js");
+    static PARTIAL_ID_CONTAINS_REVOCATION: import("bn.js");
+    static PARTIAL_ID_CONTAINS_RECOVERY: import("bn.js");
+    static PARTIAL_ID_CONTAINS_UNLOCK_AFTER: import("bn.js");
+    static PARTIAL_ID_CONTAINS_SYSTEM_ID: import("bn.js");
+    static PARTIAL_ID_CONTAINS_PRIV_ADDRS: import("bn.js");
+    static PARTIAL_ID_CONTAINS_CONTENT_MAP: import("bn.js");
+    static PARTIAL_ID_CONTAINS_MINSIGS: import("bn.js");
+    static PARTIAL_ID_CONTAINS_FLAGS: import("bn.js");
     constructor(data?: VerusIDInitData);
     protected serializeFlags(): boolean;
     protected serializePrimaryAddresses(): boolean;
@@ -39,7 +39,6 @@ export declare class PartialIdentity extends Identity implements SerializableEnt
     private toggleContainsFlags;
     private toggleContainsMinSigs;
     private toggleContainsPrimaryAddresses;
-    toggleAllContains(): void;
     private getPartialIdentityByteLength;
     getByteLength(): number;
     fromBuffer(buffer: Buffer, offset?: number, parseVdxfObjects?: boolean): number;
