@@ -436,3 +436,15 @@ export const CurrencyStartNotarizationKey: VDXFKeyInterface = {
     "name": "vrsc::system.currency.startnotarization"
   }
 }
+
+export const EvidenceDataKeyName = "vrsc::system.crosschain.evidencedata";
+
+export const EvidenceDataKey: VDXFKeyInterface = {
+  "vdxfid": "i6ZGLNfqu4cQ3h98VHimETwnWtizMwCJw6",
+  "indexid": "xBPNoB6vkNq4fs2ALyNvCrUKYYk1FFK2fs",
+  "hash160result": "3dd00f6451974c99a3190f430cce5b788ddacd21",
+  "qualifiedname": {
+    "namespace": "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV",
+    "name": "vrsc::system.crosschain.evidencedata"
+  }
+}
