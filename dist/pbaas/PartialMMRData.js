@@ -5,12 +5,13 @@ const bn_js_1 = require("bn.js");
 const varint_1 = require("../utils/varint");
 const bufferutils_1 = require("../utils/bufferutils");
 const varuint_1 = require("../utils/varuint");
+const pbaas_1 = require("../constants/pbaas");
 const { BufferReader, BufferWriter } = bufferutils_1.default;
 class PartialMMRData {
     constructor(data) {
         this.flags = data && data.flags ? data.flags : new bn_js_1.BN("0");
         this.data = data && data.data ? data.data : [];
-        this.hashtype = data && data.hashtype ? data.hashtype : PartialMMRData.DEFAULT_HASH_TYPE;
+        this.mmrhashtype = data && data.mmrhashtype ? data.mmrhashtype : pbaas_1.DEFAULT_HASH_TYPE;
         if (data === null || data === void 0 ? void 0 : data.salt) {
             this.toggleContainsSalt();
             this.salt = data.salt;
@@ -42,7 +43,7 @@ class PartialMMRData {
             length += varuint_1.default.encodingLength(unit.data.length);
             length += unit.data.length;
         }
-        length += varint_1.default.encodingLength(this.hashtype);
+        length += varint_1.default.encodingLength(this.mmrhashtype);
         if (this.serializeSalt()) {
             length += varuint_1.default.encodingLength(this.salt.length);
             for (let i = 0; i < this.salt.length; i++) {
@@ -76,7 +77,7 @@ class PartialMMRData {
                 data
             });
         }
-        this.hashtype = reader.readVarInt();
+        this.mmrhashtype = reader.readVarInt();
         if (this.serializeSalt()) {
             this.salt = reader.readVector();
         }
@@ -94,7 +95,7 @@ class PartialMMRData {
             writer.writeVarInt(this.data[i].type);
             writer.writeVarSlice(this.data[i].data);
         }
-        writer.writeVarInt(this.hashtype);
+        writer.writeVarInt(this.mmrhashtype);
         if (this.serializeSalt()) {
             writer.writeVector(this.salt);
         }
@@ -107,17 +108,3 @@ class PartialMMRData {
 exports.PartialMMRData = PartialMMRData;
 PartialMMRData.CONTAINS_SALT = new bn_js_1.BN("1", 10);
 PartialMMRData.CONTAINS_PRIORMMR = new bn_js_1.BN("2", 10);
-// "1" is omitted to avoid overloading DATA_TYPE_MMRDATA in PartialSignData
-PartialMMRData.DATA_TYPE_UNKNOWN = new bn_js_1.BN("0", 10);
-PartialMMRData.DATA_TYPE_FILENAME = new bn_js_1.BN("2", 10);
-PartialMMRData.DATA_TYPE_MESSAGE = new bn_js_1.BN("3", 10);
-PartialMMRData.DATA_TYPE_VDXFDATA = new bn_js_1.BN("4", 10);
-PartialMMRData.DATA_TYPE_SERIALIZEDHEX = new bn_js_1.BN("5", 10);
-PartialMMRData.DATA_TYPE_SERIALIZEDBASE64 = new bn_js_1.BN("6", 10);
-PartialMMRData.DATA_TYPE_DATAHASH = new bn_js_1.BN("7", 10);
-PartialMMRData.DATA_TYPE_RAWSTRINGDATA = new bn_js_1.BN("8", 10);
-PartialMMRData.HASH_TYPE_SHA256 = new bn_js_1.BN("1", 10);
-PartialMMRData.HASH_TYPE_SHA256D = new bn_js_1.BN("2", 10);
-PartialMMRData.HASH_TYPE_BLAKE2B = new bn_js_1.BN("3", 10);
-PartialMMRData.HASH_TYPE_KECCAK256 = new bn_js_1.BN("4", 10);
-PartialMMRData.DEFAULT_HASH_TYPE = PartialMMRData.HASH_TYPE_SHA256;

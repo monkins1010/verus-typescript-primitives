@@ -10,6 +10,7 @@ const varuint_1 = require("../utils/varuint");
 const Hash160_1 = require("../vdxf/classes/Hash160");
 const vdxf_1 = require("../constants/vdxf");
 const PartialMMRData_1 = require("./PartialMMRData");
+const pbaas_1 = require("../constants/pbaas");
 const { BufferReader, BufferWriter } = bufferutils_1.default;
 class PartialSignData {
     constructor(data) {
@@ -36,7 +37,7 @@ class PartialSignData {
                 this.hashtype = data.hashtype;
             }
             else
-                this.hashtype = PartialSignData.DEFAULT_HASH_TYPE;
+                this.hashtype = pbaas_1.DEFAULT_HASH_TYPE;
             this.toggleContainsBoundHashes();
             this.boundhashes = data.boundhashes;
         }
@@ -103,7 +104,7 @@ class PartialSignData {
         this.flags = this.flags.xor(PartialSignData.CONTAINS_BOUNDHASHES);
     }
     isMMRData() {
-        return this.datatype && this.datatype.eq(PartialSignData.DATA_TYPE_MMRDATA);
+        return this.datatype && this.datatype.eq(pbaas_1.DATA_TYPE_MMRDATA);
     }
     getPartialSignDataByteLength() {
         function calculateVectorLength(items, getItemLength, varlength = true) {
@@ -290,16 +291,3 @@ PartialSignData.CONTAINS_PREFIXSTRING = new bn_js_1.BN("16", 10);
 PartialSignData.CONTAINS_VDXFKEYS = new bn_js_1.BN("32", 10);
 PartialSignData.CONTAINS_VDXFKEYNAMES = new bn_js_1.BN("64", 10);
 PartialSignData.CONTAINS_BOUNDHASHES = new bn_js_1.BN("128", 10);
-PartialSignData.DATA_TYPE_UNKNOWN = new bn_js_1.BN("0", 10);
-PartialSignData.DATA_TYPE_MMRDATA = new bn_js_1.BN("1", 10);
-PartialSignData.DATA_TYPE_FILENAME = new bn_js_1.BN("2", 10);
-PartialSignData.DATA_TYPE_MESSAGE = new bn_js_1.BN("3", 10);
-PartialSignData.DATA_TYPE_VDXFDATA = new bn_js_1.BN("4", 10);
-PartialSignData.DATA_TYPE_MESSAGEHEX = new bn_js_1.BN("5", 10);
-PartialSignData.DATA_TYPE_MESSAGEBASE64 = new bn_js_1.BN("6", 10);
-PartialSignData.DATA_TYPE_DATAHASH = new bn_js_1.BN("7", 10);
-PartialSignData.HASH_TYPE_SHA256 = new bn_js_1.BN("1", 10);
-PartialSignData.HASH_TYPE_SHA256D = new bn_js_1.BN("2", 10);
-PartialSignData.HASH_TYPE_BLAKE2B = new bn_js_1.BN("3", 10);
-PartialSignData.HASH_TYPE_KECCAK256 = new bn_js_1.BN("4", 10);
-PartialSignData.DEFAULT_HASH_TYPE = PartialSignData.HASH_TYPE_SHA256;

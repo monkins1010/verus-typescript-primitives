@@ -10,6 +10,7 @@ import varuint from '../utils/varuint';
 import { Hash160SerEnt } from '../vdxf/classes/Hash160';
 import { HASH160_BYTE_LENGTH, I_ADDR_VERSION, R_ADDR_VERSION } from '../constants/vdxf';
 import { PartialMMRData } from './PartialMMRData';
+import { DATA_TYPE_MMRDATA, DEFAULT_HASH_TYPE } from '../constants/pbaas';
 
 const { BufferReader, BufferWriter } = bufferutils;
 
@@ -51,21 +52,6 @@ export class PartialSignData implements SerializableEntity {
   static CONTAINS_VDXFKEYS = new BN("32", 10);
   static CONTAINS_VDXFKEYNAMES = new BN("64", 10);
   static CONTAINS_BOUNDHASHES = new BN("128", 10);
-
-  static DATA_TYPE_UNKNOWN = new BN("0", 10);
-  static DATA_TYPE_MMRDATA = new BN("1", 10);
-  static DATA_TYPE_FILENAME = new BN("2", 10);
-  static DATA_TYPE_MESSAGE = new BN("3", 10);
-  static DATA_TYPE_VDXFDATA = new BN("4", 10);
-  static DATA_TYPE_MESSAGEHEX = new BN("5", 10);
-  static DATA_TYPE_MESSAGEBASE64 = new BN("6", 10);
-  static DATA_TYPE_DATAHASH = new BN("7", 10);
-
-  static HASH_TYPE_SHA256 = new BN("1", 10);
-  static HASH_TYPE_SHA256D = new BN("2", 10);
-  static HASH_TYPE_BLAKE2B = new BN("3", 10);
-  static HASH_TYPE_KECCAK256 = new BN("4", 10);
-  static DEFAULT_HASH_TYPE = PartialSignData.HASH_TYPE_SHA256;
   
   constructor(data?: PartialSignDataInitData) {
     this.flags = data && data.flags ? data.flags : new BN("0");
@@ -94,7 +80,7 @@ export class PartialSignData implements SerializableEntity {
     if (data?.boundhashes) {
       if (data?.hashtype) {
         this.hashtype = data.hashtype;
-      } else this.hashtype = PartialSignData.DEFAULT_HASH_TYPE;
+      } else this.hashtype = DEFAULT_HASH_TYPE;
 
       this.toggleContainsBoundHashes();
       this.boundhashes = data.boundhashes;
@@ -182,7 +168,7 @@ export class PartialSignData implements SerializableEntity {
   }
 
   isMMRData(): boolean {
-    return this.datatype && this.datatype.eq(PartialSignData.DATA_TYPE_MMRDATA);
+    return this.datatype && this.datatype.eq(DATA_TYPE_MMRDATA);
   }
 
   private getPartialSignDataByteLength(): number {

@@ -4,6 +4,7 @@ import { BN } from 'bn.js';
 import varint from '../utils/varint';
 import bufferutils from '../utils/bufferutils';
 import varuint from '../utils/varuint';
+import { DEFAULT_HASH_TYPE } from '../constants/pbaas';
 
 const { BufferReader, BufferWriter } = bufferutils;
 
@@ -13,41 +14,25 @@ export type PartialMMRDataInitData = {
   flags?: BigNumber;
   data?: Array<PartialMMRDataUnit>;
   salt?: Array<Buffer>;
-  hashtype?: BigNumber;
+  mmrhashtype?: BigNumber;
   priormmr?: Array<Buffer>;
 }
 
 export class PartialMMRData implements SerializableEntity {
   flags: BigNumber;
   data: Array<PartialMMRDataUnit>;
-  hashtype?: BigNumber;
+  mmrhashtype?: BigNumber;
 
   salt?: Array<Buffer>;
   priormmr?: Array<Buffer>;
 
   static CONTAINS_SALT = new BN("1", 10);
   static CONTAINS_PRIORMMR = new BN("2", 10);
-
-  // "1" is omitted to avoid overloading DATA_TYPE_MMRDATA in PartialSignData
-  static DATA_TYPE_UNKNOWN = new BN("0", 10);
-  static DATA_TYPE_FILENAME = new BN("2", 10);
-  static DATA_TYPE_MESSAGE = new BN("3", 10);
-  static DATA_TYPE_VDXFDATA = new BN("4", 10);
-  static DATA_TYPE_SERIALIZEDHEX = new BN("5", 10);
-  static DATA_TYPE_SERIALIZEDBASE64 = new BN("6", 10);
-  static DATA_TYPE_DATAHASH = new BN("7", 10);
-  static DATA_TYPE_RAWSTRINGDATA = new BN("8", 10);
-
-  static HASH_TYPE_SHA256 = new BN("1", 10);
-  static HASH_TYPE_SHA256D = new BN("2", 10);
-  static HASH_TYPE_BLAKE2B = new BN("3", 10);
-  static HASH_TYPE_KECCAK256 = new BN("4", 10);
-  static DEFAULT_HASH_TYPE = PartialMMRData.HASH_TYPE_SHA256;
   
   constructor(data?: PartialMMRDataInitData) {
     this.flags = data && data.flags ? data.flags : new BN("0");
     this.data = data && data.data ? data.data : [];
-    this.hashtype = data && data.hashtype ? data.hashtype : PartialMMRData.DEFAULT_HASH_TYPE;
+    this.mmrhashtype = data && data.mmrhashtype ? data.mmrhashtype : DEFAULT_HASH_TYPE;
     
     if (data?.salt) {
       this.toggleContainsSalt();
@@ -91,7 +76,7 @@ export class PartialMMRData implements SerializableEntity {
       length += unit.data.length;
     }
 
-    length += varint.encodingLength(this.hashtype);
+    length += varint.encodingLength(this.mmrhashtype);
 
     if (this.serializeSalt()) {
       length += varuint.encodingLength(this.salt.length);
@@ -136,7 +121,7 @@ export class PartialMMRData implements SerializableEntity {
       })
     }
 
-    this.hashtype = reader.readVarInt();
+    this.mmrhashtype = reader.readVarInt();
 
     if (this.serializeSalt()) {
       this.salt = reader.readVector();
@@ -162,7 +147,7 @@ export class PartialMMRData implements SerializableEntity {
       writer.writeVarSlice(this.data[i].data);
     }
 
-    writer.writeVarInt(this.hashtype);
+    writer.writeVarInt(this.mmrhashtype);
 
     if (this.serializeSalt()) {
       writer.writeVector(this.salt);
