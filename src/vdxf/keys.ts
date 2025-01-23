@@ -9,6 +9,10 @@ export interface VDXFKeyInterface {
     vdxfkey: string;
   }
   indexid?: string;
+  bounddata?: {
+    vdxfkey: string;
+  }
+  indexid?: string;
 }
 
 export const VERUSPAY_INVOICE_VDXF_KEY: VDXFKeyInterface = {
@@ -355,11 +359,11 @@ export const SIGNED_SESSION_OBJECT: VDXFKeyInterface = {
 };
 
 export const CURRENCY_ADDRESS: VDXFKeyInterface = {
-  "vdxfid": "iBy2s9cQL9RadMVPjog6bbSV5ityBxTuNR",
-  "hash160result": "4fb4c86b8ce18e596e28f62bc9a78f43d738255d",
+  "vdxfid":"iBy2s9cQL9RadMVPjog6bbSV5ityBxTuNR",
+  "hash160result":"4fb4c86b8ce18e596e28f62bc9a78f43d738255d",
   "qualifiedname": {
-    "namespace": "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV",
-    "name": "vrsc::currency.address"
+    "namespace":"i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV",
+    "name":"vrsc::currency.address"
   }
 }
 

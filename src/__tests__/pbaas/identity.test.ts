@@ -99,8 +99,8 @@ describe('Serializes and deserializes identity properly', () => {
     expect(identityFromBuf.toBuffer().toString('hex')).toBe(identity.toBuffer().toString('hex'));
     
     const idJson = identityFromBuf.toJson();
-    expect(idJson.primaryaddresses[0]).toBe("RKjVHqM4VF2pCfVcwGzKH7CxvfMUE4H6o8");
-    expect(idJson.primaryaddresses[1]).toBe("RP1j8ziHUzgs6THJiAQa2BiqjRLLCWQxAk");
+    expect(idJson.primaryaddresses![0]).toBe("RKjVHqM4VF2pCfVcwGzKH7CxvfMUE4H6o8");
+    expect(idJson.primaryaddresses![1]).toBe("RP1j8ziHUzgs6THJiAQa2BiqjRLLCWQxAk");
   })
 
   test('deserialize/serialize VerusID without zaddr, post pbaas, without multimap', () => {

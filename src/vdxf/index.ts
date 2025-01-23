@@ -67,7 +67,7 @@ export class VDXFObject implements VDXFObjectInterface {
   toDataBuffer() {
     return Buffer.alloc(0);
   }
-
+  
   fromDataBuffer(buffer: Buffer, offset: number = 0) {
     return offset;
   }
@@ -164,6 +164,43 @@ export class BufferDataVdxfObject extends VDXFObject {
       data: this.data,
       vdxfkey: this.vdxfkey,
     };
+  }
+}
+
+export class VDXFData extends VDXFObject {
+  data: Buffer
+  
+    constructor(
+      data: Buffer = Buffer.from(""),
+      vdxfkey: string = ""
+    ) {
+      super(vdxfkey);
+      this.data = data;
+    }
+  
+    dataByteLength(): number {
+      return this.data.length;
+    }
+  
+    toDataBuffer(): Buffer {
+      return this.data;
+    }
+
+    fromDataBuffer(buffer: Buffer, offset?: number): number {
+      const reader = new bufferutils.BufferReader(buffer, offset);
+  
+      this.data = reader.readVarSlice();
+  
+      return reader.offset;
+    }
+  
+    toJson() {
+      return {
+        data: this.data.toString("hex"),
+        vdxfkey: this.vdxfkey,
+      };
+    }
+  
   }
 }
 

@@ -1,12 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RequestedPermission = exports.Challenge = exports.AltAuthFactor = exports.Audience = exports.ProvisioningInfo = exports.Subject = exports.RedirectUri = void 0;
+exports.RequestedPermission = exports.Challenge = exports.Attestation = exports.AltAuthFactor = exports.Audience = exports.ProvisioningInfo = exports.Subject = exports.RedirectUri = void 0;
 const __1 = require("../");
 const bufferutils_1 = require("../../utils/bufferutils");
 const varuint_1 = require("../../utils/varuint");
 const Context_1 = require("./Context");
 const Hash160_1 = require("./Hash160");
-const Attestation_1 = require("./Attestation");
 const address_1 = require("../../utils/address");
 class RedirectUri extends __1.VDXFObject {
     constructor(uri = "", vdxfkey = "") {
@@ -58,6 +57,9 @@ exports.Audience = Audience;
 class AltAuthFactor extends __1.Utf8DataVdxfObject {
 }
 exports.AltAuthFactor = AltAuthFactor;
+class Attestation extends __1.Utf8DataVdxfObject {
+}
+exports.Attestation = Attestation;
 class Challenge extends __1.VDXFObject {
     constructor(challenge = { challenge_id: "", created_at: 0 }, vdxfkey = __1.LOGIN_CONSENT_CHALLENGE_VDXF_KEY.vdxfid) {
         super(vdxfkey);
@@ -100,7 +102,7 @@ class Challenge extends __1.VDXFObject {
         const _subject = this.subject ? this.subject : [];
         const _provisioning_info = this.provisioning_info ? this.provisioning_info : [];
         const _alt_auth_factors = [];
-        const _attestations = this.attestations ? this.attestations : [];
+        const _attestations = [];
         const _redirect_uris = this.redirect_uris ? this.redirect_uris : [];
         const _context = this.context ? this.context : new Context_1.Context({});
         length += _challenge_id.byteLength();
@@ -118,7 +120,6 @@ class Challenge extends __1.VDXFObject {
             length += _provisioning_info.reduce((sum, current) => sum + current.byteLength(), 0);
             length += varuint_1.default.encodingLength(_alt_auth_factors.length);
             length += varuint_1.default.encodingLength(_attestations.length);
-            length += _attestations.reduce((sum, current) => sum + current.byteLength(), 0);
             length += varuint_1.default.encodingLength(_redirect_uris.length);
             length += _redirect_uris.reduce((sum, current) => sum + current.byteLength(), 0);
         }
@@ -143,7 +144,7 @@ class Challenge extends __1.VDXFObject {
         const _subject = this.subject ? this.subject : [];
         const _provisioning_info = this.provisioning_info ? this.provisioning_info : [];
         const _alt_auth_factors = [];
-        const _attestations = this.attestations ? this.attestations : [];
+        const _attestations = [];
         const _redirect_uris = this.redirect_uris ? this.redirect_uris : [];
         const _context = this.context ? this.context : new Context_1.Context({});
         writer.writeSlice(_challenge_id.toBuffer());
@@ -215,10 +216,8 @@ class Challenge extends __1.VDXFObject {
                 }
                 this.attestations = [];
                 const attestationsLength = reader.readCompactSize();
-                for (let i = 0; i < attestationsLength; i++) {
-                    const _att = new Attestation_1.Attestation();
-                    reader.offset = _att.fromBuffer(reader.buffer, reader.offset);
-                    this.attestations.push(_att);
+                if (attestationsLength > 0) {
+                    throw new Error("Attestations currently unsupported");
                 }
                 this.redirect_uris = [];
                 const urisLength = reader.readCompactSize();

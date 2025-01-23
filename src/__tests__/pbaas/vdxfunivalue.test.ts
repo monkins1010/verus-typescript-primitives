@@ -28,6 +28,7 @@ describe('Encodes and decodes VdxfUniValue', () => {
     const vFromBuf = new VdxfUniValue();
 
     vFromBuf.fromBuffer(v.toBuffer(), 0);
+    vFromBuf.fromBuffer(v.toBuffer(), 0);
 
     expect(vFromBuf.toBuffer().toString('hex')).toBe(v.toBuffer().toString('hex'));
     expect(VdxfUniValue.fromJson(v.toJson()).toBuffer().toString('hex')).toBe(vFromBuf.toBuffer().toString('hex'));
