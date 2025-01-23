@@ -11,7 +11,6 @@ import bufferutils from "../../utils/bufferutils";
 import varuint from "../../utils/varuint";
 import { Context } from "./Context";
 import { Hash160 } from "./Hash160";
-import { Attestation } from "./Attestation";
 import { fromBase58Check, toBase58Check } from '../../utils/address';
 import { HASH160_BYTE_LENGTH, I_ADDR_VERSION } from '../../constants/vdxf';
 import { BufferDataVdxfObject, VDXFData } from '../index'
@@ -70,11 +69,6 @@ export class ProvisioningInfo extends Utf8OrBase58Object {
   }
 }
 
-export class RequestedPermission extends Utf8DataVdxfObject {
-  constructor(vdxfkey: string = "") {
-    super("", vdxfkey);
-  }
-}
 
 export class Audience extends Utf8DataVdxfObject {}
 
@@ -129,7 +123,7 @@ export interface ChallengeInterface {
 export class Challenge extends VDXFObject implements ChallengeInterface {
   challenge_id: string;
   requested_access?: Array<RequestedPermission> | null;
-  requested_access_audience?: Array<RequestedPermission> | null;
+  requested_access_audience?: Array<Audience> | null;
   subject?: Array<Subject>;
   provisioning_info?: Array<ProvisioningInfo>;
   alt_auth_factors?: Array<AltAuthFactor> | null;
