@@ -13,3 +13,4 @@ export declare const HASH_TYPE_SHA256D: import("bn.js");
 export declare const HASH_TYPE_BLAKE2B: import("bn.js");
 export declare const HASH_TYPE_KECCAK256: import("bn.js");
 export declare const DEFAULT_HASH_TYPE: import("bn.js");
+export declare const UINT_256_LENGTH = 32;

@@ -1,0 +1,69 @@
+import { BN } from "bn.js";
+import { BigNumber } from "../../utils/types/BigNumber";
+import { SerializableEntity } from "../../utils/types/SerializableEntity";
+import varint from "../../utils/varint";
+import varuint from "../../utils/varuint";
+import bufferutils from "../../utils/bufferutils";
+
+export class ResponseUri implements SerializableEntity {
+  uri: Buffer;      // utf8 uri string
+  type: BigNumber;  // type of place to send response
+
+  static TYPE_INVALID = new BN(0, 10);
+  static TYPE_REDIRECT = new BN(1, 10);
+  static TYPE_POST = new BN(2, 10);
+
+  constructor(uri?: Buffer) {
+    if (uri != null) {
+      this.uri = uri;
+    }
+  }
+
+  getUriString(): string {
+    return this.uri.toString('utf-8');
+  }
+
+  static fromUriString(str: string): ResponseUri {
+    return new ResponseUri(Buffer.from(str, 'utf-8'));
+  }
+
+  getByteLength(): number {
+    let length = 0;
+    
+    length += varint.encodingLength(this.type);
+
+    let uriBufLen = this.uri.length;
+
+    length += varuint.encodingLength(uriBufLen);
+    length += uriBufLen;
+
+    return length;
+  }
+
+  toBuffer(): Buffer {
+    const writer = new bufferutils.BufferWriter(Buffer.alloc(this.getByteLength()));
+
+    writer.writeVarInt(this.type);
+    
+    writer.writeVarSlice(this.uri);
+
+    return writer.buffer;
+  }
+
+  fromBuffer(buffer: Buffer, offset?: number): number {
+    const reader = new bufferutils.BufferReader(buffer, offset);
+
+    this.type = reader.readVarInt();
+
+    this.uri = reader.readVarSlice();
+
+    return reader.offset;
+  }
+
+  toJson() {
+    return {
+      type: this.type.toNumber(),
+      uri: this.getUriString()
+    };
+  }
+}

@@ -356,25 +356,27 @@ export class Identity extends Principal implements SerializableEntity {
   toJson(): VerusCLIVerusIDJson {
     const contentmap = {};
 
-    for (const [key, value] of this.content_map.entries()) { 
-      const valueCopy = Buffer.from(value);
-      contentmap[fromBase58Check(key).hash.reverse().toString('hex')] = valueCopy.reverse().toString('hex');
+    if (this.serializeContentMap()) {
+      for (const [key, value] of this.content_map.entries()) { 
+        const valueCopy = Buffer.from(value);
+        contentmap[fromBase58Check(key).hash.reverse().toString('hex')] = valueCopy.reverse().toString('hex');
+      }
     }
-
+    
     const ret: VerusCLIVerusIDJson = {
-      contentmap,
-      contentmultimap: this.content_multimap.toJson(),
+      contentmap: this.serializeContentMap() ? contentmap : undefined,
+      contentmultimap: this.serializeContentMultiMap() ? this.content_multimap.toJson() : undefined,
       flags: this.flags.toNumber(),
-      minimumsignatures: this.min_sigs.toNumber(),
+      minimumsignatures: this.serializeMinSigs() ? this.min_sigs.toNumber() : undefined,
       name: this.name,
-      parent: this.parent.toAddress(),
-      primaryaddresses: this.primary_addresses.map(x => x.toAddress()),
-      recoveryauthority: this.recovery_authority.toAddress(),
-      revocationauthority: this.revocation_authority.toAddress(),
-      systemid: this.system_id.toAddress(),
-      timelock: this.unlock_after.toNumber(),
+      parent: this.serializeParent() ? this.parent.toAddress() : undefined,
+      primaryaddresses: this.serializePrimaryAddresses() ? this.primary_addresses.map(x => x.toAddress()) : undefined,
+      recoveryauthority: this.serializeRecovery() ? this.recovery_authority.toAddress() : undefined,
+      revocationauthority: this.serializeRevocation() ? this.revocation_authority.toAddress() : undefined,
+      systemid: this.serializeSystemId() ? this.system_id.toAddress() : undefined,
+      timelock: this.serializeUnlockAfter() ? this.unlock_after.toNumber() : undefined,
       version: this.version.toNumber(),
-      identityaddress: this.getIdentityAddress()
+      identityaddress: this.serializeParent() ? this.getIdentityAddress() : undefined
     };
 
     if (this.private_addresses != null && this.private_addresses.length > 0) {

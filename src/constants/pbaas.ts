@@ -15,3 +15,5 @@ export const HASH_TYPE_SHA256D = new BN("2", 10);
 export const HASH_TYPE_BLAKE2B = new BN("3", 10);
 export const HASH_TYPE_KECCAK256 = new BN("4", 10);
 export const DEFAULT_HASH_TYPE = HASH_TYPE_SHA256;
+
+export const UINT_256_LENGTH = 32;

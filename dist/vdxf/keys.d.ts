@@ -11,6 +11,8 @@ export interface VDXFKeyInterface {
     indexid?: string;
 }
 export declare const VERUSPAY_INVOICE_VDXF_KEY: VDXFKeyInterface;
+export declare const IDENTITY_UPDATE_REQUEST_VDXF_KEY: VDXFKeyInterface;
+export declare const IDENTITY_UPDATE_RESPONSE_VDXF_KEY: VDXFKeyInterface;
 export declare const IDENTITY_AUTH_SIG_VDXF_KEY: VDXFKeyInterface;
 export declare const LOGIN_CONSENT_RESPONSE_SIG_VDXF_KEY: VDXFKeyInterface;
 export declare const LOGIN_CONSENT_REQUEST_VDXF_KEY: VDXFKeyInterface;
