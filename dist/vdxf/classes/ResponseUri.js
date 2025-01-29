@@ -6,16 +6,21 @@ const varint_1 = require("../../utils/varint");
 const varuint_1 = require("../../utils/varuint");
 const bufferutils_1 = require("../../utils/bufferutils");
 class ResponseUri {
-    constructor(uri) {
-        if (uri != null) {
-            this.uri = uri;
+    constructor(data) {
+        if (data) {
+            if (data.uri != null) {
+                this.uri = data.uri;
+            }
+            if (data.type != null) {
+                this.type = data.type;
+            }
         }
     }
     getUriString() {
         return this.uri.toString('utf-8');
     }
-    static fromUriString(str) {
-        return new ResponseUri(Buffer.from(str, 'utf-8'));
+    static fromUriString(str, type = ResponseUri.TYPE_REDIRECT) {
+        return new ResponseUri({ uri: Buffer.from(str, 'utf-8'), type });
     }
     getByteLength() {
         let length = 0;

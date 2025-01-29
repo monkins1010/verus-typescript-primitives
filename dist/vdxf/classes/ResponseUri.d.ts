@@ -8,9 +8,12 @@ export declare class ResponseUri implements SerializableEntity {
     static TYPE_INVALID: import("bn.js");
     static TYPE_REDIRECT: import("bn.js");
     static TYPE_POST: import("bn.js");
-    constructor(uri?: Buffer);
+    constructor(data?: {
+        uri?: Buffer;
+        type?: BigNumber;
+    });
     getUriString(): string;
-    static fromUriString(str: string): ResponseUri;
+    static fromUriString(str: string, type?: BigNumber): ResponseUri;
     getByteLength(): number;
     toBuffer(): Buffer;
     fromBuffer(buffer: Buffer, offset?: number): number;

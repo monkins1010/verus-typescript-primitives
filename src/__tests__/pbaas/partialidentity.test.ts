@@ -1,9 +1,8 @@
 import { BN } from "bn.js";
 import { ContentMultiMap } from "../../pbaas/ContentMultiMap";
-import { IDENTITY_FLAG_TOKENIZED_CONTROL, IDENTITY_VERSION_PBAAS, Identity, IDENTITY_FLAG_ACTIVECURRENCY, VerusIDInitData } from "../../pbaas/Identity";
+import { IDENTITY_VERSION_PBAAS } from "../../pbaas/Identity";
 import { KeyID } from "../../pbaas/KeyID";
 import { IdentityID } from "../../pbaas/IdentityID";
-import { DATA_TYPE_STRING } from "../../vdxf";
 import { PartialIdentity, SaplingPaymentAddress } from "../../index";
 
 describe('Serializes and deserializes identity properly', () => {

@@ -75,7 +75,7 @@ class IdentityUpdateResponseDetails {
             writer.writeSlice(this.txid);
         }
         if (this.containsSalt()) {
-            writer.writeVarSlice(this.txid);
+            writer.writeVarSlice(this.salt);
         }
         return writer.buffer;
     }

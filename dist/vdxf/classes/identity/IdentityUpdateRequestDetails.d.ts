@@ -20,7 +20,7 @@ export declare class IdentityUpdateRequestDetails {
     static IDENTITY_UPDATE_REQUEST_VALID: import("bn.js");
     static IDENTITY_UPDATE_REQUEST_CONTAINS_SIGNDATA: import("bn.js");
     static IDENTITY_UPDATE_REQUEST_EXPIRES: import("bn.js");
-    static IDENTITY_UPDATE_REQUEST_CONTAINS_REDIRECT_URI: import("bn.js");
+    static IDENTITY_UPDATE_REQUEST_CONTAINS_RESPONSE_URIS: import("bn.js");
     static IDENTITY_UPDATE_REQUEST_CONTAINS_SYSTEM: import("bn.js");
     static IDENTITY_UPDATE_REQUEST_CONTAINS_SALT: import("bn.js");
     static IDENTITY_UPDATE_REQUEST_IS_TESTNET: import("bn.js");
@@ -52,5 +52,5 @@ export declare class IdentityUpdateRequestDetails {
     toSha256(): Buffer;
     getByteLength(): number;
     toBuffer(): Buffer;
-    fromBuffer(buffer: Buffer, offset?: number): number;
+    fromBuffer(buffer: Buffer, offset?: number, parseVdxfObjects?: boolean): number;
 }

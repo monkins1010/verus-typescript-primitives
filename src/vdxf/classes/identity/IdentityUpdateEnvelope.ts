@@ -3,7 +3,7 @@ import {
   VDXFObject,
   VerusIDSignature,
   VerusIDSignatureInterface,
-} from "../../";
+} from "../..";
 import { IDENTITY_AUTH_SIG_VDXF_KEY, IDENTITY_UPDATE_REQUEST_VDXF_KEY, IDENTITY_UPDATE_RESPONSE_VDXF_KEY } from "../../keys";
 import bufferutils from "../../../utils/bufferutils";
 import { VERUS_DATA_SIGNATURE_PREFIX } from "../../../constants/vdxf";
@@ -27,7 +27,7 @@ export interface IdentityUpdateEnvelopeInterface {
   details: IdentityUpdateDetails;
   systemid?: IdentityID;
   signingid?: IdentityID;
-  signature?: VerusIDSignatureInterface;
+  signature?: string;
   version?: BigNumber;
 }
 
@@ -45,23 +45,27 @@ export class IdentityUpdateEnvelope extends VDXFObject {
   ) {
     super(vdxfkey);
 
+    if (request.version) this.version = request.version;
+    else this.version = IDENTITY_UPDATE_VERSION_CURRENT;
+
     if (!request.details) {
       this.details = this.createEmptyDetails();
     }
 
     this.systemid = request.systemid;
     this.signingid = request.signingid;
-    this.signature = request.signature
-      ? new VerusIDSignature(
-          request.signature,
-          IDENTITY_AUTH_SIG_VDXF_KEY,
-          false
-        )
-      : undefined;
-    this.details = request.details;
 
-    if (request.version) this.version = request.version;
-    else this.version = IDENTITY_UPDATE_VERSION_CURRENT;
+    if (request.signature) {
+      this.signature = new VerusIDSignature(
+        { signature: request.signature },
+        IDENTITY_AUTH_SIG_VDXF_KEY,
+        false
+      );
+
+      this.setSigned()
+    }
+
+    this.details = request.details;
   }
 
   private createEmptyDetails(): IdentityUpdateDetails {

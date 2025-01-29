@@ -61,7 +61,7 @@ class IdentityUpdateRequestDetails {
         return !!(this.flags.and(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_SYSTEM).toNumber());
     }
     containsResponseUris() {
-        return !!(this.flags.and(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_REDIRECT_URI).toNumber());
+        return !!(this.flags.and(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_RESPONSE_URIS).toNumber());
     }
     containsSalt() {
         return !!(this.flags.and(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_SALT).toNumber());
@@ -82,7 +82,7 @@ class IdentityUpdateRequestDetails {
         this.flags = this.flags.xor(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_SYSTEM);
     }
     toggleContainsResponseUris() {
-        this.flags = this.flags.xor(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_REDIRECT_URI);
+        this.flags = this.flags.xor(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_RESPONSE_URIS);
     }
     toggleContainsSalt() {
         this.flags = this.flags.xor(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_SALT);
@@ -145,13 +145,13 @@ class IdentityUpdateRequestDetails {
         }
         return writer.buffer;
     }
-    fromBuffer(buffer, offset = 0) {
+    fromBuffer(buffer, offset = 0, parseVdxfObjects = false) {
         const reader = new BufferReader(buffer, offset);
         this.flags = reader.readVarInt();
         this.requestid = reader.readVarInt();
         this.createdat = reader.readVarInt();
         this.identity = new PartialIdentity_1.PartialIdentity();
-        reader.offset = this.identity.fromBuffer(reader.buffer, reader.offset, true);
+        reader.offset = this.identity.fromBuffer(reader.buffer, reader.offset, parseVdxfObjects);
         if (this.expires()) {
             this.expiryheight = reader.readVarInt();
         }
@@ -189,7 +189,7 @@ IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_INVALID = new bn_js_1.BN(0,
 IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_VALID = new bn_js_1.BN(1, 10);
 IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_SIGNDATA = new bn_js_1.BN(2, 10);
 IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_EXPIRES = new bn_js_1.BN(4, 10);
-IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_REDIRECT_URI = new bn_js_1.BN(8, 10);
+IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_RESPONSE_URIS = new bn_js_1.BN(8, 10);
 IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_SYSTEM = new bn_js_1.BN(16, 10);
 IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_SALT = new bn_js_1.BN(32, 10);
 IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_IS_TESTNET = new bn_js_1.BN(64, 10);

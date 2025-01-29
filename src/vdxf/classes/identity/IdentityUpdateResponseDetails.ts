@@ -126,7 +126,7 @@ export class IdentityUpdateResponseDetails {
     }
 
     if (this.containsSalt()) {
-      writer.writeVarSlice(this.txid);
+      writer.writeVarSlice(this.salt);
     }
 
     return writer.buffer;

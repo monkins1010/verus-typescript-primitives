@@ -13,9 +13,18 @@ export class ResponseUri implements SerializableEntity {
   static TYPE_REDIRECT = new BN(1, 10);
   static TYPE_POST = new BN(2, 10);
 
-  constructor(uri?: Buffer) {
-    if (uri != null) {
-      this.uri = uri;
+  constructor(data?: {
+    uri?: Buffer,
+    type?: BigNumber
+  }) {
+    if (data) {
+      if (data.uri != null) {
+        this.uri = data.uri;
+      }
+  
+      if (data.type != null) {
+        this.type = data.type;
+      }
     }
   }
 
@@ -23,8 +32,8 @@ export class ResponseUri implements SerializableEntity {
     return this.uri.toString('utf-8');
   }
 
-  static fromUriString(str: string): ResponseUri {
-    return new ResponseUri(Buffer.from(str, 'utf-8'));
+  static fromUriString(str: string, type: BigNumber = ResponseUri.TYPE_REDIRECT): ResponseUri {
+    return new ResponseUri({ uri: Buffer.from(str, 'utf-8'), type });
   }
 
   getByteLength(): number {

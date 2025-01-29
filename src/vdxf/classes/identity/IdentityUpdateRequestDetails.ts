@@ -29,7 +29,7 @@ export class IdentityUpdateRequestDetails {
   static IDENTITY_UPDATE_REQUEST_VALID = new BN(1, 10);
   static IDENTITY_UPDATE_REQUEST_CONTAINS_SIGNDATA = new BN(2, 10);
   static IDENTITY_UPDATE_REQUEST_EXPIRES = new BN(4, 10);
-  static IDENTITY_UPDATE_REQUEST_CONTAINS_REDIRECT_URI = new BN(8, 10);
+  static IDENTITY_UPDATE_REQUEST_CONTAINS_RESPONSE_URIS = new BN(8, 10);
   static IDENTITY_UPDATE_REQUEST_CONTAINS_SYSTEM = new BN(16, 10);
   static IDENTITY_UPDATE_REQUEST_CONTAINS_SALT = new BN(32, 10);
   static IDENTITY_UPDATE_REQUEST_IS_TESTNET = new BN(64, 10);
@@ -102,7 +102,7 @@ export class IdentityUpdateRequestDetails {
   }
 
   containsResponseUris() {
-    return !!(this.flags.and(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_REDIRECT_URI).toNumber());
+    return !!(this.flags.and(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_RESPONSE_URIS).toNumber());
   }
 
   containsSalt() {
@@ -130,7 +130,7 @@ export class IdentityUpdateRequestDetails {
   }
 
   toggleContainsResponseUris() {
-    this.flags = this.flags.xor(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_REDIRECT_URI);
+    this.flags = this.flags.xor(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_RESPONSE_URIS);
   }
 
   toggleContainsSalt() {
@@ -218,7 +218,7 @@ export class IdentityUpdateRequestDetails {
     return writer.buffer;
   }
 
-  fromBuffer(buffer: Buffer, offset: number = 0) {
+  fromBuffer(buffer: Buffer, offset: number = 0, parseVdxfObjects: boolean = false) {
     const reader = new BufferReader(buffer, offset);
 
     this.flags = reader.readVarInt();
@@ -228,7 +228,7 @@ export class IdentityUpdateRequestDetails {
     this.createdat = reader.readVarInt();
 
     this.identity = new PartialIdentity();
-    reader.offset = this.identity.fromBuffer(reader.buffer, reader.offset, true);
+    reader.offset = this.identity.fromBuffer(reader.buffer, reader.offset, parseVdxfObjects);
     
     if (this.expires()) {
       this.expiryheight = reader.readVarInt();
