@@ -1,11 +1,24 @@
 /// <reference types="node" />
 /// <reference types="bn.js" />
 import { PartialIdentity } from '../../../pbaas/PartialIdentity';
-import { PartialSignData } from '../../../pbaas/PartialSignData';
+import { PartialSignData, PartialSignDataJson } from '../../../pbaas/PartialSignData';
 import { BigNumber } from '../../../utils/types/BigNumber';
-import { IdentityID } from '../../../pbaas';
-import { ResponseUri } from '../ResponseUri';
+import { IdentityID, VerusCLIVerusIDJson } from '../../../pbaas';
+import { ResponseUri, ResponseUriJson } from '../ResponseUri';
 export declare type SignDataMap = Map<string, PartialSignData>;
+export declare type IdentityUpdateRequestDetailsJson = {
+    flags?: string;
+    requestid?: string;
+    createdat?: string;
+    identity?: VerusCLIVerusIDJson;
+    expiryheight?: string;
+    systemid?: string;
+    responseuris?: Array<ResponseUriJson>;
+    signdatamap?: {
+        [key: string]: PartialSignDataJson;
+    };
+    salt?: string;
+};
 export declare class IdentityUpdateRequestDetails {
     flags?: BigNumber;
     requestid?: BigNumber;
@@ -53,4 +66,6 @@ export declare class IdentityUpdateRequestDetails {
     getByteLength(): number;
     toBuffer(): Buffer;
     fromBuffer(buffer: Buffer, offset?: number, parseVdxfObjects?: boolean): number;
+    toJson(): IdentityUpdateRequestDetailsJson;
+    static fromJson(json: IdentityUpdateRequestDetailsJson): IdentityUpdateRequestDetails;
 }

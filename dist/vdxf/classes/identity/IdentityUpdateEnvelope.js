@@ -160,6 +160,22 @@ class IdentityUpdateEnvelope extends __1.VDXFObject {
         inv.fromBuffer(base64url_1.default.toBuffer(qrstring), 0);
         return inv;
     }
+    toJson() {
+        return {
+            systemid: this.systemid ? this.systemid.toAddress() : undefined,
+            signingid: this.signingid ? this.signingid.toAddress() : undefined,
+            signature: this.signature ? this.signature.signature : undefined,
+            details: this.details ? this.details.toJson() : undefined
+        };
+    }
+    static internalFromJson(json, ctor, detailsFromJson) {
+        return new ctor({
+            systemid: json.systemid ? pbaas_1.IdentityID.fromAddress(json.systemid) : undefined,
+            signingid: json.signingid ? pbaas_1.IdentityID.fromAddress(json.signingid) : undefined,
+            signature: json.signature,
+            details: json.details ? detailsFromJson(json.details) : undefined
+        });
+    }
 }
 exports.IdentityUpdateEnvelope = IdentityUpdateEnvelope;
 class IdentityUpdateRequest extends IdentityUpdateEnvelope {
@@ -172,6 +188,9 @@ class IdentityUpdateRequest extends IdentityUpdateEnvelope {
     static fromQrString(qrstring) {
         return IdentityUpdateEnvelope.fromQrString(keys_1.IDENTITY_UPDATE_REQUEST_VDXF_KEY.vdxfid, qrstring);
     }
+    static fromJson(json) {
+        return IdentityUpdateEnvelope.internalFromJson(json, IdentityUpdateRequest, IdentityUpdateRequestDetails_1.IdentityUpdateRequestDetails.fromJson);
+    }
 }
 exports.IdentityUpdateRequest = IdentityUpdateRequest;
 class IdentityUpdateResponse extends IdentityUpdateEnvelope {
@@ -183,6 +202,9 @@ class IdentityUpdateResponse extends IdentityUpdateEnvelope {
     }
     static fromQrString(qrstring) {
         return IdentityUpdateEnvelope.fromQrString(keys_1.IDENTITY_UPDATE_RESPONSE_VDXF_KEY.vdxfid, qrstring);
+    }
+    static fromJson(json) {
+        return IdentityUpdateEnvelope.internalFromJson(json, IdentityUpdateResponse, IdentityUpdateResponseDetails_1.IdentityUpdateResponseDetails.fromJson);
     }
 }
 exports.IdentityUpdateResponse = IdentityUpdateResponse;

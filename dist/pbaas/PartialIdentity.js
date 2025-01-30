@@ -33,37 +33,37 @@ class PartialIdentity extends Identity_1.Identity {
         if ((data === null || data === void 0 ? void 0 : data.primary_addresses) && data.primary_addresses.length > 0)
             this.toggleContainsPrimaryAddresses();
     }
-    serializeFlags() {
+    containsFlags() {
         return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_FLAGS).toNumber());
     }
-    serializePrimaryAddresses() {
+    containsPrimaryAddresses() {
         return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_PRIMARY_ADDRS).toNumber());
     }
-    serializeMinSigs() {
+    containsMinSigs() {
         return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_MINSIGS).toNumber());
     }
-    serializeParent() {
+    containsParent() {
         return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_PARENT).toNumber());
     }
-    serializeSystemId() {
+    containsSystemId() {
         return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_SYSTEM_ID).toNumber());
     }
-    serializeContentMap() {
+    containsContentMap() {
         return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_CONTENT_MAP).toNumber());
     }
-    serializeContentMultiMap() {
+    containsContentMultiMap() {
         return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_CONTENT_MULTIMAP).toNumber());
     }
-    serializeRevocation() {
+    containsRevocation() {
         return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_REVOCATION).toNumber());
     }
-    serializeRecovery() {
+    containsRecovery() {
         return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_RECOVERY).toNumber());
     }
-    serializePrivateAddresses() {
+    containsPrivateAddresses() {
         return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_PRIV_ADDRS).toNumber());
     }
-    serializeUnlockAfter() {
+    containsUnlockAfter() {
         return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_UNLOCK_AFTER).toNumber());
     }
     toggleContainsParent() {
@@ -119,6 +119,9 @@ class PartialIdentity extends Identity_1.Identity {
         writer.writeVarInt(this.contains);
         writer.writeSlice(super.toBuffer());
         return writer.buffer;
+    }
+    static fromJson(json) {
+        return Identity_1.Identity.internalFromJson(json, PartialIdentity);
     }
 }
 exports.PartialIdentity = PartialIdentity;

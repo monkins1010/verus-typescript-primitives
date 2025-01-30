@@ -95,6 +95,14 @@ describe("IdentityUpdateEnvelope Serialization", () => {
     expect(fromBufferInstance.toBuffer().toString("hex")).toBe(instance.toBuffer().toString("hex"));
   }
 
+  function testJsonSerialization(instance) {
+    const json = instance.toJson();
+    const fromJsonInstance = instance.constructor.fromJson(json);
+    const newJson = fromJsonInstance.toJson();
+
+    expect(newJson).toEqual(json);
+  }
+
   test("Serialize/Deserialize unsigned IdentityUpdateRequest", () => {
     const requestDetails = new IdentityUpdateRequestDetails({ 
       requestid: requestID, 
@@ -188,5 +196,119 @@ describe("IdentityUpdateEnvelope Serialization", () => {
         delete baseResponseDetailsConfig[toRemove[i]]
       }
     }
+  });
+
+  test("Serialize/Deserialize IdentityUpdateRequest to/from JSON", () => {
+    const requestDetails = new IdentityUpdateRequestDetails({ 
+      requestid: requestID, 
+      createdat: createdAt, 
+      systemid: systemID, 
+      identity: partialIdentity, 
+      expiryheight: expiryHeight, 
+      salt: salt, 
+      signdatamap 
+    });
+
+    const request = new IdentityUpdateRequest({ details: requestDetails });
+    testJsonSerialization(request);
+  });
+
+  test("Serialize/Deserialize signed IdentityUpdateRequest to/from JSON", () => {
+    const requestDetails = new IdentityUpdateRequestDetails({ 
+      requestid: requestID, 
+      createdat: createdAt, 
+      systemid: systemID, 
+      identity: partialIdentity, 
+      expiryheight: expiryHeight, 
+      salt: salt, 
+      signdatamap 
+    });
+
+    const request = new IdentityUpdateRequest({ 
+      details: requestDetails, 
+      systemid: systemID, 
+      signingid: signingID, 
+      signature: "AeNjMwABQSAPBEuajDkRyy+OBJsWmDP3EUoqN9UjCJK9nmoSQiNoZWBK19OgGCYdEqr1CiFfBf8SFHVoUv4r2tb5Q3qsMTrp" 
+    });
+
+    testJsonSerialization(request);
+  });
+
+  test("Serialize/Deserialize IdentityUpdateResponse to/from JSON", () => {
+    const txidbuf = Buffer.from(txid, 'hex').reverse();
+    let baseResponseDetailsConfig = { requestid: requestID, createdat: createdAt, txid: txidbuf, salt };
+
+    const responseDetails = new IdentityUpdateResponseDetails(baseResponseDetailsConfig);
+    const response = new IdentityUpdateResponse({ details: responseDetails });
+    testJsonSerialization(response);
+  });
+
+  test("Serialize/Deserialize signed IdentityUpdateResponse to/from JSON", () => {
+    const txidbuf = Buffer.from(txid, 'hex').reverse();
+    let baseResponseDetailsConfig = { requestid: requestID, createdat: createdAt, txid: txidbuf, salt };
+
+    const responseDetails = new IdentityUpdateResponseDetails(baseResponseDetailsConfig);
+
+    const response = new IdentityUpdateResponse({ 
+      details: responseDetails, 
+      systemid: systemID, 
+      signingid: signingID, 
+      signature: "AeNjMwABQSAPBEuajDkRyy+OBJsWmDP3EUoqN9UjCJK9nmoSQiNoZWBK19OgGCYdEqr1CiFfBf8SFHVoUv4r2tb5Q3qsMTrp" 
+    });
+
+    testJsonSerialization(response);
+  });
+
+  test("Serialize/Deserialize IdentityUpdateRequestDetails to/from JSON", () => {
+    const requestDetails = new IdentityUpdateRequestDetails({ 
+      requestid: requestID, 
+      createdat: createdAt, 
+      systemid: systemID, 
+      identity: partialIdentity, 
+      expiryheight: expiryHeight, 
+      salt: salt, 
+      signdatamap 
+    });
+
+    testJsonSerialization(requestDetails);
+  });
+
+  test("Serialize/Deserialize IdentityUpdateResponseDetails to/from JSON", () => {
+    const responseDetails = new IdentityUpdateResponseDetails({ 
+      requestid: requestID, 
+      createdat: createdAt, 
+      txid: Buffer.from(txid, 'hex').reverse(), 
+      salt 
+    });
+
+    testJsonSerialization(responseDetails);
+  });
+
+  test("Serialize/Deserialize PartialIdentity to/from JSON", () => {
+    testJsonSerialization(partialIdentity);
+  });
+
+  test("Serialize/Deserialize PartialSignData to/from JSON", () => {
+    const partialSignData = new PartialSignData(baseSignDataWithMMR);
+    testJsonSerialization(partialSignData);
+  });
+
+  test("Serialize/Deserialize PartialMMRData to/from JSON", () => {
+    testJsonSerialization(mmrData);
+  });
+
+  test("Serialize/Deserialize ResponseUri to/from JSON", () => {
+    const responseUri = ResponseUri.fromUriString("http:/127.0.0.1:8000", ResponseUri.TYPE_REDIRECT);
+    testJsonSerialization(responseUri);
+  });
+
+  test("Serialize/Deserialize ContentMultiMap to/from JSON", () => {
+    const contentMultiMap = ContentMultiMap.fromJson({
+      "iPsFBfFoCcxtuZNzE8yxPQhXVn4dmytf8j": [
+        { "iK7a5JNJnbeuYWVHCDRpJosj3irGJ5Qa8c": "Test String 123454321" }
+      ]
+    });
+
+    testJsonSerialization(contentMultiMap);
   });
 });

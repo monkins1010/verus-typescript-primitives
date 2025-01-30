@@ -5,14 +5,27 @@ import { fromBase58Check, toBase58Check } from '../../../utils/address';
 import { HASH160_BYTE_LENGTH, I_ADDR_VERSION } from '../../../constants/vdxf';
 import createHash = require('create-hash');
 import { PartialIdentity } from '../../../pbaas/PartialIdentity';
-import { PartialSignData } from '../../../pbaas/PartialSignData';
+import { PartialSignData, PartialSignDataJson } from '../../../pbaas/PartialSignData';
 import { BigNumber } from '../../../utils/types/BigNumber';
 import { BN } from 'bn.js';
-import { IdentityID } from '../../../pbaas';
-import { ResponseUri } from '../ResponseUri';
+import { IdentityID, VerusCLIVerusIDJson } from '../../../pbaas';
+import { ResponseUri, ResponseUriJson } from '../ResponseUri';
+import { IdentityUpdateRequest } from './IdentityUpdateEnvelope';
 const { BufferReader, BufferWriter } = bufferutils;
 
 export type SignDataMap = Map<string, PartialSignData>;
+
+export type IdentityUpdateRequestDetailsJson = {
+  flags?: string;
+  requestid?: string;
+  createdat?: string;
+  identity?: VerusCLIVerusIDJson;
+  expiryheight?: string;
+  systemid?: string;
+  responseuris?: Array<ResponseUriJson>;
+  signdatamap?: { [key: string]: PartialSignDataJson };
+  salt?: string;
+}
 
 export class IdentityUpdateRequestDetails {
   flags?: BigNumber;
@@ -60,27 +73,27 @@ export class IdentityUpdateRequestDetails {
     }
 
     if (data?.expiryheight) {
-      this.toggleExpires();
+      if (!this.expires()) this.toggleExpires();
       this.expiryheight = data.expiryheight;
     }
 
     if (data?.systemid) {
-      this.toggleContainsSystem();
+      if (!this.containsSystem()) this.toggleContainsSystem();
       this.systemid = data.systemid;
     }
 
     if (data?.responseuris) {
-      this.toggleContainsResponseUris();
+      if (!this.containsResponseUris()) this.toggleContainsResponseUris();
       this.responseuris = data.responseuris;
     }
 
     if (data?.signdatamap) {
-      this.toggleContainsSignData();
+      if (!this.containsSignData()) this.toggleContainsSignData();
       this.signdatamap = data.signdatamap;
     }
 
     if (data?.salt) {
-      this.toggleContainsSalt();
+      if (!this.containsSalt()) this.toggleContainsSalt();
       this.salt = data.salt;
     }
   }
@@ -273,5 +286,53 @@ export class IdentityUpdateRequestDetails {
     }
 
     return reader.offset;
+  }
+
+  toJson(): IdentityUpdateRequestDetailsJson {
+    let signDataJson: { [key: string]: PartialSignDataJson };
+    
+    if (this.signdatamap) {
+      signDataJson = {};
+      
+      for (const [key, psd] of this.signdatamap.entries()) {
+        signDataJson[key] = psd.toJson();
+      }
+    }
+
+    return {
+      flags: this.flags ? this.flags.toString(10) : undefined,
+      requestid: this.requestid ? this.requestid.toString(10) : undefined,
+      createdat: this.createdat ? this.createdat.toString(10) : undefined,
+      identity: this.identity ? this.identity.toJson() : undefined,
+      expiryheight: this.expiryheight ? this.expiryheight.toString(10) : undefined,
+      systemid: this.systemid ? this.systemid.toAddress() : undefined,
+      responseuris: this.responseuris ? this.responseuris.map(x => x.toJson()) : undefined,
+      signdatamap: signDataJson,
+      salt: this.salt ? this.salt.toString('hex') : undefined
+    }
+  }
+
+  static fromJson(json: IdentityUpdateRequestDetailsJson): IdentityUpdateRequestDetails {
+    let signdatamap: SignDataMap;
+
+    if (json.signdatamap) {
+      signdatamap = new Map();
+
+      for (const key in json.signdatamap) {
+        signdatamap.set(key, PartialSignData.fromJson(json.signdatamap[key]))
+      }
+    }
+
+    return new IdentityUpdateRequestDetails({
+      flags: json.flags ? new BN(json.flags, 10) : undefined,
+      requestid: json.requestid ? new BN(json.requestid, 10) : undefined,
+      createdat: json.createdat ? new BN(json.createdat, 10) : undefined,
+      identity: json.identity ? PartialIdentity.fromJson(json.identity) : undefined,
+      expiryheight: json.expiryheight ? new BN(json.expiryheight, 10) : undefined,
+      systemid: json.systemid ? IdentityID.fromAddress(json.systemid) : undefined,
+      responseuris: json.responseuris ? json.responseuris.map(x => ResponseUri.fromJson(x)) : undefined,
+      signdatamap,
+      salt: json.salt ? Buffer.from(json.salt, 'hex') : undefined
+    })
   }
 }

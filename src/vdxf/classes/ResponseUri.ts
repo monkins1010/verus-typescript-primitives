@@ -5,6 +5,11 @@ import varint from "../../utils/varint";
 import varuint from "../../utils/varuint";
 import bufferutils from "../../utils/bufferutils";
 
+export type ResponseUriJson = {
+  type: string;
+  uri: string;
+}
+
 export class ResponseUri implements SerializableEntity {
   uri: Buffer;      // utf8 uri string
   type: BigNumber;  // type of place to send response
@@ -69,10 +74,17 @@ export class ResponseUri implements SerializableEntity {
     return reader.offset;
   }
 
-  toJson() {
+  toJson(): ResponseUriJson {
     return {
-      type: this.type.toNumber(),
+      type: this.type.toString(10),
       uri: this.getUriString()
     };
+  }
+
+  static fromJson(json: ResponseUriJson): ResponseUri {
+    return new ResponseUri({
+      type: new BN(json.type, 10),
+      uri: Buffer.from(json.uri, 'utf-8')
+    });
   }
 }

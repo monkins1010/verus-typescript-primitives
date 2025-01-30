@@ -1,14 +1,11 @@
 import varint from '../../../utils/varint'
 import bufferutils from '../../../utils/bufferutils'
 import createHash = require('create-hash');
-import { PartialSignData } from '../../../pbaas/PartialSignData';
 import { BigNumber } from '../../../utils/types/BigNumber';
 import { BN } from 'bn.js';
 import { UINT_256_LENGTH } from '../../../constants/pbaas';
 import varuint from '../../../utils/varuint';
 const { BufferReader, BufferWriter } = bufferutils;
-
-export type SignDataMap = Map<string, PartialSignData>;
 
 export type IdentityUpdateReponseDetailsJson = {
   flags: string,
@@ -49,12 +46,12 @@ export class IdentityUpdateResponseDetails {
     }
 
     if (data?.txid) {
-      this.toggleContainsTxid();
+      if (!this.containsTxid()) this.toggleContainsTxid();
       this.txid = data.txid;
     }
 
     if (data?.salt) {
-      this.toggleContainsSalt();
+      if (!this.containsSalt()) this.toggleContainsSalt();
       this.salt = data.salt;
     }
   }

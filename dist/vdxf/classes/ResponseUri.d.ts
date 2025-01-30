@@ -2,6 +2,10 @@
 /// <reference types="bn.js" />
 import { BigNumber } from "../../utils/types/BigNumber";
 import { SerializableEntity } from "../../utils/types/SerializableEntity";
+export declare type ResponseUriJson = {
+    type: string;
+    uri: string;
+};
 export declare class ResponseUri implements SerializableEntity {
     uri: Buffer;
     type: BigNumber;
@@ -17,8 +21,6 @@ export declare class ResponseUri implements SerializableEntity {
     getByteLength(): number;
     toBuffer(): Buffer;
     fromBuffer(buffer: Buffer, offset?: number): number;
-    toJson(): {
-        type: number;
-        uri: string;
-    };
+    toJson(): ResponseUriJson;
+    static fromJson(json: ResponseUriJson): ResponseUri;
 }

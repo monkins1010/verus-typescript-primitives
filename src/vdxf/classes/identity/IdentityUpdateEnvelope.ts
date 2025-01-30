@@ -2,7 +2,7 @@ import {
   WALLET_VDXF_KEY,
   VDXFObject,
   VerusIDSignature,
-  VerusIDSignatureInterface,
+  VerusIDSignatureJson,
 } from "../..";
 import { IDENTITY_AUTH_SIG_VDXF_KEY, IDENTITY_UPDATE_REQUEST_VDXF_KEY, IDENTITY_UPDATE_RESPONSE_VDXF_KEY } from "../../keys";
 import bufferutils from "../../../utils/bufferutils";
@@ -11,9 +11,9 @@ import createHash = require("create-hash");
 import base64url from "base64url";
 import { BN } from 'bn.js';
 import { BigNumber } from "../../../utils/types/BigNumber";
-import { IdentityUpdateRequestDetails } from "./IdentityUpdateRequestDetails";
+import { IdentityUpdateRequestDetails, IdentityUpdateRequestDetailsJson } from "./IdentityUpdateRequestDetails";
 import { IdentityID } from "../../../pbaas";
-import { IdentityUpdateResponseDetails } from "./IdentityUpdateResponseDetails";
+import { IdentityUpdateResponseDetails, IdentityUpdateReponseDetailsJson } from "./IdentityUpdateResponseDetails";
 
 export const IDENTITY_UPDATE_VERSION_CURRENT = new BN(3, 10)
 export const IDENTITY_UPDATE_VERSION_FIRSTVALID = new BN(3, 10)
@@ -22,6 +22,7 @@ export const IDENTITY_UPDATE_VERSION_SIGNED = new BN('80000000', 16)
 export const IDENTITY_UPDATE_VERSION_MASK = IDENTITY_UPDATE_VERSION_SIGNED;
 
 export type IdentityUpdateDetails = IdentityUpdateRequestDetails | IdentityUpdateResponseDetails;
+export type IdentityUpdateDetailsJson = IdentityUpdateRequestDetailsJson | IdentityUpdateReponseDetailsJson;
 
 export interface IdentityUpdateEnvelopeInterface {
   details: IdentityUpdateDetails;
@@ -29,6 +30,14 @@ export interface IdentityUpdateEnvelopeInterface {
   signingid?: IdentityID;
   signature?: string;
   version?: BigNumber;
+}
+
+export interface IdentityUpdateEnvelopeJson {
+  details: IdentityUpdateDetailsJson;
+  systemid?: string;
+  signingid?: string;
+  signature?: string;
+  version?: string;
 }
 
 export class IdentityUpdateEnvelope extends VDXFObject {
@@ -231,6 +240,28 @@ export class IdentityUpdateEnvelope extends VDXFObject {
 
     return inv;
   }
+
+  toJson(): IdentityUpdateEnvelopeJson {
+    return {
+      systemid: this.systemid ? this.systemid.toAddress() : undefined,
+      signingid: this.signingid ? this.signingid.toAddress() : undefined,
+      signature: this.signature ? this.signature.signature : undefined,
+      details: this.details ? this.details.toJson() : undefined
+    }
+  }
+
+  protected static internalFromJson<T>(
+    json: IdentityUpdateEnvelopeJson, 
+    ctor: new (...args: any[]) => T,
+    detailsFromJson: (json: IdentityUpdateDetailsJson) => IdentityUpdateDetails
+  ): T {
+    return new ctor({
+      systemid: json.systemid ? IdentityID.fromAddress(json.systemid) : undefined,
+      signingid: json.signingid ? IdentityID.fromAddress(json.signingid) : undefined,
+      signature: json.signature,
+      details: json.details ? detailsFromJson(json.details) : undefined
+    });
+  }
 }
 
 export class IdentityUpdateRequest extends IdentityUpdateEnvelope {
@@ -245,6 +276,10 @@ export class IdentityUpdateRequest extends IdentityUpdateEnvelope {
   static fromQrString(qrstring: string): IdentityUpdateRequest {
     return (IdentityUpdateEnvelope.fromQrString(IDENTITY_UPDATE_REQUEST_VDXF_KEY.vdxfid, qrstring) as IdentityUpdateRequest);
   }
+
+  static fromJson(json: IdentityUpdateEnvelopeJson) {
+    return IdentityUpdateEnvelope.internalFromJson<IdentityUpdateRequest>(json, IdentityUpdateRequest, IdentityUpdateRequestDetails.fromJson);
+  }
 }
 
 export class IdentityUpdateResponse extends IdentityUpdateEnvelope {
@@ -258,5 +293,9 @@ export class IdentityUpdateResponse extends IdentityUpdateEnvelope {
 
   static fromQrString(qrstring: string): IdentityUpdateResponse {
     return (IdentityUpdateEnvelope.fromQrString(IDENTITY_UPDATE_RESPONSE_VDXF_KEY.vdxfid, qrstring) as IdentityUpdateResponse);
+  }
+
+  static fromJson(json: IdentityUpdateEnvelopeJson) {
+    return IdentityUpdateEnvelope.internalFromJson<IdentityUpdateResponse>(json, IdentityUpdateResponse, IdentityUpdateResponseDetails.fromJson);
   }
 }

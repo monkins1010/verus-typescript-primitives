@@ -1,8 +1,6 @@
 /// <reference types="node" />
 /// <reference types="bn.js" />
-import { PartialSignData } from '../../../pbaas/PartialSignData';
 import { BigNumber } from '../../../utils/types/BigNumber';
-export declare type SignDataMap = Map<string, PartialSignData>;
 export declare type IdentityUpdateReponseDetailsJson = {
     flags: string;
     requestid: string;

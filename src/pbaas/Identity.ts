@@ -94,39 +94,39 @@ export class Identity extends Principal implements SerializableEntity {
     if (data?.unlock_after) this.unlock_after = data.unlock_after;
   }
 
-  protected serializeParent() {
+  protected containsParent() {
     return true;
   }
 
-  protected serializeSystemId() {
+  protected containsSystemId() {
     return true;
   }
 
-  protected serializeName() {
+  protected containsName() {
     return true;
   }
 
-  protected serializeContentMap() {
+  protected containsContentMap() {
     return true;
   }
 
-  protected serializeContentMultiMap() {
+  protected containsContentMultiMap() {
     return true;
   }
 
-  protected serializeRevocation() {
+  protected containsRevocation() {
     return true;
   }
 
-  protected serializeRecovery() {
+  protected containsRecovery() {
     return true;
   }
 
-  protected serializePrivateAddresses() {
+  protected containsPrivateAddresses() {
     return true;
   }
 
-  protected serializeUnlockAfter() {
+  protected containsUnlockAfter() {
     return true;
   }
 
@@ -135,19 +135,19 @@ export class Identity extends Principal implements SerializableEntity {
 
     length += super.getByteLength();
     
-    if (this.serializeParent()) length += this.parent.getByteLength();
+    if (this.containsParent()) length += this.parent.getByteLength();
 
-    if (this.serializeName()) {
+    if (this.containsName()) {
       const nameLength = Buffer.from(this.name, "utf8").length;
       length += varuint.encodingLength(nameLength);
       length += nameLength;
     }
     
-    if (this.serializeContentMultiMap() && this.version.gte(IDENTITY_VERSION_PBAAS)) {
+    if (this.containsContentMultiMap() && this.version.gte(IDENTITY_VERSION_PBAAS)) {
       length += this.content_multimap.getByteLength();
     }
 
-    if (this.serializeContentMap()) {
+    if (this.containsContentMap()) {
       if (this.version.lt(IDENTITY_VERSION_PBAAS)) {
         length += varuint.encodingLength(this.content_map.size);
   
@@ -165,10 +165,10 @@ export class Identity extends Principal implements SerializableEntity {
       }
     }
 
-    if (this.serializeRevocation()) length += this.revocation_authority.getByteLength();   //uint160 revocation authority
-    if (this.serializeRecovery()) length += this.recovery_authority.getByteLength();   //uint160 recovery authority
+    if (this.containsRevocation()) length += this.revocation_authority.getByteLength();   //uint160 revocation authority
+    if (this.containsRecovery()) length += this.recovery_authority.getByteLength();   //uint160 recovery authority
 
-    if (this.serializePrivateAddresses()) {
+    if (this.containsPrivateAddresses()) {
       length += varuint.encodingLength(this.private_addresses ? this.private_addresses.length : 0);
       
       if (this.private_addresses) {
@@ -180,8 +180,8 @@ export class Identity extends Principal implements SerializableEntity {
     
     // post PBAAS
     if (this.version.gte(IDENTITY_VERSION_VAULT)) {
-      if (this.serializeSystemId()) length += this.system_id.getByteLength();   //uint160 systemid
-      if (this.serializeUnlockAfter()) length += 4;                             //uint32 unlockafter
+      if (this.containsSystemId()) length += this.system_id.getByteLength();   //uint160 systemid
+      if (this.containsUnlockAfter()) length += 4;                             //uint32 unlockafter
     }
 
     return length;
@@ -200,15 +200,15 @@ export class Identity extends Principal implements SerializableEntity {
 
     writer.writeSlice(super.toBuffer());
 
-    if (this.serializeParent()) writer.writeSlice(this.parent.toBuffer());
-    if (this.serializeName()) writer.writeVarSlice(Buffer.from(this.name, "utf8"));
+    if (this.containsParent()) writer.writeSlice(this.parent.toBuffer());
+    if (this.containsName()) writer.writeVarSlice(Buffer.from(this.name, "utf8"));
 
     //contentmultimap
-    if (this.serializeContentMultiMap() && this.version.gte(IDENTITY_VERSION_PBAAS)) {
+    if (this.containsContentMultiMap() && this.version.gte(IDENTITY_VERSION_PBAAS)) {
       writer.writeSlice(this.content_multimap.toBuffer());
     }
 
-    if (this.serializeContentMap()) {
+    if (this.containsContentMap()) {
       //contentmap
       if (this.version.lt(IDENTITY_VERSION_PBAAS)) {
         writer.writeCompactSize(this.content_map.size);
@@ -228,10 +228,10 @@ export class Identity extends Principal implements SerializableEntity {
       }
     }
     
-    if (this.serializeRevocation()) writer.writeSlice(this.revocation_authority.toBuffer());
-    if (this.serializeRecovery()) writer.writeSlice(this.recovery_authority.toBuffer());
+    if (this.containsRevocation()) writer.writeSlice(this.revocation_authority.toBuffer());
+    if (this.containsRecovery()) writer.writeSlice(this.recovery_authority.toBuffer());
 
-    if (this.serializePrivateAddresses()) {
+    if (this.containsPrivateAddresses()) {
       // privateaddresses
       writer.writeCompactSize(this.private_addresses ? this.private_addresses.length : 0);
 
@@ -244,8 +244,8 @@ export class Identity extends Principal implements SerializableEntity {
     
     // post PBAAS
     if (this.version.gte(IDENTITY_VERSION_VAULT)) {
-      if (this.serializeSystemId()) writer.writeSlice(this.system_id.toBuffer())
-      if (this.serializeUnlockAfter()) writer.writeUInt32(this.unlock_after.toNumber())
+      if (this.containsSystemId()) writer.writeSlice(this.system_id.toBuffer())
+      if (this.containsUnlockAfter()) writer.writeUInt32(this.unlock_after.toNumber())
     }
 
     return writer.buffer
@@ -257,7 +257,7 @@ export class Identity extends Principal implements SerializableEntity {
     reader.offset = super.fromBuffer(reader.buffer, reader.offset);
     const _parent = new IdentityID();
 
-    if (this.serializeParent()) {
+    if (this.containsParent()) {
       reader.offset = _parent.fromBuffer(
         reader.buffer,
         reader.offset
@@ -265,9 +265,9 @@ export class Identity extends Principal implements SerializableEntity {
       this.parent = _parent;
     }
     
-    if (this.serializeName()) this.name = Buffer.from(reader.readVarSlice()).toString('utf8')
+    if (this.containsName()) this.name = Buffer.from(reader.readVarSlice()).toString('utf8')
 
-    if (this.serializeContentMultiMap()) {
+    if (this.containsContentMultiMap()) {
       //contentmultimap
       if (this.version.gte(IDENTITY_VERSION_PBAAS)) {
         const multimap = new ContentMultiMap();
@@ -278,7 +278,7 @@ export class Identity extends Principal implements SerializableEntity {
       }
     }
 
-    if (this.serializeContentMap()) {
+    if (this.containsContentMap()) {
       // contentmap
       if (this.version.lt(IDENTITY_VERSION_PBAAS)) {
         const contentMapSize = reader.readVarInt();
@@ -299,7 +299,7 @@ export class Identity extends Principal implements SerializableEntity {
       }
     }
 
-    if (this.serializeRevocation()) {
+    if (this.containsRevocation()) {
       const _revocation = new IdentityID();
       reader.offset = _revocation.fromBuffer(
         reader.buffer,
@@ -308,7 +308,7 @@ export class Identity extends Principal implements SerializableEntity {
       this.revocation_authority = _revocation;
     }
 
-    if (this.serializeRecovery()) {
+    if (this.containsRecovery()) {
       const _recovery = new IdentityID();
       reader.offset = _recovery.fromBuffer(
         reader.buffer,
@@ -317,7 +317,7 @@ export class Identity extends Principal implements SerializableEntity {
       this.recovery_authority = _recovery;
     }
     
-    if (this.serializePrivateAddresses()) {
+    if (this.containsPrivateAddresses()) {
       const numPrivateAddresses = reader.readVarInt();
 
       if (numPrivateAddresses.gt(new BN(0))) this.private_addresses = [];
@@ -333,7 +333,7 @@ export class Identity extends Principal implements SerializableEntity {
     }
 
     if (this.version.gte(IDENTITY_VERSION_VAULT)) {
-      if (this.serializeSystemId()) {
+      if (this.containsSystemId()) {
         const _system = new IdentityID();
         reader.offset = _system.fromBuffer(
           reader.buffer,
@@ -342,7 +342,7 @@ export class Identity extends Principal implements SerializableEntity {
         this.system_id = _system;
       }
       
-      if (this.serializeUnlockAfter()) {
+      if (this.containsUnlockAfter()) {
         this.unlock_after = new BN(reader.readUInt32(), 10);
       }
     } else {
@@ -356,7 +356,7 @@ export class Identity extends Principal implements SerializableEntity {
   toJson(): VerusCLIVerusIDJson {
     const contentmap = {};
 
-    if (this.serializeContentMap()) {
+    if (this.containsContentMap()) {
       for (const [key, value] of this.content_map.entries()) { 
         const valueCopy = Buffer.from(value);
         contentmap[fromBase58Check(key).hash.reverse().toString('hex')] = valueCopy.reverse().toString('hex');
@@ -364,19 +364,19 @@ export class Identity extends Principal implements SerializableEntity {
     }
     
     const ret: VerusCLIVerusIDJson = {
-      contentmap: this.serializeContentMap() ? contentmap : undefined,
-      contentmultimap: this.serializeContentMultiMap() ? this.content_multimap.toJson() : undefined,
+      contentmap: this.containsContentMap() ? contentmap : undefined,
+      contentmultimap: this.containsContentMultiMap() ? this.content_multimap.toJson() : undefined,
       flags: this.flags.toNumber(),
-      minimumsignatures: this.serializeMinSigs() ? this.min_sigs.toNumber() : undefined,
+      minimumsignatures: this.containsMinSigs() ? this.min_sigs.toNumber() : undefined,
       name: this.name,
-      parent: this.serializeParent() ? this.parent.toAddress() : undefined,
-      primaryaddresses: this.serializePrimaryAddresses() ? this.primary_addresses.map(x => x.toAddress()) : undefined,
-      recoveryauthority: this.serializeRecovery() ? this.recovery_authority.toAddress() : undefined,
-      revocationauthority: this.serializeRevocation() ? this.revocation_authority.toAddress() : undefined,
-      systemid: this.serializeSystemId() ? this.system_id.toAddress() : undefined,
-      timelock: this.serializeUnlockAfter() ? this.unlock_after.toNumber() : undefined,
+      parent: this.containsParent() ? this.parent.toAddress() : undefined,
+      primaryaddresses: this.containsPrimaryAddresses() ? this.primary_addresses.map(x => x.toAddress()) : undefined,
+      recoveryauthority: this.containsRecovery() ? this.recovery_authority.toAddress() : undefined,
+      revocationauthority: this.containsRevocation() ? this.revocation_authority.toAddress() : undefined,
+      systemid: this.containsSystemId() ? this.system_id.toAddress() : undefined,
+      timelock: this.containsUnlockAfter() ? this.unlock_after.toNumber() : undefined,
       version: this.version.toNumber(),
-      identityaddress: this.serializeParent() ? this.getIdentityAddress() : undefined
+      identityaddress: this.containsParent() ? this.getIdentityAddress() : undefined
     };
 
     if (this.private_addresses != null && this.private_addresses.length > 0) {
@@ -487,19 +487,22 @@ export class Identity extends Principal implements SerializableEntity {
     }
   }
 
-  static fromJson(json: VerusCLIVerusIDJson): Identity {
+  protected static internalFromJson<T>(
+    json: VerusCLIVerusIDJson, 
+    ctor: new (...args: any[]) => T
+  ): T {
     const contentmap = new Map<string, Buffer>();
-
+  
     if (json.contentmap) {
       for (const key in json.contentmap) {
         const reverseKey = Buffer.from(key, 'hex').reverse();
         const iAddrKey = toBase58Check(reverseKey, I_ADDR_VERSION);
-        
+  
         contentmap.set(iAddrKey, Buffer.from(json.contentmap[key], 'hex').reverse());
       }
     }
-
-    return new Identity({
+  
+    return new ctor({
       version: json.version ? new BN(json.version, 10) : null,
       flags: json.flags ? new BN(json.flags, 10) : null,
       min_sigs: json.minimumsignatures ? new BN(json.minimumsignatures, 10) : null,
@@ -514,5 +517,9 @@ export class Identity extends Principal implements SerializableEntity {
       private_addresses: json.privateaddress == null ? [] : [SaplingPaymentAddress.fromAddressString(json.privateaddress)],
       unlock_after: json.timelock != null ? new BN(json.timelock, 10) : null
     });
+  }
+
+  static fromJson(json: VerusCLIVerusIDJson): Identity {
+    return Identity.internalFromJson<Identity>(json, Identity);
   }
 }

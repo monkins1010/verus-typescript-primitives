@@ -2,21 +2,29 @@
 /// <reference types="node" />
 import { VDXFObject, VerusIDSignature } from "../..";
 import { BigNumber } from "../../../utils/types/BigNumber";
-import { IdentityUpdateRequestDetails } from "./IdentityUpdateRequestDetails";
+import { IdentityUpdateRequestDetails, IdentityUpdateRequestDetailsJson } from "./IdentityUpdateRequestDetails";
 import { IdentityID } from "../../../pbaas";
-import { IdentityUpdateResponseDetails } from "./IdentityUpdateResponseDetails";
+import { IdentityUpdateResponseDetails, IdentityUpdateReponseDetailsJson } from "./IdentityUpdateResponseDetails";
 export declare const IDENTITY_UPDATE_VERSION_CURRENT: import("bn.js");
 export declare const IDENTITY_UPDATE_VERSION_FIRSTVALID: import("bn.js");
 export declare const IDENTITY_UPDATE_VERSION_LASTVALID: import("bn.js");
 export declare const IDENTITY_UPDATE_VERSION_SIGNED: import("bn.js");
 export declare const IDENTITY_UPDATE_VERSION_MASK: import("bn.js");
 export declare type IdentityUpdateDetails = IdentityUpdateRequestDetails | IdentityUpdateResponseDetails;
+export declare type IdentityUpdateDetailsJson = IdentityUpdateRequestDetailsJson | IdentityUpdateReponseDetailsJson;
 export interface IdentityUpdateEnvelopeInterface {
     details: IdentityUpdateDetails;
     systemid?: IdentityID;
     signingid?: IdentityID;
     signature?: string;
     version?: BigNumber;
+}
+export interface IdentityUpdateEnvelopeJson {
+    details: IdentityUpdateDetailsJson;
+    systemid?: string;
+    signingid?: string;
+    signature?: string;
+    version?: string;
 }
 export declare class IdentityUpdateEnvelope extends VDXFObject {
     systemid: IdentityID;
@@ -40,14 +48,18 @@ export declare class IdentityUpdateEnvelope extends VDXFObject {
     static fromWalletDeeplinkUri(vdxfkey: string, uri: string): IdentityUpdateEnvelope;
     toQrString(): string;
     static fromQrString(vdxfkey: string, qrstring: string): IdentityUpdateEnvelope;
+    toJson(): IdentityUpdateEnvelopeJson;
+    protected static internalFromJson<T>(json: IdentityUpdateEnvelopeJson, ctor: new (...args: any[]) => T, detailsFromJson: (json: IdentityUpdateDetailsJson) => IdentityUpdateDetails): T;
 }
 export declare class IdentityUpdateRequest extends IdentityUpdateEnvelope {
     constructor(request: IdentityUpdateEnvelopeInterface);
     static fromWalletDeeplinkUri(uri: string): IdentityUpdateRequest;
     static fromQrString(qrstring: string): IdentityUpdateRequest;
+    static fromJson(json: IdentityUpdateEnvelopeJson): IdentityUpdateRequest;
 }
 export declare class IdentityUpdateResponse extends IdentityUpdateEnvelope {
     constructor(response: IdentityUpdateEnvelopeInterface);
     static fromWalletDeeplinkUri(uri: string): IdentityUpdateEnvelope;
     static fromQrString(qrstring: string): IdentityUpdateResponse;
+    static fromJson(json: IdentityUpdateEnvelopeJson): IdentityUpdateResponse;
 }

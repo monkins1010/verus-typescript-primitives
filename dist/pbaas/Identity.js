@@ -47,47 +47,47 @@ class Identity extends Principal_1.Principal {
         if (data === null || data === void 0 ? void 0 : data.unlock_after)
             this.unlock_after = data.unlock_after;
     }
-    serializeParent() {
+    containsParent() {
         return true;
     }
-    serializeSystemId() {
+    containsSystemId() {
         return true;
     }
-    serializeName() {
+    containsName() {
         return true;
     }
-    serializeContentMap() {
+    containsContentMap() {
         return true;
     }
-    serializeContentMultiMap() {
+    containsContentMultiMap() {
         return true;
     }
-    serializeRevocation() {
+    containsRevocation() {
         return true;
     }
-    serializeRecovery() {
+    containsRecovery() {
         return true;
     }
-    serializePrivateAddresses() {
+    containsPrivateAddresses() {
         return true;
     }
-    serializeUnlockAfter() {
+    containsUnlockAfter() {
         return true;
     }
     getIdentityByteLength() {
         let length = 0;
         length += super.getByteLength();
-        if (this.serializeParent())
+        if (this.containsParent())
             length += this.parent.getByteLength();
-        if (this.serializeName()) {
+        if (this.containsName()) {
             const nameLength = Buffer.from(this.name, "utf8").length;
             length += varuint_1.default.encodingLength(nameLength);
             length += nameLength;
         }
-        if (this.serializeContentMultiMap() && this.version.gte(exports.IDENTITY_VERSION_PBAAS)) {
+        if (this.containsContentMultiMap() && this.version.gte(exports.IDENTITY_VERSION_PBAAS)) {
             length += this.content_multimap.getByteLength();
         }
-        if (this.serializeContentMap()) {
+        if (this.containsContentMap()) {
             if (this.version.lt(exports.IDENTITY_VERSION_PBAAS)) {
                 length += varuint_1.default.encodingLength(this.content_map.size);
                 for (const m of this.content_map.entries()) {
@@ -101,11 +101,11 @@ class Identity extends Principal_1.Principal {
                 length += 32; //uint256 hash
             }
         }
-        if (this.serializeRevocation())
+        if (this.containsRevocation())
             length += this.revocation_authority.getByteLength(); //uint160 revocation authority
-        if (this.serializeRecovery())
+        if (this.containsRecovery())
             length += this.recovery_authority.getByteLength(); //uint160 recovery authority
-        if (this.serializePrivateAddresses()) {
+        if (this.containsPrivateAddresses()) {
             length += varuint_1.default.encodingLength(this.private_addresses ? this.private_addresses.length : 0);
             if (this.private_addresses) {
                 for (const n of this.private_addresses) {
@@ -115,9 +115,9 @@ class Identity extends Principal_1.Principal {
         }
         // post PBAAS
         if (this.version.gte(exports.IDENTITY_VERSION_VAULT)) {
-            if (this.serializeSystemId())
+            if (this.containsSystemId())
                 length += this.system_id.getByteLength(); //uint160 systemid
-            if (this.serializeUnlockAfter())
+            if (this.containsUnlockAfter())
                 length += 4; //uint32 unlockafter
         }
         return length;
@@ -131,15 +131,15 @@ class Identity extends Principal_1.Principal {
     toBuffer() {
         const writer = new BufferWriter(Buffer.alloc(this.getIdentityByteLength()));
         writer.writeSlice(super.toBuffer());
-        if (this.serializeParent())
+        if (this.containsParent())
             writer.writeSlice(this.parent.toBuffer());
-        if (this.serializeName())
+        if (this.containsName())
             writer.writeVarSlice(Buffer.from(this.name, "utf8"));
         //contentmultimap
-        if (this.serializeContentMultiMap() && this.version.gte(exports.IDENTITY_VERSION_PBAAS)) {
+        if (this.containsContentMultiMap() && this.version.gte(exports.IDENTITY_VERSION_PBAAS)) {
             writer.writeSlice(this.content_multimap.toBuffer());
         }
-        if (this.serializeContentMap()) {
+        if (this.containsContentMap()) {
             //contentmap
             if (this.version.lt(exports.IDENTITY_VERSION_PBAAS)) {
                 writer.writeCompactSize(this.content_map.size);
@@ -155,11 +155,11 @@ class Identity extends Principal_1.Principal {
                 writer.writeSlice(value);
             }
         }
-        if (this.serializeRevocation())
+        if (this.containsRevocation())
             writer.writeSlice(this.revocation_authority.toBuffer());
-        if (this.serializeRecovery())
+        if (this.containsRecovery())
             writer.writeSlice(this.recovery_authority.toBuffer());
-        if (this.serializePrivateAddresses()) {
+        if (this.containsPrivateAddresses()) {
             // privateaddresses
             writer.writeCompactSize(this.private_addresses ? this.private_addresses.length : 0);
             if (this.private_addresses) {
@@ -170,9 +170,9 @@ class Identity extends Principal_1.Principal {
         }
         // post PBAAS
         if (this.version.gte(exports.IDENTITY_VERSION_VAULT)) {
-            if (this.serializeSystemId())
+            if (this.containsSystemId())
                 writer.writeSlice(this.system_id.toBuffer());
-            if (this.serializeUnlockAfter())
+            if (this.containsUnlockAfter())
                 writer.writeUInt32(this.unlock_after.toNumber());
         }
         return writer.buffer;
@@ -181,13 +181,13 @@ class Identity extends Principal_1.Principal {
         const reader = new BufferReader(buffer, offset);
         reader.offset = super.fromBuffer(reader.buffer, reader.offset);
         const _parent = new IdentityID_1.IdentityID();
-        if (this.serializeParent()) {
+        if (this.containsParent()) {
             reader.offset = _parent.fromBuffer(reader.buffer, reader.offset);
             this.parent = _parent;
         }
-        if (this.serializeName())
+        if (this.containsName())
             this.name = Buffer.from(reader.readVarSlice()).toString('utf8');
-        if (this.serializeContentMultiMap()) {
+        if (this.containsContentMultiMap()) {
             //contentmultimap
             if (this.version.gte(exports.IDENTITY_VERSION_PBAAS)) {
                 const multimap = new ContentMultiMap_1.ContentMultiMap();
@@ -195,7 +195,7 @@ class Identity extends Principal_1.Principal {
                 this.content_multimap = multimap;
             }
         }
-        if (this.serializeContentMap()) {
+        if (this.containsContentMap()) {
             // contentmap
             if (this.version.lt(exports.IDENTITY_VERSION_PBAAS)) {
                 const contentMapSize = reader.readVarInt();
@@ -212,17 +212,17 @@ class Identity extends Principal_1.Principal {
                 this.content_map.set(contentMapKey, reader.readSlice(32));
             }
         }
-        if (this.serializeRevocation()) {
+        if (this.containsRevocation()) {
             const _revocation = new IdentityID_1.IdentityID();
             reader.offset = _revocation.fromBuffer(reader.buffer, reader.offset);
             this.revocation_authority = _revocation;
         }
-        if (this.serializeRecovery()) {
+        if (this.containsRecovery()) {
             const _recovery = new IdentityID_1.IdentityID();
             reader.offset = _recovery.fromBuffer(reader.buffer, reader.offset);
             this.recovery_authority = _recovery;
         }
-        if (this.serializePrivateAddresses()) {
+        if (this.containsPrivateAddresses()) {
             const numPrivateAddresses = reader.readVarInt();
             if (numPrivateAddresses.gt(new bn_js_1.BN(0)))
                 this.private_addresses = [];
@@ -233,12 +233,12 @@ class Identity extends Principal_1.Principal {
             }
         }
         if (this.version.gte(exports.IDENTITY_VERSION_VAULT)) {
-            if (this.serializeSystemId()) {
+            if (this.containsSystemId()) {
                 const _system = new IdentityID_1.IdentityID();
                 reader.offset = _system.fromBuffer(reader.buffer, reader.offset);
                 this.system_id = _system;
             }
-            if (this.serializeUnlockAfter()) {
+            if (this.containsUnlockAfter()) {
                 this.unlock_after = new bn_js_1.BN(reader.readUInt32(), 10);
             }
         }
@@ -250,26 +250,26 @@ class Identity extends Principal_1.Principal {
     }
     toJson() {
         const contentmap = {};
-        if (this.serializeContentMap()) {
+        if (this.containsContentMap()) {
             for (const [key, value] of this.content_map.entries()) {
                 const valueCopy = Buffer.from(value);
                 contentmap[(0, address_1.fromBase58Check)(key).hash.reverse().toString('hex')] = valueCopy.reverse().toString('hex');
             }
         }
         const ret = {
-            contentmap: this.serializeContentMap() ? contentmap : undefined,
-            contentmultimap: this.serializeContentMultiMap() ? this.content_multimap.toJson() : undefined,
+            contentmap: this.containsContentMap() ? contentmap : undefined,
+            contentmultimap: this.containsContentMultiMap() ? this.content_multimap.toJson() : undefined,
             flags: this.flags.toNumber(),
-            minimumsignatures: this.serializeMinSigs() ? this.min_sigs.toNumber() : undefined,
+            minimumsignatures: this.containsMinSigs() ? this.min_sigs.toNumber() : undefined,
             name: this.name,
-            parent: this.serializeParent() ? this.parent.toAddress() : undefined,
-            primaryaddresses: this.serializePrimaryAddresses() ? this.primary_addresses.map(x => x.toAddress()) : undefined,
-            recoveryauthority: this.serializeRecovery() ? this.recovery_authority.toAddress() : undefined,
-            revocationauthority: this.serializeRevocation() ? this.revocation_authority.toAddress() : undefined,
-            systemid: this.serializeSystemId() ? this.system_id.toAddress() : undefined,
-            timelock: this.serializeUnlockAfter() ? this.unlock_after.toNumber() : undefined,
+            parent: this.containsParent() ? this.parent.toAddress() : undefined,
+            primaryaddresses: this.containsPrimaryAddresses() ? this.primary_addresses.map(x => x.toAddress()) : undefined,
+            recoveryauthority: this.containsRecovery() ? this.recovery_authority.toAddress() : undefined,
+            revocationauthority: this.containsRevocation() ? this.revocation_authority.toAddress() : undefined,
+            systemid: this.containsSystemId() ? this.system_id.toAddress() : undefined,
+            timelock: this.containsUnlockAfter() ? this.unlock_after.toNumber() : undefined,
             version: this.version.toNumber(),
-            identityaddress: this.serializeParent() ? this.getIdentityAddress() : undefined
+            identityaddress: this.containsParent() ? this.getIdentityAddress() : undefined
         };
         if (this.private_addresses != null && this.private_addresses.length > 0) {
             ret.privateaddress = this.private_addresses[0].toAddressString();
@@ -363,7 +363,7 @@ class Identity extends Principal_1.Principal {
             this.version = Identity.VERSION_PBAAS;
         }
     }
-    static fromJson(json) {
+    static internalFromJson(json, ctor) {
         const contentmap = new Map();
         if (json.contentmap) {
             for (const key in json.contentmap) {
@@ -372,7 +372,7 @@ class Identity extends Principal_1.Principal {
                 contentmap.set(iAddrKey, Buffer.from(json.contentmap[key], 'hex').reverse());
             }
         }
-        return new Identity({
+        return new ctor({
             version: json.version ? new bn_js_1.BN(json.version, 10) : null,
             flags: json.flags ? new bn_js_1.BN(json.flags, 10) : null,
             min_sigs: json.minimumsignatures ? new bn_js_1.BN(json.minimumsignatures, 10) : null,
@@ -387,6 +387,9 @@ class Identity extends Principal_1.Principal {
             private_addresses: json.privateaddress == null ? [] : [SaplingPaymentAddress_1.SaplingPaymentAddress.fromAddressString(json.privateaddress)],
             unlock_after: json.timelock != null ? new bn_js_1.BN(json.timelock, 10) : null
         });
+    }
+    static fromJson(json) {
+        return Identity.internalFromJson(json, Identity);
     }
 }
 exports.Identity = Identity;

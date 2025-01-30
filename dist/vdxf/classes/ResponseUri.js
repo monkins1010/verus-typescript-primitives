@@ -44,9 +44,15 @@ class ResponseUri {
     }
     toJson() {
         return {
-            type: this.type.toNumber(),
+            type: this.type.toString(10),
             uri: this.getUriString()
         };
+    }
+    static fromJson(json) {
+        return new ResponseUri({
+            type: new bn_js_1.BN(json.type, 10),
+            uri: Buffer.from(json.uri, 'utf-8')
+        });
     }
 }
 exports.ResponseUri = ResponseUri;

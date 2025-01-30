@@ -20,11 +20,13 @@ class IdentityUpdateResponseDetails {
             this.createdat = data.createdat;
         }
         if (data === null || data === void 0 ? void 0 : data.txid) {
-            this.toggleContainsTxid();
+            if (!this.containsTxid())
+                this.toggleContainsTxid();
             this.txid = data.txid;
         }
         if (data === null || data === void 0 ? void 0 : data.salt) {
-            this.toggleContainsSalt();
+            if (!this.containsSalt())
+                this.toggleContainsSalt();
             this.salt = data.salt;
         }
     }

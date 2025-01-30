@@ -18,6 +18,14 @@ export type PartialMMRDataInitData = {
   priormmr?: Array<Buffer>;
 }
 
+export type PartialMMRDataJson = {
+  flags?: string;
+  data?: Array<{type: string, data: string}>;
+  salt?: Array<string>;
+  mmrhashtype?: string;
+  priormmr?: Array<string>;
+}
+
 export class PartialMMRData implements SerializableEntity {
   flags: BigNumber;
   data: Array<PartialMMRDataUnit>;
@@ -35,21 +43,21 @@ export class PartialMMRData implements SerializableEntity {
     this.mmrhashtype = data && data.mmrhashtype ? data.mmrhashtype : DEFAULT_HASH_TYPE;
     
     if (data?.salt) {
-      this.toggleContainsSalt();
+      if (!this.containsSalt()) this.toggleContainsSalt();
       this.salt = data.salt;
     }
 
     if (data?.priormmr) {
-      this.toggleContainsPriorMMR();
+      if (!this.containsPriorMMR()) this.toggleContainsPriorMMR();
       this.priormmr = data.priormmr;
     }
   }
 
-  protected serializeSalt() {
+  protected containsSalt() {
     return !!(this.flags.and(PartialMMRData.CONTAINS_SALT).toNumber());
   }
 
-  protected serializePriorMMR() {
+  protected containsPriorMMR() {
     return !!(this.flags.and(PartialMMRData.CONTAINS_PRIORMMR).toNumber());
   }
 
@@ -78,7 +86,7 @@ export class PartialMMRData implements SerializableEntity {
 
     length += varint.encodingLength(this.mmrhashtype);
 
-    if (this.serializeSalt()) {
+    if (this.containsSalt()) {
       length += varuint.encodingLength(this.salt.length);
       for (let i = 0; i < this.salt.length; i++) {
         const salt = this.salt[i];
@@ -88,7 +96,7 @@ export class PartialMMRData implements SerializableEntity {
       }
     }
 
-    if (this.serializePriorMMR()) {
+    if (this.containsPriorMMR()) {
       length += varuint.encodingLength(this.priormmr.length);
       for (let i = 0; i < this.priormmr.length; i++) {
         const priormmr = this.priormmr[i];
@@ -123,11 +131,11 @@ export class PartialMMRData implements SerializableEntity {
 
     this.mmrhashtype = reader.readVarInt();
 
-    if (this.serializeSalt()) {
+    if (this.containsSalt()) {
       this.salt = reader.readVector();
     }
 
-    if (this.serializePriorMMR()) {
+    if (this.containsPriorMMR()) {
       this.priormmr = reader.readVector();
     }
 
@@ -149,14 +157,44 @@ export class PartialMMRData implements SerializableEntity {
 
     writer.writeVarInt(this.mmrhashtype);
 
-    if (this.serializeSalt()) {
+    if (this.containsSalt()) {
       writer.writeVector(this.salt);
     }
 
-    if (this.serializePriorMMR()) {
+    if (this.containsPriorMMR()) {
       writer.writeVector(this.priormmr);
     }
   
     return writer.buffer;
+  }
+
+  toJson(): PartialMMRDataJson {
+    return {
+      flags: this.flags ? this.flags.toString(10) : undefined,
+      data: this.data ? this.data.map(x => {
+        return {
+          type: x.type.toString(10),
+          data: x.data.toString('hex')
+        }
+      }) : undefined,
+      salt: this.salt ? this.salt.map(x => x.toString('hex')) : undefined,
+      mmrhashtype: this.mmrhashtype ? this.mmrhashtype.toString(10) : undefined,
+      priormmr: this.priormmr ? this.priormmr.map(x => x.toString('hex')) : undefined
+    }
+  }
+
+  static fromJson(json: PartialMMRDataJson): PartialMMRData {
+    return new PartialMMRData({
+      flags: json.flags ? new BN(json.flags, 10) : undefined,
+      data: json.data ? json.data.map(x => {
+        return {
+          type: new BN(x.type, 10),
+          data: Buffer.from(x.data, 'hex')
+        }
+      }) : undefined,
+      salt: json.salt ? json.salt.map(x => Buffer.from(x, 'hex')) : undefined,
+      mmrhashtype: json.mmrhashtype ? new BN(json.mmrhashtype, 10) : undefined,
+      priormmr: json.priormmr ? json.priormmr.map(x => Buffer.from(x, 'hex')) : undefined,
+    })
   }
 }

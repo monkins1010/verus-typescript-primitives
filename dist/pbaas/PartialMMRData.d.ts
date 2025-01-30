@@ -13,6 +13,16 @@ export declare type PartialMMRDataInitData = {
     mmrhashtype?: BigNumber;
     priormmr?: Array<Buffer>;
 };
+export declare type PartialMMRDataJson = {
+    flags?: string;
+    data?: Array<{
+        type: string;
+        data: string;
+    }>;
+    salt?: Array<string>;
+    mmrhashtype?: string;
+    priormmr?: Array<string>;
+};
 export declare class PartialMMRData implements SerializableEntity {
     flags: BigNumber;
     data: Array<PartialMMRDataUnit>;
@@ -22,12 +32,14 @@ export declare class PartialMMRData implements SerializableEntity {
     static CONTAINS_SALT: import("bn.js");
     static CONTAINS_PRIORMMR: import("bn.js");
     constructor(data?: PartialMMRDataInitData);
-    protected serializeSalt(): boolean;
-    protected serializePriorMMR(): boolean;
+    protected containsSalt(): boolean;
+    protected containsPriorMMR(): boolean;
     private toggleContainsSalt;
     private toggleContainsPriorMMR;
     private getPartialMMRDataByteLength;
     getByteLength(): number;
     fromBuffer(buffer: Buffer, offset?: number): number;
     toBuffer(): Buffer;
+    toJson(): PartialMMRDataJson;
+    static fromJson(json: PartialMMRDataJson): PartialMMRData;
 }

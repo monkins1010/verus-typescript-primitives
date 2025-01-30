@@ -13,18 +13,20 @@ class PartialMMRData {
         this.data = data && data.data ? data.data : [];
         this.mmrhashtype = data && data.mmrhashtype ? data.mmrhashtype : pbaas_1.DEFAULT_HASH_TYPE;
         if (data === null || data === void 0 ? void 0 : data.salt) {
-            this.toggleContainsSalt();
+            if (!this.containsSalt())
+                this.toggleContainsSalt();
             this.salt = data.salt;
         }
         if (data === null || data === void 0 ? void 0 : data.priormmr) {
-            this.toggleContainsPriorMMR();
+            if (!this.containsPriorMMR())
+                this.toggleContainsPriorMMR();
             this.priormmr = data.priormmr;
         }
     }
-    serializeSalt() {
+    containsSalt() {
         return !!(this.flags.and(PartialMMRData.CONTAINS_SALT).toNumber());
     }
-    serializePriorMMR() {
+    containsPriorMMR() {
         return !!(this.flags.and(PartialMMRData.CONTAINS_PRIORMMR).toNumber());
     }
     toggleContainsSalt() {
@@ -44,7 +46,7 @@ class PartialMMRData {
             length += unit.data.length;
         }
         length += varint_1.default.encodingLength(this.mmrhashtype);
-        if (this.serializeSalt()) {
+        if (this.containsSalt()) {
             length += varuint_1.default.encodingLength(this.salt.length);
             for (let i = 0; i < this.salt.length; i++) {
                 const salt = this.salt[i];
@@ -52,7 +54,7 @@ class PartialMMRData {
                 length += salt.length;
             }
         }
-        if (this.serializePriorMMR()) {
+        if (this.containsPriorMMR()) {
             length += varuint_1.default.encodingLength(this.priormmr.length);
             for (let i = 0; i < this.priormmr.length; i++) {
                 const priormmr = this.priormmr[i];
@@ -78,10 +80,10 @@ class PartialMMRData {
             });
         }
         this.mmrhashtype = reader.readVarInt();
-        if (this.serializeSalt()) {
+        if (this.containsSalt()) {
             this.salt = reader.readVector();
         }
-        if (this.serializePriorMMR()) {
+        if (this.containsPriorMMR()) {
             this.priormmr = reader.readVector();
         }
         return reader.offset;
@@ -96,13 +98,41 @@ class PartialMMRData {
             writer.writeVarSlice(this.data[i].data);
         }
         writer.writeVarInt(this.mmrhashtype);
-        if (this.serializeSalt()) {
+        if (this.containsSalt()) {
             writer.writeVector(this.salt);
         }
-        if (this.serializePriorMMR()) {
+        if (this.containsPriorMMR()) {
             writer.writeVector(this.priormmr);
         }
         return writer.buffer;
+    }
+    toJson() {
+        return {
+            flags: this.flags ? this.flags.toString(10) : undefined,
+            data: this.data ? this.data.map(x => {
+                return {
+                    type: x.type.toString(10),
+                    data: x.data.toString('hex')
+                };
+            }) : undefined,
+            salt: this.salt ? this.salt.map(x => x.toString('hex')) : undefined,
+            mmrhashtype: this.mmrhashtype ? this.mmrhashtype.toString(10) : undefined,
+            priormmr: this.priormmr ? this.priormmr.map(x => x.toString('hex')) : undefined
+        };
+    }
+    static fromJson(json) {
+        return new PartialMMRData({
+            flags: json.flags ? new bn_js_1.BN(json.flags, 10) : undefined,
+            data: json.data ? json.data.map(x => {
+                return {
+                    type: new bn_js_1.BN(x.type, 10),
+                    data: Buffer.from(x.data, 'hex')
+                };
+            }) : undefined,
+            salt: json.salt ? json.salt.map(x => Buffer.from(x, 'hex')) : undefined,
+            mmrhashtype: json.mmrhashtype ? new bn_js_1.BN(json.mmrhashtype, 10) : undefined,
+            priormmr: json.priormmr ? json.priormmr.map(x => Buffer.from(x, 'hex')) : undefined,
+        });
     }
 }
 exports.PartialMMRData = PartialMMRData;

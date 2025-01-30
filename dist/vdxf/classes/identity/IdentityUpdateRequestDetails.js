@@ -28,23 +28,28 @@ class IdentityUpdateRequestDetails {
             this.identity = data.identity;
         }
         if (data === null || data === void 0 ? void 0 : data.expiryheight) {
-            this.toggleExpires();
+            if (!this.expires())
+                this.toggleExpires();
             this.expiryheight = data.expiryheight;
         }
         if (data === null || data === void 0 ? void 0 : data.systemid) {
-            this.toggleContainsSystem();
+            if (!this.containsSystem())
+                this.toggleContainsSystem();
             this.systemid = data.systemid;
         }
         if (data === null || data === void 0 ? void 0 : data.responseuris) {
-            this.toggleContainsResponseUris();
+            if (!this.containsResponseUris())
+                this.toggleContainsResponseUris();
             this.responseuris = data.responseuris;
         }
         if (data === null || data === void 0 ? void 0 : data.signdatamap) {
-            this.toggleContainsSignData();
+            if (!this.containsSignData())
+                this.toggleContainsSignData();
             this.signdatamap = data.signdatamap;
         }
         if (data === null || data === void 0 ? void 0 : data.salt) {
-            this.toggleContainsSalt();
+            if (!this.containsSalt())
+                this.toggleContainsSalt();
             this.salt = data.salt;
         }
     }
@@ -182,6 +187,46 @@ class IdentityUpdateRequestDetails {
             this.salt = reader.readVarSlice();
         }
         return reader.offset;
+    }
+    toJson() {
+        let signDataJson;
+        if (this.signdatamap) {
+            signDataJson = {};
+            for (const [key, psd] of this.signdatamap.entries()) {
+                signDataJson[key] = psd.toJson();
+            }
+        }
+        return {
+            flags: this.flags ? this.flags.toString(10) : undefined,
+            requestid: this.requestid ? this.requestid.toString(10) : undefined,
+            createdat: this.createdat ? this.createdat.toString(10) : undefined,
+            identity: this.identity ? this.identity.toJson() : undefined,
+            expiryheight: this.expiryheight ? this.expiryheight.toString(10) : undefined,
+            systemid: this.systemid ? this.systemid.toAddress() : undefined,
+            responseuris: this.responseuris ? this.responseuris.map(x => x.toJson()) : undefined,
+            signdatamap: signDataJson,
+            salt: this.salt ? this.salt.toString('hex') : undefined
+        };
+    }
+    static fromJson(json) {
+        let signdatamap;
+        if (json.signdatamap) {
+            signdatamap = new Map();
+            for (const key in json.signdatamap) {
+                signdatamap.set(key, PartialSignData_1.PartialSignData.fromJson(json.signdatamap[key]));
+            }
+        }
+        return new IdentityUpdateRequestDetails({
+            flags: json.flags ? new bn_js_1.BN(json.flags, 10) : undefined,
+            requestid: json.requestid ? new bn_js_1.BN(json.requestid, 10) : undefined,
+            createdat: json.createdat ? new bn_js_1.BN(json.createdat, 10) : undefined,
+            identity: json.identity ? PartialIdentity_1.PartialIdentity.fromJson(json.identity) : undefined,
+            expiryheight: json.expiryheight ? new bn_js_1.BN(json.expiryheight, 10) : undefined,
+            systemid: json.systemid ? pbaas_1.IdentityID.fromAddress(json.systemid) : undefined,
+            responseuris: json.responseuris ? json.responseuris.map(x => ResponseUri_1.ResponseUri.fromJson(x)) : undefined,
+            signdatamap,
+            salt: json.salt ? Buffer.from(json.salt, 'hex') : undefined
+        });
     }
 }
 exports.IdentityUpdateRequestDetails = IdentityUpdateRequestDetails;
