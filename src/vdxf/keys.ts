@@ -501,8 +501,7 @@ export const IDENTITY_SIGNDATA_REQUEST: VDXFKeyInterface = {
 }
 
 // DATA TYPES
-export const DATA_TYPE_STRING: VDXFKeyInterface = 
-  {
+export const DATA_TYPE_STRING: VDXFKeyInterface = {
     "vdxfid": "iK7a5JNJnbeuYWVHCDRpJosj3irGJ5Qa8c",
     "hash160result": "e5c061641228a399169211e666de18448b7b8bab",
     "qualifiedname": {
@@ -510,4 +509,14 @@ export const DATA_TYPE_STRING: VDXFKeyInterface =
       "name": "vrsc::data.type.string"
     },
 };
+
+export const IDENTITY_UPDATE_REQUEST_VDXF_KEY: VDXFKeyInterface = {
+  "vdxfid": "iQJAPr53wZnjLyGpGdjiNZhSwSTXSfyoYy",
+  "indexid": "xV8GreW8nt1Py99r8KPsLxDyy6UYJQvXja",
+  "hash160result": "0bcef8b06c211828d16dc038e4d34d097aeb64e4",
+  "qualifiedname": {
+    "namespace": "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV",
+    "name": "vrsc::identity.update.request"
+  }
+}
 
