@@ -655,7 +655,7 @@ export class VdxfUniValue implements SerializableEntity {
       const key = Object.keys(inner)[0];
       const value = inner[key];
 
-      if (key === "") {
+      if (key === "" && Buffer.isBuffer(value)) {
         ret.push({[key]: (value as Buffer).toString('hex')});
       } else if (typeof (value) == 'string') {
         ret.push({[key]: value as string});

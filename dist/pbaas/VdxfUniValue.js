@@ -549,7 +549,7 @@ class VdxfUniValue {
         for (const inner of this.values) {
             const key = Object.keys(inner)[0];
             const value = inner[key];
-            if (key === "") {
+            if (key === "" && Buffer.isBuffer(value)) {
                 ret.push({ [key]: value.toString('hex') });
             }
             else if (typeof (value) == 'string') {
