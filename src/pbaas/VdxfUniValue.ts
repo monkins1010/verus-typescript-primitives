@@ -15,6 +15,8 @@ import { CrossChainDataRef, CrossChainDataRefJson } from './CrossChainDataRef';
 import { SignatureData, SignatureJsonDataInterface } from './SignatureData';
 import { DataDescriptor, DataDescriptorJson } from './DataDescriptor';
 import { MMRDescriptor, MMRDescriptorJson } from './MMRDescriptor';
+import { URLRef } from './URLRef';
+import {IdentityMultimapRef} from './IdentityMultimapRef';
 import * as VDXF_Data from '../vdxf/vdxfdatakeys';
 
 export const VDXF_UNI_VALUE_VERSION_INVALID = new BN(0, 10);
@@ -25,7 +27,7 @@ const { BufferWriter, BufferReader } = bufferutils
 // TODO: Add other type definitions
 export type VdxfUniType = string | Buffer | BigNumber | CurrencyValueMap | Rating |
   TransferDestination | ContentMultiMapRemove | CrossChainDataRef | SignatureData |
-  DataDescriptor | MMRDescriptor;
+  DataDescriptor | MMRDescriptor | URLRef | IdentityMultimapRef;
 
 export interface VdxfUniValueJson {
   [key: string]: string | number | RatingJson | TransferDestinationJson |
@@ -667,6 +669,8 @@ export class VdxfUniValue implements SerializableEntity {
         ret.push((value as Buffer).toString('hex'));
       } else if (Buffer.isBuffer(value)) {
         ret.push({ [key]: (value as Buffer).toString('hex') });
+      } else if (typeof(value) === 'string') {
+        ret.push({ [key]: value });
       } else if (value instanceof BN) {
         ret.push({ [key]: (value as BigNumber).toString(10) });
       } else {
