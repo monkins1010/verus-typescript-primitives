@@ -43,10 +43,10 @@ export type JsonSerializableObject = CurrencyValueMap | Rating |
 // This UniValue class was adapted from C++ code for encoding JSON objects into bytes. It is not serialization and
 // therefore doesn't have a fromBuffer function, as you can't reliably decode it, only encode.
 export class VdxfUniValue implements SerializableEntity {
-  values: Array<{[key: string]: VdxfUniType}>;
+  values: Array<{ [key: string]: VdxfUniType }>;
   version: BigNumber;
 
-  constructor(data?: { values: Array<{[key: string]: VdxfUniType}>, version?: BigNumber }) {
+  constructor(data?: { values: Array<{ [key: string]: VdxfUniType }>, version?: BigNumber }) {
     if (data?.values) this.values = data.values;
     if (data?.version) this.version = data.version;
     else this.version = VDXF_UNI_VALUE_VERSION_CURRENT;
@@ -356,7 +356,7 @@ export class VdxfUniValue implements SerializableEntity {
         checkVal = toBase58Check(reader.readSlice(HASH160_BYTE_LENGTH), I_ADDR_VERSION);
 
         if (checkVal == VDXF_Data.DataCurrencyMapKey.vdxfid) {
-          const oneCurrencyMap = new CurrencyValueMap({multivalue:true});
+          const oneCurrencyMap = new CurrencyValueMap({ multivalue: true });
           version = reader.readVarInt();
           objSize = reader.readCompactSize();
           reader.offset = oneCurrencyMap.fromBuffer(reader.buffer, reader.offset);
@@ -463,183 +463,191 @@ export class VdxfUniValue implements SerializableEntity {
       bytesLeft = reader.buffer.length - reader.offset;
 
       if (pSuccess?.value && pSuccess?.value) {
-        this.values.push({[objectUni.key]: objectUni.value});
+        this.values.push({ [objectUni.key]: objectUni.value });
       }
       else {
         // add the remaining data as a hex string
         reader.offset = initialOffset;
-        this.values.push({[""]: reader.readSlice(reader.buffer.length - reader.offset)});
+        this.values.push({ [""]: reader.readSlice(reader.buffer.length - reader.offset) });
         bytesLeft = 0;
         break;
       }
     }
     if (bytesLeft && bytesLeft <= HASH160_BYTE_LENGTH) {
-      this.values.push({[""]: reader.readSlice(bytesLeft)});
+      this.values.push({ [""]: reader.readSlice(bytesLeft) });
     }
     return reader.offset;
   }
 
-  static fromJson(obj: VdxfUniValueJson) {
-    const arrayItem = new Array<{[key: string]: VdxfUniType}>;
+  static fromJson(obj: VdxfUniValueJson | VdxfUniValueJsonArray): VdxfUniValue {
+    const arrayItem = new Array<{ [key: string]: VdxfUniType }>;
 
-    if (typeof (obj) != 'object') {
-      if (typeof (obj) != 'string') throw new Error('Not JSON string as expected');
-      if (isHexString(obj)) {
-        arrayItem.push({[""]: Buffer.from(obj, "hex")})
+    if (!Array.isArray(obj)) {
+      if (typeof (obj) != 'object') {
+        if (typeof (obj) != 'string') throw new Error('Not JSON string as expected');
+        if (isHexString(obj)) {
+          arrayItem.push({ [""]: Buffer.from(obj, "hex") })
+          return new VdxfUniValue({
+            values: arrayItem
+          });
+        }
+        arrayItem.push({ [""]: Buffer.from(obj, "utf-8") })
         return new VdxfUniValue({
           values: arrayItem
         });
       }
-      arrayItem.push({[""]: Buffer.from(obj, "utf-8")})
-      return new VdxfUniValue({
-        values: arrayItem
-      });
-    }
 
-    if (obj.serializedHex) {
-      if (!isHexString(obj.serializedHex)) {
-        throw new Error("contentmap: If the \"serializedhex\" key is present, it's data must be only valid hex and complete");
-      }
-      arrayItem.push({[""]: Buffer.from(obj.serializedHex, "hex")})
-      return new VdxfUniValue({
-        values: arrayItem
-      });
-    }
-
-    if (obj.serializedBase64) {
-      try {
-        arrayItem.push({[""]: Buffer.from(obj.serializedBase64, "base64")})
+      if (obj.serializedHex) {
+        if (!isHexString(obj.serializedHex)) {
+          throw new Error("contentmap: If the \"serializedhex\" key is present, it's data must be only valid hex and complete");
+        }
+        arrayItem.push({ [""]: Buffer.from(obj.serializedHex, "hex") })
         return new VdxfUniValue({
           values: arrayItem
         });
-      } catch (e) {
-        throw new Error("contentmap: If the \"serializedBase64\" key is present, it's data must be only valid base64 and complete");
+      }
+
+      if (obj.serializedBase64) {
+        try {
+          arrayItem.push({ [""]: Buffer.from(obj.serializedBase64, "base64") })
+          return new VdxfUniValue({
+            values: arrayItem
+          });
+        } catch (e) {
+          throw new Error("contentmap: If the \"serializedBase64\" key is present, it's data must be only valid base64 and complete");
+        }
+      }
+
+      if (obj.message) {
+        arrayItem.push({ [""]: Buffer.from(obj.message, "utf-8") })
+        return new VdxfUniValue({
+          values: arrayItem
+        });
       }
     }
 
-    if (obj.message) {
-      arrayItem.push({[""]: Buffer.from(obj.message, "utf-8")})
-      return new VdxfUniValue({
-        values: arrayItem
-      });
+    if (!Array.isArray(obj)) {
+      obj = [obj];
     }
 
     // this should be an object with "vdxfkey" as the key and {object} as the json object to serialize
-    const oneValKeys = Object.keys(obj);
-    const oneValValues = Object.values(obj);
+    for (let i = 0; i < obj.length; i++) {
+      const oneValKeys = Object.keys(obj[i]);
+      const oneValValues = Object.values(obj[i]);
 
-    for (let k = 0; k < oneValKeys.length; k++) {
-      const objTypeKey = oneValKeys[k];
-      if (objTypeKey == VDXF_Data.DataByteKey.vdxfid) {
+      for (let k = 0; k < oneValKeys.length; k++) {
+        const objTypeKey = oneValKeys[k];
+        if (objTypeKey == VDXF_Data.DataByteKey.vdxfid) {
 
-        const oneByte = Buffer.from(oneValValues[k] as string, "hex");
-        if (oneByte.length != 1) {
-          throw new Error("contentmap: byte data must be exactly one byte");
+          const oneByte = Buffer.from(oneValValues[k] as string, "hex");
+          if (oneByte.length != 1) {
+            throw new Error("contentmap: byte data must be exactly one byte");
+          }
+          arrayItem.push({ [objTypeKey]: oneByte });
         }
-        arrayItem.push({[objTypeKey]: oneByte});
-      }
-      else if (objTypeKey == VDXF_Data.DataInt16Key.vdxfid) {
-        const oneShort = Buffer.alloc(2);
-        oneShort.writeInt16LE(oneValValues[k] as number);
-        arrayItem.push({[objTypeKey]: oneShort});
-      }
-      else if (objTypeKey == VDXF_Data.DataUint16Key.vdxfid) {
-        const oneUShort = Buffer.alloc(2);
-        oneUShort.writeUInt16LE(oneValValues[k] as number);
-        arrayItem.push({[objTypeKey]: oneUShort});
-      }
-      else if (objTypeKey == VDXF_Data.DataInt32Key.vdxfid) {
-        const oneInt = Buffer.alloc(4);
-        oneInt.writeInt32LE(oneValValues[k] as number);
-        arrayItem.push({[objTypeKey]: oneInt});
-
-      }
-      else if (objTypeKey == VDXF_Data.DataUint32Key.vdxfid) {
-        const oneUInt = Buffer.alloc(4);
-        oneUInt.writeUInt32LE(oneValValues[k] as number);
-        arrayItem.push({[objTypeKey]: oneUInt});
-      }
-      else if (objTypeKey == VDXF_Data.DataInt64Key.vdxfid) {
-        const oneInt64 = Buffer.alloc(8);
-        oneInt64.writeIntLE(oneValValues[k] as number, 0, 8);
-        arrayItem.push({[objTypeKey]: oneInt64});
-      }
-      else if (objTypeKey == VDXF_Data.DataUint160Key.vdxfid) {
-        fromBase58Check(oneValValues[k] as string).hash;
-        arrayItem.push({[objTypeKey]: oneValValues[k] as string});
-      }
-      else if (objTypeKey == VDXF_Data.DataUint256Key.vdxfid) {
-        const oneHash = Buffer.from(oneValValues[k] as string, "hex");
-        if (oneHash.length != HASH256_BYTE_LENGTH) {
-          throw new Error("contentmap: hash data must be exactly 32 bytes");
+        else if (objTypeKey == VDXF_Data.DataInt16Key.vdxfid) {
+          const oneShort = Buffer.alloc(2);
+          oneShort.writeInt16LE(oneValValues[k] as number);
+          arrayItem.push({ [objTypeKey]: oneShort });
         }
-        arrayItem.push({[objTypeKey]: oneHash});
-      }
-      else if (objTypeKey == VDXF_Data.DataStringKey.vdxfid) {
-        arrayItem.push({[objTypeKey]: oneValValues[k] as string});
-      }
-      else if (objTypeKey == VDXF_Data.DataByteVectorKey.vdxfid) {
-
-        if (!isHexString(oneValValues[k] as string)) {
-          throw new Error("contentmap: bytevector data must be valid hex");
+        else if (objTypeKey == VDXF_Data.DataUint16Key.vdxfid) {
+          const oneUShort = Buffer.alloc(2);
+          oneUShort.writeUInt16LE(oneValValues[k] as number);
+          arrayItem.push({ [objTypeKey]: oneUShort });
         }
+        else if (objTypeKey == VDXF_Data.DataInt32Key.vdxfid) {
+          const oneInt = Buffer.alloc(4);
+          oneInt.writeInt32LE(oneValValues[k] as number);
+          arrayItem.push({ [objTypeKey]: oneInt });
 
-        arrayItem.push({[objTypeKey]: Buffer.from(oneValValues[k] as string, "hex")});
+        }
+        else if (objTypeKey == VDXF_Data.DataUint32Key.vdxfid) {
+          const oneUInt = Buffer.alloc(4);
+          oneUInt.writeUInt32LE(oneValValues[k] as number);
+          arrayItem.push({ [objTypeKey]: oneUInt });
+        }
+        else if (objTypeKey == VDXF_Data.DataInt64Key.vdxfid) {
+          const oneInt64 = Buffer.alloc(8);
+          oneInt64.writeIntLE(oneValValues[k] as number, 0, 8);
+          arrayItem.push({ [objTypeKey]: oneInt64 });
+        }
+        else if (objTypeKey == VDXF_Data.DataUint160Key.vdxfid) {
+          fromBase58Check(oneValValues[k] as string).hash;
+          arrayItem.push({ [objTypeKey]: oneValValues[k] as string });
+        }
+        else if (objTypeKey == VDXF_Data.DataUint256Key.vdxfid) {
+          const oneHash = Buffer.from(oneValValues[k] as string, "hex");
+          if (oneHash.length != HASH256_BYTE_LENGTH) {
+            throw new Error("contentmap: hash data must be exactly 32 bytes");
+          }
+          arrayItem.push({ [objTypeKey]: oneHash });
+        }
+        else if (objTypeKey == VDXF_Data.DataStringKey.vdxfid) {
+          arrayItem.push({ [objTypeKey]: oneValValues[k] as string });
+        }
+        else if (objTypeKey == VDXF_Data.DataByteVectorKey.vdxfid) {
 
-      }
-      else if (objTypeKey == VDXF_Data.DataCurrencyMapKey.vdxfid) {
+          if (!isHexString(oneValValues[k] as string)) {
+            throw new Error("contentmap: bytevector data must be valid hex");
+          }
 
-        const destinations = Object.keys(oneValValues[k]);
-        const values = Object.values(oneValValues[k]);
+          arrayItem.push({ [objTypeKey]: Buffer.from(oneValValues[k] as string, "hex") });
 
-        const oneCurMap = new CurrencyValueMap({ value_map: new Map(destinations.map((key, index) => [key, new BN(values[index])])), multivalue: true });
-        arrayItem.push({[objTypeKey]: oneCurMap});
+        }
+        else if (objTypeKey == VDXF_Data.DataCurrencyMapKey.vdxfid) {
 
-      }
-      else if (objTypeKey == VDXF_Data.DataRatingsKey.vdxfid) {
+          const destinations = Object.keys(oneValValues[k]);
+          const values = Object.values(oneValValues[k]);
 
-        const oneRatingMap = Rating.fromJson(oneValValues[k] as RatingJson);
-        arrayItem.push({[objTypeKey]: oneRatingMap});
+          const oneCurMap = new CurrencyValueMap({ value_map: new Map(destinations.map((key, index) => [key, new BN(values[index] as number)])), multivalue: true });
+          arrayItem.push({ [objTypeKey]: oneCurMap });
 
-      }
-      else if (objTypeKey == VDXF_Data.DataTransferDestinationKey.vdxfid) {
+        }
+        else if (objTypeKey == VDXF_Data.DataRatingsKey.vdxfid) {
 
-        const transferDest = TransferDestination.fromJson(oneValValues[k] as TransferDestinationJson);
-        arrayItem.push({[objTypeKey]: transferDest});
+          const oneRatingMap = Rating.fromJson(oneValValues[k] as RatingJson);
+          arrayItem.push({ [objTypeKey]: oneRatingMap });
 
-      }
-      else if (objTypeKey == VDXF_Data.ContentMultiMapRemoveKey.vdxfid) {
+        }
+        else if (objTypeKey == VDXF_Data.DataTransferDestinationKey.vdxfid) {
 
-        const content = ContentMultiMapRemove.fromJson(oneValValues[k] as ContentMultiMapRemoveJson);
-        arrayItem.push({[objTypeKey]: content});
+          const transferDest = TransferDestination.fromJson(oneValValues[k] as TransferDestinationJson);
+          arrayItem.push({ [objTypeKey]: transferDest });
 
-      }
-      else if (objTypeKey == VDXF_Data.CrossChainDataRefKey.vdxfid) {
+        }
+        else if (objTypeKey == VDXF_Data.ContentMultiMapRemoveKey.vdxfid) {
 
-        const crossChainRefKey = CrossChainDataRef.fromJson(oneValValues[k] as CrossChainDataRefJson);
-        arrayItem.push({[objTypeKey]: crossChainRefKey});
+          const content = ContentMultiMapRemove.fromJson(oneValValues[k] as ContentMultiMapRemoveJson);
+          arrayItem.push({ [objTypeKey]: content });
 
-      }
-      else if (objTypeKey == VDXF_Data.DataDescriptorKey.vdxfid) {
+        }
+        else if (objTypeKey == VDXF_Data.CrossChainDataRefKey.vdxfid) {
 
-        const descriptor = DataDescriptor.fromJson(oneValValues[k]);
-        arrayItem.push({[objTypeKey]: descriptor});
+          const crossChainRefKey = CrossChainDataRef.fromJson(oneValValues[k] as CrossChainDataRefJson);
+          arrayItem.push({ [objTypeKey]: crossChainRefKey });
 
-      }
-      else if (objTypeKey == VDXF_Data.MMRDescriptorKey.vdxfid) {
+        }
+        else if (objTypeKey == VDXF_Data.DataDescriptorKey.vdxfid) {
 
-        const mmrDescriptor = MMRDescriptor.fromJson(oneValValues[k] as MMRDescriptorJson);
-        arrayItem.push({[objTypeKey]: mmrDescriptor});
+          const descriptor = DataDescriptor.fromJson(oneValValues[k]);
+          arrayItem.push({ [objTypeKey]: descriptor });
 
-      }
-      else if (objTypeKey == VDXF_Data.SignatureDataKey.vdxfid) {
+        }
+        else if (objTypeKey == VDXF_Data.MMRDescriptorKey.vdxfid) {
 
-        const sigData = SignatureData.fromJson(oneValValues[k]);
-        arrayItem.push({[objTypeKey]: sigData});
+          const mmrDescriptor = MMRDescriptor.fromJson(oneValValues[k] as MMRDescriptorJson);
+          arrayItem.push({ [objTypeKey]: mmrDescriptor });
 
-      }
-      else {
-        throw new Error("Unkknow vdxfkey: " + oneValValues[k]);
+        }
+        else if (objTypeKey == VDXF_Data.SignatureDataKey.vdxfid) {
+
+          const sigData = SignatureData.fromJson(oneValValues[k]);
+          arrayItem.push({ [objTypeKey]: sigData });
+
+        }
+        else {
+          throw new Error("Unkknow vdxfkey: " + oneValValues[k]);
+        }
       }
     }
     return new VdxfUniValue({
@@ -647,7 +655,7 @@ export class VdxfUniValue implements SerializableEntity {
     })
   }
 
-  toJson(): VdxfUniValueJsonArray {
+  toJson(): VdxfUniValueJsonArray | VdxfUniValueJson {
     let ret = [];
 
     for (const inner of this.values) {
@@ -656,15 +664,13 @@ export class VdxfUniValue implements SerializableEntity {
       const value = inner[key];
 
       if (key === "" && Buffer.isBuffer(value)) {
-        ret.push({[key]: (value as Buffer).toString('hex')});
-      } else if (typeof (value) == 'string') {
-        ret.push({[key]: value as string});
+        ret.push((value as Buffer).toString('hex'));
       } else if (Buffer.isBuffer(value)) {
-        ret.push({[key]: (value as Buffer).toString('hex')});
+        ret.push({ [key]: (value as Buffer).toString('hex') });
       } else if (value instanceof BN) {
-        ret.push({[key]: (value as BigNumber).toString(10)});
+        ret.push({ [key]: (value as BigNumber).toString(10) });
       } else {
-        ret.push({[key]: (value as JsonSerializableObject).toJson()});
+        ret.push({ [key]: (value as JsonSerializableObject).toJson() });
       }
     }
 

@@ -11,11 +11,12 @@ import { SaltedData } from "../../pbaas/SaltedData";
 import { SignatureData } from "../../pbaas/SignatureData";
 import { MMRDescriptor } from "../../pbaas/MMRDescriptor";
 import { URLRef, URLRefJson } from "../../pbaas/URLRef";
+import { VdxfUniType } from "../../pbaas/VdxfUniValue";
 
 describe('Encodes and decodes VdxfUniValue', () => {
   test('encode/decode VdxfUniValue with string data', () => {
-    const values = new Map();
-    values.set(DATA_TYPE_STRING.vdxfid, "Test String 123454321");
+    const values = new Array<{[key: string]: VdxfUniType}>;
+    values.push({[DATA_TYPE_STRING.vdxfid]: "Test String 123454321"});
 
     const v = new VdxfUniValue({
       values,
@@ -31,8 +32,8 @@ describe('Encodes and decodes VdxfUniValue', () => {
   });
 
   test('fail to encode/decode VdxfUniValue with unknown data', () => {
-    const values = new Map();
-    values.set(VERUSPAY_INVOICE_VDXF_KEY.vdxfid, Buffer.alloc(20));
+    const values = new Array<{[key: string]: VdxfUniType}>;
+    values.push({[VERUSPAY_INVOICE_VDXF_KEY.vdxfid]: Buffer.alloc(20)});
 
     const v = new VdxfUniValue({
       values,
@@ -56,7 +57,7 @@ describe('Encodes and decodes VdxfUniValue', () => {
     const v = new VdxfUniValue();
     v.fromBuffer(Buffer.from(multiMapwithRating, 'hex'));
 
-    const extractedRating = v.values.get('iHJComZUXXGniLkDhjYprWYEN8qvQGDoam') as Rating;
+    const extractedRating = v.values[0]['iHJComZUXXGniLkDhjYprWYEN8qvQGDoam'] as Rating;
 
     expect(jsonRating.toBuffer().toString('hex')).toBe(extractedRating.toBuffer().toString('hex'));
   });
@@ -73,7 +74,7 @@ describe('Encodes and decodes VdxfUniValue', () => {
     const v = new VdxfUniValue();
     v.fromBuffer(Buffer.from(multimapwithCurrencymap, 'hex'));
 
-    const currencyMap = v.values.get('iMrGhzkZq5fpWWSa1RambRySFPb7CuvKuX') as CurrencyValueMap;
+    const currencyMap = v.values[0]['iMrGhzkZq5fpWWSa1RambRySFPb7CuvKuX'] as CurrencyValueMap;
 
     const jsonCurrencyMap = {"i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV":"10000000000000"};
     const currencyMapFromJson = CurrencyValueMap.fromJson(jsonCurrencyMap, true);
@@ -85,7 +86,7 @@ describe('Encodes and decodes VdxfUniValue', () => {
     const v = new VdxfUniValue();
     v.fromBuffer(Buffer.from(multimapwithcrosschaindataref, 'hex'));
 
-    const crossChainDataRef = v.values.get('iP3euVSzNcXUrLNHnQnR9G6q8jeYuGSxgw') as CrossChainDataRef;
+    const crossChainDataRef = v.values[0]['iP3euVSzNcXUrLNHnQnR9G6q8jeYuGSxgw'] as CrossChainDataRef;
 
     const jsonCrossChainDataRef = {"version":"1", "url":"https://verus.io"};
 
@@ -98,7 +99,7 @@ describe('Encodes and decodes VdxfUniValue', () => {
     const v = new VdxfUniValue();
     v.fromBuffer(Buffer.from(multimapwithsignaturedata, 'hex'));
 
-    const signatureData = v.values.get('i7PcVF9wwPtQ6p6jDtCVpohX65pTZuP2ah') as SignatureData;
+    const signatureData = v.values[0]['i7PcVF9wwPtQ6p6jDtCVpohX65pTZuP2ah'] as SignatureData;
 
     const jsonSignatureData = {
 			"version": 1,
@@ -118,7 +119,7 @@ describe('Encodes and decodes VdxfUniValue', () => {
     const v = new VdxfUniValue();
     v.fromBuffer(Buffer.from(multimapwithmmrdescriptor, 'hex'));
 
-    const mmrDescriptor = v.values.get('i9dVDb4LgfMYrZD1JBNP2uaso4bNAkT4Jr') as MMRDescriptor;
+    const mmrDescriptor = v.values[0]['i9dVDb4LgfMYrZD1JBNP2uaso4bNAkT4Jr'] as MMRDescriptor;
 
     const jsonMMRDescriptor ={
       "version": 1,
