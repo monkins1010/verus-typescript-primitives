@@ -93,8 +93,9 @@ class ContentMultiMap {
                     unival.fromBuffer(reader.readVarSlice(), 0);
                     vector.push(unival);
                 }
-                else
+                else {
                     vector.push(reader.readVarSlice());
+                }
             }
             this.kv_content.set(contentMapKey, vector);
         }

@@ -19,17 +19,22 @@ export interface VdxfUniValueJson {
     serializedBase64?: string;
     message?: string;
 }
+export declare type VdxfUniValueJsonArray = Array<VdxfUniValueJson>;
 export declare type JsonSerializableObject = CurrencyValueMap | Rating | TransferDestination | ContentMultiMapRemove | CrossChainDataRef | SignatureData | DataDescriptor | MMRDescriptor;
 export declare class VdxfUniValue implements SerializableEntity {
-    values: Map<string, VdxfUniType>;
+    values: Array<{
+        [key: string]: VdxfUniType;
+    }>;
     version: BigNumber;
     constructor(data?: {
-        values: Map<string, VdxfUniType>;
+        values: Array<{
+            [key: string]: VdxfUniType;
+        }>;
         version?: BigNumber;
     });
     getByteLength(): number;
     toBuffer(): Buffer;
     fromBuffer(buffer: Buffer, offset?: number): number;
     static fromJson(obj: VdxfUniValueJson): VdxfUniValue;
-    toJson(): VdxfUniValueJson;
+    toJson(): VdxfUniValueJsonArray;
 }

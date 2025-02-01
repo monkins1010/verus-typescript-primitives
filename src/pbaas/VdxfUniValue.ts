@@ -35,6 +35,8 @@ export interface VdxfUniValueJson {
   message?: string;
 };
 
+export type VdxfUniValueJsonArray = Array<VdxfUniValueJson>;
+
 export type JsonSerializableObject = CurrencyValueMap | Rating |
   TransferDestination | ContentMultiMapRemove | CrossChainDataRef | SignatureData |
   DataDescriptor | MMRDescriptor;
@@ -534,7 +536,7 @@ export class VdxfUniValue implements SerializableEntity {
         if (oneByte.length != 1) {
           throw new Error("contentmap: byte data must be exactly one byte");
         }
-        arrayItem.push({[objTypeKey], oneByte});
+        arrayItem.push({[objTypeKey]: oneByte});
       }
       else if (objTypeKey == VDXF_Data.DataInt16Key.vdxfid) {
         const oneShort = Buffer.alloc(2);
@@ -645,7 +647,7 @@ export class VdxfUniValue implements SerializableEntity {
     })
   }
 
-  toJson(): VdxfUniValueJson {
+  toJson(): VdxfUniValueJsonArray {
     let ret = [];
 
     for (const inner of this.values) {
@@ -654,20 +656,20 @@ export class VdxfUniValue implements SerializableEntity {
       const value = inner[key];
 
       if (key === "") {
-        ret[key] = (value as Buffer).toString('hex');
+        ret.push({[key]: (value as Buffer).toString('hex')});
       } else if (typeof (value) == 'string') {
-        ret[key] = value as string;
+        ret.push({[key]: value as string});
       } else if (Buffer.isBuffer(value)) {
-        ret[key] = (value as Buffer).toString('hex');
+        ret.push({[key]: (value as Buffer).toString('hex')});
       } else if (value instanceof BN) {
-        ret[key] = (value as BigNumber).toString(10);
+        ret.push({[key]: (value as BigNumber).toString(10)});
       } else {
-        ret[key] = (value as JsonSerializableObject).toJson();
+        ret.push({[key]: (value as JsonSerializableObject).toJson()});
       }
     }
 
-    if (ret && ret[""] && Object.keys(ret).length == 1) {
-      ret = ret[""];
+    if (ret && ret.length == 1) {
+      return ret[0];
     }
 
     return ret;
