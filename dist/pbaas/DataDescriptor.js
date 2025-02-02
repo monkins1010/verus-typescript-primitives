@@ -217,13 +217,17 @@ class DataDescriptor {
         }
         let processedObject = new _1.VdxfUniValue();
         processedObject.fromBuffer(this.objectdata);
-        if (isText && typeof (processedObject.values[""]) === 'string') {
-            const objectDataUni = { message: '' };
-            objectDataUni.message = processedObject.values[""];
-            retval['objectdata'] = objectDataUni;
-        }
-        else if (Buffer.isBuffer(processedObject.values[""])) {
-            retval['objectdata'] = processedObject.values[""].toString('hex');
+        if (processedObject.values[0][""]) {
+            const keys = Object.keys(processedObject.values[0]);
+            const values = Object.values(processedObject.values[0]);
+            if (isText && Buffer.isBuffer(values[0]) && keys[0] === "") {
+                const objectDataUni = { message: '' };
+                objectDataUni.message = values[0].toString('utf8');
+                retval['objectdata'] = objectDataUni;
+            }
+            else if (Buffer.isBuffer(values[0])) {
+                retval['objectdata'] = values[0].toString('hex');
+            }
         }
         else {
             retval['objectdata'] = processedObject.toJson();

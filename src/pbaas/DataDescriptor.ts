@@ -12,7 +12,7 @@ import { SerializableEntity } from '../utils/types/SerializableEntity';
 export interface DataDescriptorJson {
   version: number;
   flags?: number;
-  objectdata?: string | {['message']: string} | object;
+  objectdata?: string | { ['message']: string } | object;
   label?: string;
   mimetype?: string;
   salt?: string;
@@ -20,7 +20,7 @@ export interface DataDescriptorJson {
   ivk?: string;
   ssk?: string;
 }
-export class DataDescriptor implements SerializableEntity  {
+export class DataDescriptor implements SerializableEntity {
 
   static VERSION_INVALID = new BN(0);
   static VERSION_FIRST = new BN(1);
@@ -297,7 +297,7 @@ export class DataDescriptor implements SerializableEntity  {
     return !!(this.version.gte(DataDescriptor.FIRST_VERSION) && this.version.lte(DataDescriptor.LAST_VERSION) && this.flags.and(DataDescriptor.FLAG_MASK.notn(DataDescriptor.FLAG_MASK.bitLength())));
   }
 
-  toJson():DataDescriptorJson {
+  toJson(): DataDescriptorJson {
 
     const retval: DataDescriptorJson = {
       version: this.version.toNumber(),
@@ -311,19 +311,25 @@ export class DataDescriptor implements SerializableEntity  {
     }
 
     let processedObject = new VdxfUniValue();
-    
-    processedObject.fromBuffer(this.objectdata)
 
-    if (isText && typeof(processedObject.values[""]) === 'string') {
-      const objectDataUni = { message: ''};
+    processedObject.fromBuffer(this.objectdata);
 
-      objectDataUni.message = processedObject.values[""];
+    if (processedObject.values[0][""]) {
 
-      retval['objectdata'] = objectDataUni;
+      const keys = Object.keys(processedObject.values[0]);
+      const values = Object.values(processedObject.values[0]);
 
-    } else if(Buffer.isBuffer(processedObject.values[""])){
-      retval['objectdata'] = processedObject.values[""].toString('hex');
-    }else {
+      if (isText && Buffer.isBuffer(values[0]) && keys[0] === "") {
+        const objectDataUni = { message: '' };
+
+        objectDataUni.message = values[0].toString('utf8');
+
+        retval['objectdata'] = objectDataUni;
+
+      } else if (Buffer.isBuffer(values[0])) {
+        retval['objectdata'] = (values[0] as Buffer).toString('hex');
+      }
+    } else {
       retval['objectdata'] = processedObject.toJson();
     }
 
