@@ -10,6 +10,24 @@ exports.VERUSPAY_INVOICE_VDXF_KEY = {
     },
     vdxfid: "iEETy7La3FTN2Sd2hNRgepek5S8x8eeUeQ"
 };
+exports.IDENTITY_UPDATE_REQUEST_VDXF_KEY = {
+    "hash160result": "0bcef8b06c211828d16dc038e4d34d097aeb64e4",
+    "indexid": "xV8GreW8nt1Py99r8KPsLxDyy6UYJQvXja",
+    "qualifiedname": {
+        "name": "vrsc::identity.update.request",
+        "namespace": "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV"
+    },
+    "vdxfid": "iQJAPr53wZnjLyGpGdjiNZhSwSTXSfyoYy"
+};
+exports.IDENTITY_UPDATE_RESPONSE_VDXF_KEY = {
+    "hash160result": "667802c74fbf3dd3a9693bb9aec9bef1250b2b14",
+    "indexid": "xA9GyS1bt1WGERamNVqVrhuGvGJeYuWyNk",
+    "qualifiedname": {
+        "name": "vrsc::identity.update.response",
+        "namespace": "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV"
+    },
+    "vdxfid": "i5KAWdaX2hHbcFhjWpBLtKNjtcHdeQFjuX"
+};
 exports.IDENTITY_AUTH_SIG_VDXF_KEY = {
     vdxfid: "iPi1DPgDDu7hP1mAp5xJ8rHBWwXSzc6yA8",
     hash160result: "06d4b963da3dcf17f00905b0720f7a4c241defdd",

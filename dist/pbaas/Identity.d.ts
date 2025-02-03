@@ -68,15 +68,15 @@ export declare class Identity extends Principal implements SerializableEntity {
     static VERSION_FIRSTVALID: import("bn.js");
     static VERSION_LASTVALID: import("bn.js");
     constructor(data?: VerusIDInitData);
-    protected serializeParent(): boolean;
-    protected serializeSystemId(): boolean;
-    protected serializeName(): boolean;
-    protected serializeContentMap(): boolean;
-    protected serializeContentMultiMap(): boolean;
-    protected serializeRevocation(): boolean;
-    protected serializeRecovery(): boolean;
-    protected serializePrivateAddresses(): boolean;
-    protected serializeUnlockAfter(): boolean;
+    protected containsParent(): boolean;
+    protected containsSystemId(): boolean;
+    protected containsName(): boolean;
+    protected containsContentMap(): boolean;
+    protected containsContentMultiMap(): boolean;
+    protected containsRevocation(): boolean;
+    protected containsRecovery(): boolean;
+    protected containsPrivateAddresses(): boolean;
+    protected containsUnlockAfter(): boolean;
     private getIdentityByteLength;
     getByteLength(): number;
     clearContentMultiMap(): void;
@@ -97,5 +97,6 @@ export declare class Identity extends Principal implements SerializableEntity {
     setRecovery(iAddr: string): void;
     setPrivateAddress(zAddr: string): void;
     upgradeVersion(version?: BigNumber): void;
+    protected static internalFromJson<T>(json: VerusCLIVerusIDJson, ctor: new (...args: any[]) => T): T;
     static fromJson(json: VerusCLIVerusIDJson): Identity;
 }

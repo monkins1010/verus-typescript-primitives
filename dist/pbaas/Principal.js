@@ -25,32 +25,32 @@ class Principal {
                 this.primary_addresses = data.primary_addresses;
         }
     }
-    serializeFlags() {
+    containsFlags() {
         return true;
     }
-    serializeVersion() {
+    containsVersion() {
         return true;
     }
-    serializePrimaryAddresses() {
+    containsPrimaryAddresses() {
         return true;
     }
-    serializeMinSigs() {
+    containsMinSigs() {
         return true;
     }
     getSelfByteLength() {
         let byteLength = 0;
-        if (this.serializeVersion())
+        if (this.containsVersion())
             byteLength += 4; //uint32 version size
-        if (this.serializeFlags())
+        if (this.containsFlags())
             byteLength += 4; //uint32 flags size
-        if (this.serializePrimaryAddresses()) {
+        if (this.containsPrimaryAddresses()) {
             byteLength += varuint_1.default.encodingLength(this.primary_addresses.length);
             for (const addr of this.primary_addresses) {
                 byteLength += varuint_1.default.encodingLength(addr.getByteLength());
                 byteLength += addr.getByteLength();
             }
         }
-        if (this.serializeMinSigs()) {
+        if (this.containsMinSigs()) {
             byteLength += 4; //uint32 minimum signatures size
         }
         return byteLength;
@@ -60,23 +60,23 @@ class Principal {
     }
     toBuffer() {
         const writer = new BufferWriter(Buffer.alloc(this.getSelfByteLength()));
-        if (this.serializeVersion())
+        if (this.containsVersion())
             writer.writeUInt32(this.version.toNumber());
-        if (this.serializeFlags())
+        if (this.containsFlags())
             writer.writeUInt32(this.flags.toNumber());
-        if (this.serializePrimaryAddresses())
+        if (this.containsPrimaryAddresses())
             writer.writeVector(this.primary_addresses.map(x => x.toBuffer()));
-        if (this.serializeMinSigs())
+        if (this.containsMinSigs())
             writer.writeUInt32(this.min_sigs.toNumber());
         return writer.buffer;
     }
     fromBuffer(buffer, offset = 0) {
         const reader = new BufferReader(buffer, offset);
-        if (this.serializeVersion())
+        if (this.containsVersion())
             this.version = new bn_js_1.BN(reader.readUInt32(), 10);
-        if (this.serializeFlags())
+        if (this.containsFlags())
             this.flags = new bn_js_1.BN(reader.readUInt32(), 10);
-        if (this.serializePrimaryAddresses()) {
+        if (this.containsPrimaryAddresses()) {
             this.primary_addresses = reader.readVector().map(x => {
                 if (x.length === 20) {
                     return new KeyID_1.KeyID(x);
@@ -90,7 +90,7 @@ class Principal {
                 }
             });
         }
-        if (this.serializeMinSigs())
+        if (this.containsMinSigs())
             this.min_sigs = new bn_js_1.BN(reader.readUInt32(), 10);
         return reader.offset;
     }

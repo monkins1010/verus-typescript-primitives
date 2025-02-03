@@ -5,7 +5,7 @@ import { SerializableEntity } from '../utils/types/SerializableEntity';
 import { IdentityID } from './IdentityID';
 import { KeyID } from './KeyID';
 import { SaplingPaymentAddress } from './SaplingPaymentAddress';
-import { PartialMMRData } from './PartialMMRData';
+import { PartialMMRData, PartialMMRDataJson } from './PartialMMRData';
 export declare type PartialSignDataInitData = {
     flags?: BigNumber;
     address?: IdentityID | KeyID;
@@ -19,6 +19,20 @@ export declare type PartialSignDataInitData = {
     signature?: Buffer;
     datatype?: BigNumber;
     data?: Buffer | PartialMMRData;
+};
+export declare type PartialSignDataJson = {
+    flags?: string;
+    address?: string;
+    prefixstring?: string;
+    vdxfkeys?: Array<string>;
+    vdxfkeynames?: Array<string>;
+    boundhashes?: Array<string>;
+    hashtype?: string;
+    encrypttoaddress?: string;
+    createmmr?: boolean;
+    signature?: string;
+    datatype?: string;
+    data?: string | PartialMMRDataJson;
 };
 export declare class PartialSignData implements SerializableEntity {
     flags: BigNumber;
@@ -41,28 +55,15 @@ export declare class PartialSignData implements SerializableEntity {
     static CONTAINS_VDXFKEYS: import("bn.js");
     static CONTAINS_VDXFKEYNAMES: import("bn.js");
     static CONTAINS_BOUNDHASHES: import("bn.js");
-    static DATA_TYPE_UNKNOWN: import("bn.js");
-    static DATA_TYPE_MMRDATA: import("bn.js");
-    static DATA_TYPE_FILENAME: import("bn.js");
-    static DATA_TYPE_MESSAGE: import("bn.js");
-    static DATA_TYPE_VDXFDATA: import("bn.js");
-    static DATA_TYPE_MESSAGEHEX: import("bn.js");
-    static DATA_TYPE_MESSAGEBASE64: import("bn.js");
-    static DATA_TYPE_DATAHASH: import("bn.js");
-    static HASH_TYPE_SHA256: import("bn.js");
-    static HASH_TYPE_SHA256D: import("bn.js");
-    static HASH_TYPE_BLAKE2B: import("bn.js");
-    static HASH_TYPE_KECCAK256: import("bn.js");
-    static DEFAULT_HASH_TYPE: import("bn.js");
     constructor(data?: PartialSignDataInitData);
-    protected serializeData(): boolean;
-    protected serializeAddress(): boolean;
-    protected serializeEncrypttoAddress(): boolean;
-    protected serializeCurrentSig(): boolean;
-    protected serializePrefixString(): boolean;
-    protected serializeVdxfKeys(): boolean;
-    protected serializeVdxfKeyNames(): boolean;
-    protected serializeBoundhashes(): boolean;
+    protected containsData(): boolean;
+    protected containsAddress(): boolean;
+    protected containsEncrypttoAddress(): boolean;
+    protected containsCurrentSig(): boolean;
+    protected containsPrefixString(): boolean;
+    protected containsVdxfKeys(): boolean;
+    protected containsVdxfKeyNames(): boolean;
+    protected containsBoundhashes(): boolean;
     private toggleContainsData;
     private toggleContainsAddress;
     private toggleContainsEncryptToAddress;
@@ -76,4 +77,6 @@ export declare class PartialSignData implements SerializableEntity {
     getByteLength(): number;
     fromBuffer(buffer: Buffer, offset?: number): number;
     toBuffer(): Buffer;
+    toJson(): PartialSignDataJson;
+    static fromJson(json: PartialSignDataJson): PartialSignData;
 }

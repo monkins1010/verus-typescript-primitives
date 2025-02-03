@@ -1,6 +1,6 @@
 import { BigNumber } from '../utils/types/BigNumber';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
-import { Identity, VerusIDInitData } from './Identity';
+import { Identity, VerusCLIVerusIDJson, VerusIDInitData } from './Identity';
 import { BN } from 'bn.js';
 import varint from '../utils/varint';
 import bufferutils from '../utils/bufferutils';
@@ -40,47 +40,47 @@ export class PartialIdentity extends Identity implements SerializableEntity {
     if (data?.primary_addresses && data.primary_addresses.length > 0) this.toggleContainsPrimaryAddresses();
   }
 
-  protected serializeFlags() {
+  protected containsFlags() {
     return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_FLAGS).toNumber());
   }
 
-  protected serializePrimaryAddresses() {
+  protected containsPrimaryAddresses() {
     return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_PRIMARY_ADDRS).toNumber());
   }
 
-  protected serializeMinSigs() {
+  protected containsMinSigs() {
     return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_MINSIGS).toNumber());
   }
 
-  protected serializeParent() {
+  protected containsParent() {
     return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_PARENT).toNumber());
   }
 
-  protected serializeSystemId() {
+  protected containsSystemId() {
     return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_SYSTEM_ID).toNumber());
   }
 
-  protected serializeContentMap() {
+  protected containsContentMap() {
     return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_CONTENT_MAP).toNumber());
   }
 
-  protected serializeContentMultiMap() {
+  protected containsContentMultiMap() {
     return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_CONTENT_MULTIMAP).toNumber());
   }
 
-  protected serializeRevocation() {
+  protected containsRevocation() {
     return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_REVOCATION).toNumber());
   }
 
-  protected serializeRecovery() {
+  protected containsRecovery() {
     return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_RECOVERY).toNumber());
   }
 
-  protected serializePrivateAddresses() {
+  protected containsPrivateAddresses() {
     return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_PRIV_ADDRS).toNumber());
   }
 
-  protected serializeUnlockAfter() {
+  protected containsUnlockAfter() {
     return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_UNLOCK_AFTER).toNumber());
   }
 
@@ -159,5 +159,9 @@ export class PartialIdentity extends Identity implements SerializableEntity {
     writer.writeSlice(super.toBuffer());
 
     return writer.buffer;
+  }
+
+  static fromJson(json: VerusCLIVerusIDJson): PartialIdentity {
+    return Identity.internalFromJson<PartialIdentity>(json, PartialIdentity);
   }
 }

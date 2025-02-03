@@ -9,7 +9,9 @@ import { SaplingPaymentAddress } from './SaplingPaymentAddress';
 import varuint from '../utils/varuint';
 import { Hash160SerEnt } from '../vdxf/classes/Hash160';
 import { HASH160_BYTE_LENGTH, I_ADDR_VERSION, R_ADDR_VERSION } from '../constants/vdxf';
-import { PartialMMRData } from './PartialMMRData';
+import { PartialMMRData, PartialMMRDataJson } from './PartialMMRData';
+import { DATA_TYPE_MMRDATA, DEFAULT_HASH_TYPE } from '../constants/pbaas';
+import { fromBase58Check } from '../utils/address';
 
 const { BufferReader, BufferWriter } = bufferutils;
 
@@ -26,6 +28,21 @@ export type PartialSignDataInitData = {
   signature?: Buffer;
   datatype?: BigNumber;
   data?: Buffer | PartialMMRData;
+}
+
+export type PartialSignDataJson = {
+  flags?: string;
+  address?: string;
+  prefixstring?: string;
+  vdxfkeys?: Array<string>;
+  vdxfkeynames?: Array<string>;
+  boundhashes?: Array<string>;
+  hashtype?: string;
+  encrypttoaddress?: string;
+  createmmr?: boolean;
+  signature?: string;
+  datatype?: string;
+  data?: string | PartialMMRDataJson;
 }
 
 export class PartialSignData implements SerializableEntity {
@@ -51,101 +68,86 @@ export class PartialSignData implements SerializableEntity {
   static CONTAINS_VDXFKEYS = new BN("32", 10);
   static CONTAINS_VDXFKEYNAMES = new BN("64", 10);
   static CONTAINS_BOUNDHASHES = new BN("128", 10);
-
-  static DATA_TYPE_UNKNOWN = new BN("0", 10);
-  static DATA_TYPE_MMRDATA = new BN("1", 10);
-  static DATA_TYPE_FILENAME = new BN("2", 10);
-  static DATA_TYPE_MESSAGE = new BN("3", 10);
-  static DATA_TYPE_VDXFDATA = new BN("4", 10);
-  static DATA_TYPE_MESSAGEHEX = new BN("5", 10);
-  static DATA_TYPE_MESSAGEBASE64 = new BN("6", 10);
-  static DATA_TYPE_DATAHASH = new BN("7", 10);
-
-  static HASH_TYPE_SHA256 = new BN("1", 10);
-  static HASH_TYPE_SHA256D = new BN("2", 10);
-  static HASH_TYPE_BLAKE2B = new BN("3", 10);
-  static HASH_TYPE_KECCAK256 = new BN("4", 10);
-  static DEFAULT_HASH_TYPE = PartialSignData.HASH_TYPE_SHA256;
   
   constructor(data?: PartialSignDataInitData) {
     this.flags = data && data.flags ? data.flags : new BN("0");
     this.createmmr = data && data.createmmr ? data.createmmr : false;
     
     if (data?.address) {
-      this.toggleContainsAddress();
+      if (!this.containsAddress()) this.toggleContainsAddress();
       this.address = data.address;
     }
 
     if (data?.prefixstring) {
-      this.toggleContainsPrefixString();
+      if (!this.containsPrefixString()) this.toggleContainsPrefixString();
       this.prefixstring = data.prefixstring;
     }
 
     if (data?.vdxfkeys) {
-      this.toggleContainsVdxfKeys();
+      if (!this.containsVdxfKeys()) this.toggleContainsVdxfKeys();
       this.vdxfkeys = data.vdxfkeys;
     }
 
     if (data?.vdxfkeynames) {
-      this.toggleContainsVdxfKeyNames();
+      if (!this.containsVdxfKeyNames()) this.toggleContainsVdxfKeyNames();
       this.vdxfkeynames = data.vdxfkeynames;
     }
 
     if (data?.boundhashes) {
       if (data?.hashtype) {
         this.hashtype = data.hashtype;
-      } else this.hashtype = PartialSignData.DEFAULT_HASH_TYPE;
+      } else this.hashtype = DEFAULT_HASH_TYPE;
 
-      this.toggleContainsBoundHashes();
+      if (!this.containsBoundhashes()) this.toggleContainsBoundHashes();
       this.boundhashes = data.boundhashes;
     }
 
     if (data?.encrypttoaddress) {
-      this.toggleContainsEncryptToAddress();
+      if (!this.containsEncrypttoAddress()) this.toggleContainsEncryptToAddress();
       this.encrypttoaddress = data.encrypttoaddress;
     }
     
     if (data?.signature) {
-      this.toggleContainsCurrentSig();
+      if (!this.containsCurrentSig()) this.toggleContainsCurrentSig();
       this.signature = data.signature;
     }
 
     if (data?.datatype && data?.data) {
-      this.toggleContainsData();
+      if (!this.containsData()) this.toggleContainsData();
       this.data = data.data;
       this.datatype = data.datatype;
     }
   }
 
-  protected serializeData() {
+  protected containsData() {
     return !!(this.flags.and(PartialSignData.CONTAINS_DATA).toNumber());
   }
 
-  protected serializeAddress() {
+  protected containsAddress() {
     return !!(this.flags.and(PartialSignData.CONTAINS_ADDRESS).toNumber());
   }
 
-  protected serializeEncrypttoAddress() {
+  protected containsEncrypttoAddress() {
     return !!(this.flags.and(PartialSignData.CONTAINS_ENCRYPTTOADDRESS).toNumber());
   }
 
-  protected serializeCurrentSig() {
+  protected containsCurrentSig() {
     return !!(this.flags.and(PartialSignData.CONTAINS_CURRENTSIG).toNumber());
   }
 
-  protected serializePrefixString() {
+  protected containsPrefixString() {
     return !!(this.flags.and(PartialSignData.CONTAINS_PREFIXSTRING).toNumber());
   }
 
-  protected serializeVdxfKeys() {
+  protected containsVdxfKeys() {
     return !!(this.flags.and(PartialSignData.CONTAINS_VDXFKEYS).toNumber());
   }
 
-  protected serializeVdxfKeyNames() {
+  protected containsVdxfKeyNames() {
     return !!(this.flags.and(PartialSignData.CONTAINS_VDXFKEYNAMES).toNumber());
   }
 
-  protected serializeBoundhashes() {
+  protected containsBoundhashes() {
     return !!(this.flags.and(PartialSignData.CONTAINS_BOUNDHASHES).toNumber());
   }
 
@@ -182,7 +184,7 @@ export class PartialSignData implements SerializableEntity {
   }
 
   isMMRData(): boolean {
-    return this.datatype && this.datatype.eq(PartialSignData.DATA_TYPE_MMRDATA);
+    return this.datatype && this.datatype.eq(DATA_TYPE_MMRDATA);
   }
 
   private getPartialSignDataByteLength(): number {
@@ -205,35 +207,35 @@ export class PartialSignData implements SerializableEntity {
 
     length += varint.encodingLength(this.flags);
 
-    if (this.serializeAddress()) length += this.address!.getByteLength();
+    if (this.containsAddress()) length += this.address!.getByteLength();
 
-    if (this.serializePrefixString()) {
+    if (this.containsPrefixString()) {
       const prefixLen = this.prefixstring!.length;
 
       length += varuint.encodingLength(prefixLen);
       length += prefixLen;
     }
     
-    if (this.serializeVdxfKeys()) {
+    if (this.containsVdxfKeys()) {
       length += calculateVectorLength(this.vdxfkeys!, (vdxfkey) => vdxfkey.getByteLength(), false);
     }
     
-    if (this.serializeVdxfKeyNames()) {
+    if (this.containsVdxfKeyNames()) {
       length += calculateVectorLength(this.vdxfkeynames!, (vdxfname) => vdxfname.length);
     }
     
-    if (this.serializeBoundhashes()) {
+    if (this.containsBoundhashes()) {
       length += varint.encodingLength(this.hashtype);
       length += calculateVectorLength(this.boundhashes!, (hash) => hash.length);
     }
 
-    if (this.serializeEncrypttoAddress()) {
+    if (this.containsEncrypttoAddress()) {
       length += this.encrypttoaddress!.getByteLength();
     }
 
     length += 1; // Createmmr boolean value
 
-    if (this.serializeData()) {
+    if (this.containsData()) {
       length += varint.encodingLength(this.datatype!);
 
       if (this.isMMRData()) {
@@ -258,7 +260,7 @@ export class PartialSignData implements SerializableEntity {
 
     this.flags = reader.readVarInt();
 
-    if (this.serializeAddress()) {
+    if (this.containsAddress()) {
       const hash160 = new Hash160SerEnt();
 
       hash160.fromBuffer(reader.readSlice(HASH160_BYTE_LENGTH));
@@ -270,11 +272,11 @@ export class PartialSignData implements SerializableEntity {
       } else throw new Error("Unrecognized address version");
     }
 
-    if (this.serializePrefixString()) {
+    if (this.containsPrefixString()) {
       this.prefixstring = reader.readVarSlice();
     }
     
-    if (this.serializeVdxfKeys()) {
+    if (this.containsVdxfKeys()) {
       const count = reader.readCompactSize();
       this.vdxfkeys = [];
 
@@ -288,16 +290,16 @@ export class PartialSignData implements SerializableEntity {
       }
     }
     
-    if (this.serializeVdxfKeyNames()) {
+    if (this.containsVdxfKeyNames()) {
       this.vdxfkeynames = reader.readVector();
     }
     
-    if (this.serializeBoundhashes()) {
+    if (this.containsBoundhashes()) {
       this.hashtype = reader.readVarInt();
       this.boundhashes = reader.readVector();
     }
     
-    if (this.serializeEncrypttoAddress()) {
+    if (this.containsEncrypttoAddress()) {
       const saplingAddr = new SaplingPaymentAddress();
 
       reader.offset = saplingAddr.fromBuffer(reader.buffer, reader.offset);
@@ -307,7 +309,7 @@ export class PartialSignData implements SerializableEntity {
 
     this.createmmr = !!reader.readUInt8();
 
-    if (this.serializeData()) {
+    if (this.containsData()) {
       this.datatype = reader.readVarInt();
 
       if (this.isMMRData()) {
@@ -332,7 +334,7 @@ export class PartialSignData implements SerializableEntity {
     writer.writeVarInt(this.flags);
   
     // Address
-    if (this.serializeAddress()) {
+    if (this.containsAddress()) {
       if (!this.address) {
         throw new Error("Address is required but not provided");
       }
@@ -340,7 +342,7 @@ export class PartialSignData implements SerializableEntity {
     }
   
     // Prefix string
-    if (this.serializePrefixString()) {
+    if (this.containsPrefixString()) {
       if (!this.prefixstring) {
         throw new Error("Prefix string is required but not provided");
       }
@@ -348,7 +350,7 @@ export class PartialSignData implements SerializableEntity {
     }
   
     // VDXF keys
-    if (this.serializeVdxfKeys()) {
+    if (this.containsVdxfKeys()) {
       if (!this.vdxfkeys) {
         throw new Error("VDXF keys are required but not provided");
       }
@@ -360,7 +362,7 @@ export class PartialSignData implements SerializableEntity {
     }
   
     // VDXF key names
-    if (this.serializeVdxfKeyNames()) {
+    if (this.containsVdxfKeyNames()) {
       if (!this.vdxfkeynames) {
         throw new Error("VDXF key names are required but not provided");
       }
@@ -368,7 +370,7 @@ export class PartialSignData implements SerializableEntity {
     }
   
     // Bound hashes
-    if (this.serializeBoundhashes()) {
+    if (this.containsBoundhashes()) {
       if (!this.boundhashes || !this.hashtype) {
         throw new Error("Bound hashes are required but not provided");
       }
@@ -377,7 +379,7 @@ export class PartialSignData implements SerializableEntity {
     }
   
     // Encrypt-to address (Sapling)
-    if (this.serializeEncrypttoAddress()) {
+    if (this.containsEncrypttoAddress()) {
       if (!this.encrypttoaddress || !(this.encrypttoaddress instanceof SaplingPaymentAddress)) {
         throw new Error("Sapling payment address is required but not provided");
       }
@@ -388,7 +390,7 @@ export class PartialSignData implements SerializableEntity {
     writer.writeUInt8(this.createmmr ? 1 : 0);
   
     // Data
-    if (this.serializeData()) {
+    if (this.containsData()) {
       if (!this.data || !this.datatype) {
         throw new Error("Data is required but not provided");
       }
@@ -404,5 +406,51 @@ export class PartialSignData implements SerializableEntity {
     }
   
     return writer.buffer;
+  }
+
+  toJson(): PartialSignDataJson {
+    return {
+      flags: this.flags ? this.flags.toString(10) : undefined,
+      address: this.address ? this.address.toAddress() : undefined,
+      prefixstring: this.prefixstring ? this.prefixstring.toString('utf-8') : undefined,
+      vdxfkeys: this.vdxfkeys ? this.vdxfkeys.map(x => x.toAddress()) : undefined,
+      vdxfkeynames: this.vdxfkeys ? this.vdxfkeynames.map(x => x.toString('utf-8')) : undefined,
+      boundhashes: this.boundhashes ? this.boundhashes.map(x => x.toString('hex')) : undefined,
+      hashtype: this.hashtype ? this.hashtype.toString(10) : undefined,
+      encrypttoaddress: this.encrypttoaddress ? this.encrypttoaddress.toAddressString() : undefined,
+      createmmr: this.createmmr,
+      signature: this.signature ? this.signature.toString('base64') : undefined,
+      datatype: this.datatype ? this.datatype.toString(10) : undefined,
+      data: this.data ? this.data instanceof PartialMMRData ? this.data.toJson() : this.data.toString('hex') : undefined
+    }
+  }
+
+  static fromJson(json: PartialSignDataJson): PartialSignData {
+    let addr: IdentityID | KeyID;
+
+    if (json.address) {
+      const { version, hash } = fromBase58Check(json.address);
+
+      if (version === I_ADDR_VERSION) {
+        addr = new IdentityID(hash);
+      } else if (version === R_ADDR_VERSION) {
+        addr = new KeyID(hash);
+      } else throw new Error("Unrecognized address version");
+    }
+
+    return new PartialSignData({
+      flags: json.flags ? new BN(json.flags, 10) : undefined,
+      address: addr,
+      prefixstring: json.prefixstring ? Buffer.from(json.prefixstring, 'utf-8') : undefined,
+      vdxfkeys: json.vdxfkeys ? json.vdxfkeys.map(x => IdentityID.fromAddress(x)) : undefined,
+      vdxfkeynames: json.vdxfkeynames ? json.vdxfkeynames.map(x => Buffer.from(x, 'utf-8')) : undefined,
+      boundhashes: json.boundhashes ? json.boundhashes.map(x => Buffer.from(x, 'hex')) : undefined,
+      hashtype: json.hashtype ? new BN(json.hashtype, 10) : undefined,
+      encrypttoaddress: json.encrypttoaddress ? SaplingPaymentAddress.fromAddressString(json.encrypttoaddress) : undefined,
+      createmmr: json.createmmr,
+      signature: json.signature ? Buffer.from(json.signature, 'base64') : undefined,
+      datatype: json.datatype ? new BN(json.datatype, 10) : undefined,
+      data: json.data ? typeof json.data === 'string' ? Buffer.from(json.data, 'hex') : PartialMMRData.fromJson(json.data) : undefined
+    })
   }
 }

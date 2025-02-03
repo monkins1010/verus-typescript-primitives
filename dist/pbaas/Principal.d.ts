@@ -17,10 +17,10 @@ export declare class Principal implements SerializableEntity {
         min_sigs?: BigNumber;
         primary_addresses?: Array<KeyID>;
     });
-    protected serializeFlags(): boolean;
-    protected serializeVersion(): boolean;
-    protected serializePrimaryAddresses(): boolean;
-    protected serializeMinSigs(): boolean;
+    protected containsFlags(): boolean;
+    protected containsVersion(): boolean;
+    protected containsPrimaryAddresses(): boolean;
+    protected containsMinSigs(): boolean;
     private getSelfByteLength;
     getByteLength(): number;
     toBuffer(): Buffer;

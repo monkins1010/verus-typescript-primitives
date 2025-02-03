@@ -1,10 +1,11 @@
 import { ContentMultiMap, KvContent } from "../../pbaas/ContentMultiMap";
 import { DATA_TYPE_STRING } from "../../vdxf";
 import { VDXF_UNI_VALUE_VERSION_CURRENT, VdxfUniValue } from "../../pbaas/VdxfUniValue";
+import { VdxfUniType } from "../../pbaas/VdxfUniValue";
 
 describe('Serializes and deserializes ContentMultiMap', () => {
-  const vdxfunivaluedata = new Map();
-  vdxfunivaluedata.set(DATA_TYPE_STRING.vdxfid, "Test String 123454321");
+  const vdxfunivaluedata = new Array<{[key: string]: VdxfUniType}>;
+  vdxfunivaluedata.push({[DATA_TYPE_STRING.vdxfid]: "Test String 123454321"});
 
   const vdxfunivalue = new VdxfUniValue({
     values: vdxfunivaluedata,

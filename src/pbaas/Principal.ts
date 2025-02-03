@@ -36,29 +36,29 @@ export class Principal implements SerializableEntity {
     }
   }
 
-  protected serializeFlags() {
+  protected containsFlags() {
     return true;
   }
 
-  protected serializeVersion() {
+  protected containsVersion() {
     return true;
   }
 
-  protected serializePrimaryAddresses() {
+  protected containsPrimaryAddresses() {
     return true;
   }
 
-  protected serializeMinSigs() {
+  protected containsMinSigs() {
     return true;
   }
 
   private getSelfByteLength() {
     let byteLength = 0;
 
-    if (this.serializeVersion()) byteLength += 4; //uint32 version size
-    if (this.serializeFlags()) byteLength += 4; //uint32 flags size
+    if (this.containsVersion()) byteLength += 4; //uint32 version size
+    if (this.containsFlags()) byteLength += 4; //uint32 flags size
 
-    if (this.serializePrimaryAddresses()) {
+    if (this.containsPrimaryAddresses()) {
       byteLength += varuint.encodingLength(this.primary_addresses.length);
 
       for (const addr of this.primary_addresses) {
@@ -67,7 +67,7 @@ export class Principal implements SerializableEntity {
       }
     }
 
-    if (this.serializeMinSigs()) {
+    if (this.containsMinSigs()) {
       byteLength += 4; //uint32 minimum signatures size
     }
     
@@ -81,12 +81,12 @@ export class Principal implements SerializableEntity {
   toBuffer() {
     const writer = new BufferWriter(Buffer.alloc(this.getSelfByteLength()))
 
-    if (this.serializeVersion()) writer.writeUInt32(this.version.toNumber())
-    if (this.serializeFlags()) writer.writeUInt32(this.flags.toNumber())
+    if (this.containsVersion()) writer.writeUInt32(this.version.toNumber())
+    if (this.containsFlags()) writer.writeUInt32(this.flags.toNumber())
 
-    if (this.serializePrimaryAddresses()) writer.writeVector(this.primary_addresses.map(x => x.toBuffer()))
+    if (this.containsPrimaryAddresses()) writer.writeVector(this.primary_addresses.map(x => x.toBuffer()))
 
-    if (this.serializeMinSigs()) writer.writeUInt32(this.min_sigs.toNumber())
+    if (this.containsMinSigs()) writer.writeUInt32(this.min_sigs.toNumber())
 
     return writer.buffer
   }
@@ -94,10 +94,10 @@ export class Principal implements SerializableEntity {
   fromBuffer(buffer: Buffer, offset: number = 0) {
     const reader = new BufferReader(buffer, offset);
 
-    if (this.serializeVersion()) this.version = new BN(reader.readUInt32(), 10);
-    if (this.serializeFlags()) this.flags = new BN(reader.readUInt32(), 10);
+    if (this.containsVersion()) this.version = new BN(reader.readUInt32(), 10);
+    if (this.containsFlags()) this.flags = new BN(reader.readUInt32(), 10);
 
-    if (this.serializePrimaryAddresses()) {
+    if (this.containsPrimaryAddresses()) {
       this.primary_addresses = reader.readVector().map(x => {
         if (x.length === 20) {
           return new KeyID(x);
@@ -110,7 +110,7 @@ export class Principal implements SerializableEntity {
       })
     }
 
-    if (this.serializeMinSigs()) this.min_sigs = new BN(reader.readUInt32(), 10);
+    if (this.containsMinSigs()) this.min_sigs = new BN(reader.readUInt32(), 10);
 
     return reader.offset;
   }

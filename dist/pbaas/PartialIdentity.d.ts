@@ -2,7 +2,7 @@
 /// <reference types="node" />
 import { BigNumber } from '../utils/types/BigNumber';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
-import { Identity, VerusIDInitData } from './Identity';
+import { Identity, VerusCLIVerusIDJson, VerusIDInitData } from './Identity';
 export declare class PartialIdentity extends Identity implements SerializableEntity {
     contains: BigNumber;
     static PARTIAL_ID_CONTAINS_PARENT: import("bn.js");
@@ -17,17 +17,17 @@ export declare class PartialIdentity extends Identity implements SerializableEnt
     static PARTIAL_ID_CONTAINS_MINSIGS: import("bn.js");
     static PARTIAL_ID_CONTAINS_FLAGS: import("bn.js");
     constructor(data?: VerusIDInitData);
-    protected serializeFlags(): boolean;
-    protected serializePrimaryAddresses(): boolean;
-    protected serializeMinSigs(): boolean;
-    protected serializeParent(): boolean;
-    protected serializeSystemId(): boolean;
-    protected serializeContentMap(): boolean;
-    protected serializeContentMultiMap(): boolean;
-    protected serializeRevocation(): boolean;
-    protected serializeRecovery(): boolean;
-    protected serializePrivateAddresses(): boolean;
-    protected serializeUnlockAfter(): boolean;
+    protected containsFlags(): boolean;
+    protected containsPrimaryAddresses(): boolean;
+    protected containsMinSigs(): boolean;
+    protected containsParent(): boolean;
+    protected containsSystemId(): boolean;
+    protected containsContentMap(): boolean;
+    protected containsContentMultiMap(): boolean;
+    protected containsRevocation(): boolean;
+    protected containsRecovery(): boolean;
+    protected containsPrivateAddresses(): boolean;
+    protected containsUnlockAfter(): boolean;
     private toggleContainsParent;
     private toggleContainsSystemId;
     private toggleContainsContentMap;
@@ -43,4 +43,5 @@ export declare class PartialIdentity extends Identity implements SerializableEnt
     getByteLength(): number;
     fromBuffer(buffer: Buffer, offset?: number, parseVdxfObjects?: boolean): number;
     toBuffer(): Buffer;
+    static fromJson(json: VerusCLIVerusIDJson): PartialIdentity;
 }
