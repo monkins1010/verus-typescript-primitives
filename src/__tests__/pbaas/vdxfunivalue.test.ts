@@ -12,6 +12,9 @@ import { SignatureData } from "../../pbaas/SignatureData";
 import { MMRDescriptor } from "../../pbaas/MMRDescriptor";
 import { URLRef, URLRefJson } from "../../pbaas/URLRef";
 import { VdxfUniType } from "../../pbaas/VdxfUniValue";
+import { CrossChainProof } from "../../pbaas/CrossChainProof";
+import * as VDXF_Data from '../../vdxf/vdxfdatakeys';
+
 
 describe('Encodes and decodes VdxfUniValue', () => {
   test('encode/decode VdxfUniValue with string data', () => {
@@ -183,12 +186,8 @@ describe('Encodes and decodes VdxfUniValue', () => {
 
         const data = new VdxfUniValue();
         data.fromBuffer(egg.chainObjects[0].dataVec);
-        console.log(data.toJson());
-
       }
-
-      console.log(egg.toJson());
-    
+   
     }
     
     test();

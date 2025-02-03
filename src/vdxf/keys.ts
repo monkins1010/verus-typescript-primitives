@@ -530,13 +530,3 @@ export const DATA_TYPE_STRING: VDXFKeyInterface = {
     },
 };
 
-export const IDENTITY_UPDATE_REQUEST_VDXF_KEY: VDXFKeyInterface = {
-  "vdxfid": "iQJAPr53wZnjLyGpGdjiNZhSwSTXSfyoYy",
-  "indexid": "xV8GreW8nt1Py99r8KPsLxDyy6UYJQvXja",
-  "hash160result": "0bcef8b06c211828d16dc038e4d34d097aeb64e4",
-  "qualifiedname": {
-    "namespace": "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV",
-    "name": "vrsc::identity.update.request"
-  }
-}
-
