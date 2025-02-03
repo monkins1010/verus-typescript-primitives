@@ -17,8 +17,8 @@ export declare const VDXF_UNI_VALUE_VERSION_CURRENT: import("bn.js");
 export declare type VdxfUniType = string | Buffer | BigNumber | CurrencyValueMap | Rating | TransferDestination | ContentMultiMapRemove | CrossChainDataRef | SignatureData | DataDescriptor | MMRDescriptor | URLRef | IdentityMultimapRef;
 export interface VdxfUniValueJson {
     [key: string]: string | number | RatingJson | TransferDestinationJson | ContentMultiMapRemoveJson | CrossChainDataRefJson | SignatureJsonDataInterface | DataDescriptorJson | MMRDescriptorJson;
-    serializedHex?: string;
-    serializedBase64?: string;
+    serializedhex?: string;
+    serializedbase64?: string;
     message?: string;
 }
 export declare type VdxfUniValueJsonArray = Array<VdxfUniValueJson>;
