@@ -32,8 +32,8 @@ export type VdxfUniType = string | Buffer | BigNumber | CurrencyValueMap | Ratin
 export interface VdxfUniValueJson {
   [key: string]: string | number | RatingJson | TransferDestinationJson |
   ContentMultiMapRemoveJson | CrossChainDataRefJson | SignatureJsonDataInterface | DataDescriptorJson | MMRDescriptorJson;
-  serializedHex?: string;
-  serializedBase64?: string;
+  serializedhex?: string;
+  serializedbase64?: string;
   message?: string;
 };
 
@@ -499,24 +499,24 @@ export class VdxfUniValue implements SerializableEntity {
         });
       }
 
-      if (obj.serializedHex) {
-        if (!isHexString(obj.serializedHex)) {
+      if (obj.serializedhex) {
+        if (!isHexString(obj.serializedhex)) {
           throw new Error("contentmap: If the \"serializedhex\" key is present, it's data must be only valid hex and complete");
         }
-        arrayItem.push({ [""]: Buffer.from(obj.serializedHex, "hex") })
+        arrayItem.push({ [""]: Buffer.from(obj.serializedhex, "hex") })
         return new VdxfUniValue({
           values: arrayItem
         });
       }
 
-      if (obj.serializedBase64) {
+      if (obj.serializedbase64) {
         try {
-          arrayItem.push({ [""]: Buffer.from(obj.serializedBase64, "base64") })
+          arrayItem.push({ [""]: Buffer.from(obj.serializedbase64, "base64") })
           return new VdxfUniValue({
             values: arrayItem
           });
         } catch (e) {
-          throw new Error("contentmap: If the \"serializedBase64\" key is present, it's data must be only valid base64 and complete");
+          throw new Error("contentmap: If the \"serializedbase64\" key is present, it's data must be only valid base64 and complete");
         }
       }
 

@@ -215,6 +215,6 @@ describe('Encodes and decodes VdxfUniValue', () => {
     
     test();
   });
-
+  
 
 });
