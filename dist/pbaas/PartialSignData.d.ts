@@ -63,7 +63,7 @@ declare type BaseFields = {
 };
 declare type MMRFields = {
     mmrsalt?: Array<string>;
-    mmrhash?: AllowedHashes;
+    mmrhashtype?: AllowedHashes;
     priormmr?: Array<string>;
 };
 export declare type PartialSignDataCLIJson = ((AtLeastOne<Omit<SignDataKeys, 'mmrdata'>> & BaseFields) | (AtLeastOne<SignDataKeys> & MMRFields & BaseFields));

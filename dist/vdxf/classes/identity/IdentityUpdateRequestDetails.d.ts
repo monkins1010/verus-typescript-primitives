@@ -74,5 +74,5 @@ export declare class IdentityUpdateRequestDetails {
     toJson(): IdentityUpdateRequestDetailsJson;
     static fromJson(json: IdentityUpdateRequestDetailsJson): IdentityUpdateRequestDetails;
     toCLIJson(): VerusCLIVerusIDJsonWithData;
-    fromCLIJson(json: VerusCLIVerusIDJsonWithData, systemid?: string, requestid?: string, createdat?: string, expiryheight?: string, responseuris?: Array<ResponseUriJson>, salt?: string): IdentityUpdateRequestDetails;
+    static fromCLIJson(json: VerusCLIVerusIDJsonWithData, systemid?: string, requestid?: string, createdat?: string, expiryheight?: string, responseuris?: Array<ResponseUriJson>, salt?: string): IdentityUpdateRequestDetails;
 }

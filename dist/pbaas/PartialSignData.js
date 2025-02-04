@@ -351,7 +351,7 @@ class PartialSignData {
                 const mmrCLIJson = this.data.toCLIJson();
                 ret['mmrdata'] = mmrCLIJson.mmrdata;
                 ret['mmrsalt'] = mmrCLIJson.mmrsalt;
-                ret['mmrhash'] = mmrCLIJson.mmrhash;
+                ret['mmrhashtype'] = mmrCLIJson.mmrhashtype;
                 ret['priormmr'] = mmrCLIJson.priormmr;
             }
             else {
@@ -392,6 +392,10 @@ class PartialSignData {
         }
         else
             throw new Error("Unrecognized hash type");
+        for (const key in ret) {
+            if (ret[key] === undefined)
+                delete ret[key];
+        }
         return ret;
     }
     static fromCLIJson(json) {
@@ -421,7 +425,7 @@ class PartialSignData {
             const pmd = PartialMMRData_1.PartialMMRData.fromCLIJson({
                 mmrdata: json.mmrdata,
                 mmrsalt: json.mmrsalt,
-                mmrhash: json.mmrhash,
+                mmrhashtype: json.mmrhashtype,
                 priormmr: json.priormmr
             });
             config.data = pmd;

@@ -30,11 +30,16 @@ class PartialIdentity extends Identity_1.Identity {
             this.toggleContainsFlags();
         if (data === null || data === void 0 ? void 0 : data.min_sigs)
             this.toggleContainsMinSigs();
+        if (data === null || data === void 0 ? void 0 : data.version)
+            this.toggleContainsVersion();
         if ((data === null || data === void 0 ? void 0 : data.primary_addresses) && data.primary_addresses.length > 0)
             this.toggleContainsPrimaryAddresses();
     }
     containsFlags() {
         return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_FLAGS).toNumber());
+    }
+    containsVersion() {
+        return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_VERSION).toNumber());
     }
     containsPrimaryAddresses() {
         return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_PRIMARY_ADDRS).toNumber());
@@ -93,6 +98,9 @@ class PartialIdentity extends Identity_1.Identity {
     toggleContainsFlags() {
         this.contains = this.contains.xor(PartialIdentity.PARTIAL_ID_CONTAINS_FLAGS);
     }
+    toggleContainsVersion() {
+        this.contains = this.contains.xor(PartialIdentity.PARTIAL_ID_CONTAINS_VERSION);
+    }
     toggleContainsMinSigs() {
         this.contains = this.contains.xor(PartialIdentity.PARTIAL_ID_CONTAINS_MINSIGS);
     }
@@ -136,3 +144,4 @@ PartialIdentity.PARTIAL_ID_CONTAINS_PRIV_ADDRS = new bn_js_1.BN("128", 10);
 PartialIdentity.PARTIAL_ID_CONTAINS_CONTENT_MAP = new bn_js_1.BN("256", 10);
 PartialIdentity.PARTIAL_ID_CONTAINS_MINSIGS = new bn_js_1.BN("512", 10);
 PartialIdentity.PARTIAL_ID_CONTAINS_FLAGS = new bn_js_1.BN("1024", 10);
+PartialIdentity.PARTIAL_ID_CONTAINS_VERSION = new bn_js_1.BN("2048", 10);

@@ -354,7 +354,7 @@ export class IdentityUpdateRequestDetails {
     return idJson;
   }
 
-  fromCLIJson(
+  static fromCLIJson(
     json: VerusCLIVerusIDJsonWithData, 
     systemid?: string, 
     requestid?: string, 

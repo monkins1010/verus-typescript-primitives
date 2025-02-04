@@ -22,6 +22,15 @@ describe("IdentityUpdateEnvelope Serialization", () => {
   contentmap.set("iPsFBfFoCcxtuZNzE8yxPQhXVn4dmytf8j", Buffer.alloc(32));
   contentmap.set("iK7a5JNJnbeuYWVHCDRpJosj3irGJ5Qa8c", Buffer.alloc(32));
 
+  const cliIdUpdateRequestJson = {
+    "name": "data",
+    "contentmultimap": {
+        "i5CXAPoCLothTntExgvc5kK38u2wyHtFCg": {
+            "data": {"createmmr":true, "mmrdata":[{"message": "{\"rail_transport\": 43326.71, \"public_bus_transport\": 83452.4, \"air_transport\": 1306.83, \"urban_public_transport\": -1, \"time\": 993945600}", "mimetype": "application/json", "label": "quarter_3_2001_transport_passenger_data_cz"}]}
+        }
+    }
+  }
+
   const partialIdentity = new PartialIdentity({
     flags: new BN("0"),
     version: IDENTITY_VERSION_PBAAS,
@@ -106,7 +115,7 @@ describe("IdentityUpdateEnvelope Serialization", () => {
   function testCLIJsonSerialization(instance: IdentityUpdateRequestDetails) {
     const cliJson = instance.toCLIJson();
 
-    const fromCLIJsonInstance = new IdentityUpdateRequestDetails().fromCLIJson(cliJson);
+    const fromCLIJsonInstance = IdentityUpdateRequestDetails.fromCLIJson(cliJson);
     
     expect(fromCLIJsonInstance.toCLIJson()).toEqual(cliJson);
   }
@@ -325,4 +334,10 @@ describe("IdentityUpdateEnvelope Serialization", () => {
 
     testJsonSerialization(contentMultiMap);
   });
+
+  test("Deserialize cli identity update details", () => {
+    const req = IdentityUpdateRequestDetails.fromCLIJson(cliIdUpdateRequestJson);
+
+    testCLIJsonSerialization(req);
+  })
 });

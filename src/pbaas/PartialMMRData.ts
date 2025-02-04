@@ -60,7 +60,7 @@ export type SingleKeyMMRData = {
 export type PartialMMRDataCLIJson = {
   mmrdata: Array<SingleKeyMMRData | string>;
   mmrsalt?: Array<string>;
-  mmrhash?: AllowedHashes;
+  mmrhashtype?: AllowedHashes;
   priormmr?: Array<string>;
 };
 
@@ -240,7 +240,7 @@ export class PartialMMRData implements SerializableEntity {
     const mmrdata = [];
     let mmrsalt: Array<string>;
     let priormmr: Array<string>;
-    let mmrhash: string;
+    let mmrhashtype: string;
 
     for (const unit of this.data) {
       if (unit.type.eq(DATA_TYPE_RAWSTRINGDATA)){
@@ -283,21 +283,27 @@ export class PartialMMRData implements SerializableEntity {
     }
 
     if (this.mmrhashtype.eq(HASH_TYPE_SHA256)){
-      mmrhash = HASH_TYPE_SHA256_NAME;
+      mmrhashtype = HASH_TYPE_SHA256_NAME;
     } else if (this.mmrhashtype.eq(HASH_TYPE_SHA256D)) {
-      mmrhash = HASH_TYPE_SHA256D_NAME;
+      mmrhashtype = HASH_TYPE_SHA256D_NAME;
     } else if (this.mmrhashtype.eq(HASH_TYPE_BLAKE2B)) {
-      mmrhash = HASH_TYPE_BLAKE2B_NAME;
+      mmrhashtype = HASH_TYPE_BLAKE2B_NAME;
     } else if (this.mmrhashtype.eq(HASH_TYPE_KECCAK256)) {
-      mmrhash = HASH_TYPE_KECCAK256_NAME;
+      mmrhashtype = HASH_TYPE_KECCAK256_NAME;
     } else throw new Error("Unrecognized hash type");
 
-    return {
+    const ret = {
       mmrdata,
       mmrsalt,
       priormmr,
-      mmrhash
+      mmrhashtype
+    };
+
+    for (const key in ret) {
+      if (ret[key] === undefined) delete ret[key]
     }
+
+    return ret;
   }
 
   static fromCLIJson(json: PartialMMRDataCLIJson): PartialMMRData {
@@ -348,8 +354,8 @@ export class PartialMMRData implements SerializableEntity {
       priormmr = json.priormmr.map(x => Buffer.from(x, 'hex'));
     }
 
-    if (json.mmrhash) {
-      switch (json.mmrhash) {
+    if (json.mmrhashtype) {
+      switch (json.mmrhashtype) {
         case HASH_TYPE_SHA256_NAME:
           mmrhashtype = HASH_TYPE_SHA256;
           break;

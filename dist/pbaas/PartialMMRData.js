@@ -138,7 +138,7 @@ class PartialMMRData {
         const mmrdata = [];
         let mmrsalt;
         let priormmr;
-        let mmrhash;
+        let mmrhashtype;
         for (const unit of this.data) {
             if (unit.type.eq(pbaas_1.DATA_TYPE_RAWSTRINGDATA)) {
                 mmrdata.push(unit.data.toString('hex'));
@@ -183,25 +183,30 @@ class PartialMMRData {
             priormmr = this.priormmr.map(x => x.toString('hex'));
         }
         if (this.mmrhashtype.eq(pbaas_1.HASH_TYPE_SHA256)) {
-            mmrhash = pbaas_1.HASH_TYPE_SHA256_NAME;
+            mmrhashtype = pbaas_1.HASH_TYPE_SHA256_NAME;
         }
         else if (this.mmrhashtype.eq(pbaas_1.HASH_TYPE_SHA256D)) {
-            mmrhash = pbaas_1.HASH_TYPE_SHA256D_NAME;
+            mmrhashtype = pbaas_1.HASH_TYPE_SHA256D_NAME;
         }
         else if (this.mmrhashtype.eq(pbaas_1.HASH_TYPE_BLAKE2B)) {
-            mmrhash = pbaas_1.HASH_TYPE_BLAKE2B_NAME;
+            mmrhashtype = pbaas_1.HASH_TYPE_BLAKE2B_NAME;
         }
         else if (this.mmrhashtype.eq(pbaas_1.HASH_TYPE_KECCAK256)) {
-            mmrhash = pbaas_1.HASH_TYPE_KECCAK256_NAME;
+            mmrhashtype = pbaas_1.HASH_TYPE_KECCAK256_NAME;
         }
         else
             throw new Error("Unrecognized hash type");
-        return {
+        const ret = {
             mmrdata,
             mmrsalt,
             priormmr,
-            mmrhash
+            mmrhashtype
         };
+        for (const key in ret) {
+            if (ret[key] === undefined)
+                delete ret[key];
+        }
+        return ret;
     }
     static fromCLIJson(json) {
         const data = [];
@@ -247,8 +252,8 @@ class PartialMMRData {
         if (json.priormmr) {
             priormmr = json.priormmr.map(x => Buffer.from(x, 'hex'));
         }
-        if (json.mmrhash) {
-            switch (json.mmrhash) {
+        if (json.mmrhashtype) {
+            switch (json.mmrhashtype) {
                 case pbaas_1.HASH_TYPE_SHA256_NAME:
                     mmrhashtype = pbaas_1.HASH_TYPE_SHA256;
                     break;

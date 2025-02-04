@@ -33,7 +33,7 @@ export declare type SingleKeyMMRData = {
 export declare type PartialMMRDataCLIJson = {
     mmrdata: Array<SingleKeyMMRData | string>;
     mmrsalt?: Array<string>;
-    mmrhash?: AllowedHashes;
+    mmrhashtype?: AllowedHashes;
     priormmr?: Array<string>;
 };
 export declare class PartialMMRData implements SerializableEntity {

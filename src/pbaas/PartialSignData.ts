@@ -86,7 +86,7 @@ type BaseFields = {
 // MMR fields (only allowed if mmrdata is present)
 type MMRFields = {
   mmrsalt?: Array<string>;
-  mmrhash?: AllowedHashes;
+  mmrhashtype?: AllowedHashes;
   priormmr?: Array<string>;
 };
 
@@ -529,7 +529,7 @@ export class PartialSignData implements SerializableEntity {
   
         ret['mmrdata'] = mmrCLIJson.mmrdata;
         ret['mmrsalt'] = mmrCLIJson.mmrsalt;
-        ret['mmrhash'] = mmrCLIJson.mmrhash;
+        ret['mmrhashtype'] = mmrCLIJson.mmrhashtype;
         ret['priormmr'] = mmrCLIJson.priormmr;
       } else {
         const dataBuf = this.data as Buffer;
@@ -559,6 +559,10 @@ export class PartialSignData implements SerializableEntity {
     } else if (this.hashtype.eq(HASH_TYPE_KECCAK256)) {
       ret['hashtype'] = HASH_TYPE_KECCAK256_NAME;
     } else throw new Error("Unrecognized hash type");
+
+    for (const key in ret) {
+      if (ret[key] === undefined) delete ret[key]
+    }
 
     return ret;
   }
@@ -591,7 +595,7 @@ export class PartialSignData implements SerializableEntity {
       const pmd = PartialMMRData.fromCLIJson({
         mmrdata: json.mmrdata,
         mmrsalt: json.mmrsalt,
-        mmrhash: json.mmrhash,
+        mmrhashtype: json.mmrhashtype,
         priormmr: json.priormmr
       })
 

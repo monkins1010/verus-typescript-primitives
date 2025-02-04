@@ -369,7 +369,7 @@ export class Identity extends Principal implements SerializableEntity {
     const ret: VerusCLIVerusIDJson = {
       contentmap: this.containsContentMap() ? contentmap : undefined,
       contentmultimap: this.containsContentMultiMap() ? this.content_multimap.toJson() : undefined,
-      flags: this.flags.toNumber(),
+      flags: this.containsFlags() ? this.flags.toNumber() : undefined,
       minimumsignatures: this.containsMinSigs() ? this.min_sigs.toNumber() : undefined,
       name: this.name,
       parent: this.containsParent() ? this.parent.toAddress() : undefined,
@@ -378,12 +378,16 @@ export class Identity extends Principal implements SerializableEntity {
       revocationauthority: this.containsRevocation() ? this.revocation_authority.toAddress() : undefined,
       systemid: this.containsSystemId() ? this.system_id.toAddress() : undefined,
       timelock: this.containsUnlockAfter() ? this.unlock_after.toNumber() : undefined,
-      version: this.version.toNumber(),
+      version: this.containsVersion() ? this.version.toNumber() : undefined,
       identityaddress: this.containsParent() ? this.getIdentityAddress() : undefined
     };
 
     if (this.private_addresses != null && this.private_addresses.length > 0) {
       ret.privateaddress = this.private_addresses[0].toAddressString();
+    }
+
+    for (const key in ret) {
+      if (ret[key] === undefined) delete ret[key]
     }
 
     return ret;
@@ -506,19 +510,19 @@ export class Identity extends Principal implements SerializableEntity {
     }
   
     return new ctor({
-      version: json.version ? new BN(json.version, 10) : null,
-      flags: json.flags ? new BN(json.flags, 10) : null,
-      min_sigs: json.minimumsignatures ? new BN(json.minimumsignatures, 10) : null,
-      primary_addresses: json.primaryaddresses ? json.primaryaddresses.map(x => KeyID.fromAddress(x)) : null,
-      parent: json.parent ? IdentityID.fromAddress(json.parent) : null,
+      version: json.version != null ? new BN(json.version, 10) : undefined,
+      flags: json.flags != null ? new BN(json.flags, 10) : undefined,
+      min_sigs: json.minimumsignatures ? new BN(json.minimumsignatures, 10) : undefined,
+      primary_addresses: json.primaryaddresses ? json.primaryaddresses.map(x => KeyID.fromAddress(x)) : undefined,
+      parent: json.parent ? IdentityID.fromAddress(json.parent) : undefined,
       system_id: json.systemid ? IdentityID.fromAddress(json.systemid) : undefined,
       name: json.name,
-      content_map: contentmap,
-      content_multimap: json.contentmultimap ? ContentMultiMap.fromJson(json.contentmultimap as  ContentMultiMapJson) : null,
-      revocation_authority: json.revocationauthority ? IdentityID.fromAddress(json.revocationauthority) : null,
-      recovery_authority: json.recoveryauthority ? IdentityID.fromAddress(json.recoveryauthority) : null,
+      content_map: json.contentmap ? contentmap : undefined,
+      content_multimap: json.contentmultimap ? ContentMultiMap.fromJson(json.contentmultimap as  ContentMultiMapJson) : undefined,
+      revocation_authority: json.revocationauthority ? IdentityID.fromAddress(json.revocationauthority) : undefined,
+      recovery_authority: json.recoveryauthority ? IdentityID.fromAddress(json.recoveryauthority) : undefined,
       private_addresses: json.privateaddress == null ? [] : [SaplingPaymentAddress.fromAddressString(json.privateaddress)],
-      unlock_after: json.timelock != null ? new BN(json.timelock, 10) : null
+      unlock_after: json.timelock != null ? new BN(json.timelock, 10) : undefined
     });
   }
 

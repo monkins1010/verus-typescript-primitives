@@ -16,8 +16,10 @@ export declare class PartialIdentity extends Identity implements SerializableEnt
     static PARTIAL_ID_CONTAINS_CONTENT_MAP: import("bn.js");
     static PARTIAL_ID_CONTAINS_MINSIGS: import("bn.js");
     static PARTIAL_ID_CONTAINS_FLAGS: import("bn.js");
+    static PARTIAL_ID_CONTAINS_VERSION: import("bn.js");
     constructor(data?: VerusIDInitData);
     protected containsFlags(): boolean;
+    protected containsVersion(): boolean;
     protected containsPrimaryAddresses(): boolean;
     protected containsMinSigs(): boolean;
     protected containsParent(): boolean;
@@ -37,6 +39,7 @@ export declare class PartialIdentity extends Identity implements SerializableEnt
     private toggleContainsPrivateAddresses;
     private toggleContainsUnlockAfter;
     private toggleContainsFlags;
+    private toggleContainsVersion;
     private toggleContainsMinSigs;
     private toggleContainsPrimaryAddresses;
     private getPartialIdentityByteLength;

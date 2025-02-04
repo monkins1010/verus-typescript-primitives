@@ -21,6 +21,7 @@ export class PartialIdentity extends Identity implements SerializableEntity {
   static PARTIAL_ID_CONTAINS_CONTENT_MAP = new BN("256", 10);
   static PARTIAL_ID_CONTAINS_MINSIGS = new BN("512", 10);
   static PARTIAL_ID_CONTAINS_FLAGS = new BN("1024", 10);
+  static PARTIAL_ID_CONTAINS_VERSION = new BN("2048", 10);
 
   constructor(data?: VerusIDInitData) {
     super(data);
@@ -37,11 +38,16 @@ export class PartialIdentity extends Identity implements SerializableEntity {
     if (data?.unlock_after) this.toggleContainsUnlockAfter();
     if (data?.flags) this.toggleContainsFlags();
     if (data?.min_sigs) this.toggleContainsMinSigs();
+    if (data?.version) this.toggleContainsVersion();
     if (data?.primary_addresses && data.primary_addresses.length > 0) this.toggleContainsPrimaryAddresses();
   }
 
   protected containsFlags() {
     return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_FLAGS).toNumber());
+  }
+
+  protected containsVersion() {
+    return !!(this.contains.and(PartialIdentity.PARTIAL_ID_CONTAINS_VERSION).toNumber());
   }
 
   protected containsPrimaryAddresses() {
@@ -118,6 +124,10 @@ export class PartialIdentity extends Identity implements SerializableEntity {
 
   private toggleContainsFlags() {
     this.contains = this.contains.xor(PartialIdentity.PARTIAL_ID_CONTAINS_FLAGS);
+  }
+
+  private toggleContainsVersion() {
+    this.contains = this.contains.xor(PartialIdentity.PARTIAL_ID_CONTAINS_VERSION);
   }
 
   private toggleContainsMinSigs() {

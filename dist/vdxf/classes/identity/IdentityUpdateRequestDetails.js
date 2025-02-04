@@ -241,7 +241,7 @@ class IdentityUpdateRequestDetails {
         }
         return idJson;
     }
-    fromCLIJson(json, systemid, requestid, createdat, expiryheight, responseuris, salt) {
+    static fromCLIJson(json, systemid, requestid, createdat, expiryheight, responseuris, salt) {
         let identity;
         let signdatamap;
         if (json.contentmultimap) {
