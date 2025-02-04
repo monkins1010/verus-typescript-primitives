@@ -24,6 +24,8 @@ class IdentityUpdateRequestDetails {
         if (data === null || data === void 0 ? void 0 : data.createdat) {
             this.createdat = data.createdat;
         }
+        else
+            this.createdat = new bn_js_1.BN("0", 10);
         if (data === null || data === void 0 ? void 0 : data.identity) {
             this.identity = data.identity;
         }

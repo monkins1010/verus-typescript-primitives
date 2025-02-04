@@ -68,7 +68,7 @@ export class IdentityUpdateRequestDetails {
 
     if (data?.createdat) {
       this.createdat = data.createdat;
-    }
+    } else this.createdat = new BN("0", 10);
 
     if (data?.identity) {
       this.identity = data.identity;
