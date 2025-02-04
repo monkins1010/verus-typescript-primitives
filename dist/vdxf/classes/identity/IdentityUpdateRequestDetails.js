@@ -229,14 +229,45 @@ class IdentityUpdateRequestDetails {
         });
     }
     toCLIJson() {
-        const verusidJson = this.identity.toJson();
-        if (!this.signdatamap)
-            return verusidJson;
-        else {
-            if (!verusidJson.contentmultimap)
-                for (const [vdxfkey, psd] of this.signdatamap.entries()) {
-                }
+        if (!this.identity)
+            throw new Error("No identity details to update");
+        const idJson = this.identity.toJson();
+        if (this.containsSignData()) {
+            for (const [key, psd] of this.signdatamap.entries()) {
+                idJson.contentmultimap[key] = {
+                    "data": psd.toCLIJson()
+                };
+            }
         }
+        return idJson;
+    }
+    fromCLIJson(json, systemid, requestid, createdat, expiryheight, responseuris, salt) {
+        let identity;
+        let signdatamap;
+        if (json.contentmultimap) {
+            const cmm = Object.assign({}, json.contentmultimap);
+            for (const key in cmm) {
+                if (cmm[key]['data']) {
+                    if (!signdatamap)
+                        signdatamap = new Map();
+                    const psd = PartialSignData_1.PartialSignData.fromCLIJson(cmm[key]['data']);
+                    signdatamap.set(key, psd);
+                    delete cmm[key];
+                }
+            }
+            json = Object.assign(Object.assign({}, json), { contentmultimap: cmm });
+        }
+        identity = PartialIdentity_1.PartialIdentity.fromJson(json);
+        return new IdentityUpdateRequestDetails({
+            identity,
+            signdatamap,
+            systemid: systemid ? pbaas_1.IdentityID.fromAddress(systemid) : undefined,
+            requestid: requestid ? new bn_js_1.BN(requestid, 10) : undefined,
+            createdat: createdat ? new bn_js_1.BN(createdat, 10) : undefined,
+            expiryheight: expiryheight ? new bn_js_1.BN(expiryheight, 10) : undefined,
+            responseuris: responseuris ? responseuris.map(x => ResponseUri_1.ResponseUri.fromJson(x)) : undefined,
+            salt: salt ? Buffer.from(salt, 'hex') : undefined
+        });
     }
 }
 exports.IdentityUpdateRequestDetails = IdentityUpdateRequestDetails;

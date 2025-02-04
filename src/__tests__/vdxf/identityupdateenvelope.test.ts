@@ -103,6 +103,14 @@ describe("IdentityUpdateEnvelope Serialization", () => {
     expect(newJson).toEqual(json);
   }
 
+  function testCLIJsonSerialization(instance: IdentityUpdateRequestDetails) {
+    const cliJson = instance.toCLIJson();
+
+    const fromCLIJsonInstance = new IdentityUpdateRequestDetails().fromCLIJson(cliJson);
+    
+    expect(fromCLIJsonInstance.toCLIJson()).toEqual(cliJson);
+  }
+
   test("Serialize/Deserialize unsigned IdentityUpdateRequest", () => {
     const requestDetails = new IdentityUpdateRequestDetails({ 
       requestid: requestID, 
@@ -115,6 +123,7 @@ describe("IdentityUpdateEnvelope Serialization", () => {
     });
     const request = new IdentityUpdateRequest({ details: requestDetails });
     testSerialization(request);
+    testCLIJsonSerialization(request.details as IdentityUpdateRequestDetails);
   });
 
   test("Serialize/Deserialize signed IdentityUpdateRequest", () => {
@@ -135,6 +144,7 @@ describe("IdentityUpdateEnvelope Serialization", () => {
     });
 
     testSerialization(request);
+    testCLIJsonSerialization(request.details as IdentityUpdateRequestDetails);
   });
 
   test("Serialize/Deserialize unsigned IdentityUpdateResponse", () => {
@@ -173,6 +183,7 @@ describe("IdentityUpdateEnvelope Serialization", () => {
       const request = new IdentityUpdateRequest({ details: newRequestDetails });
 
       testSerialization(request);
+      testCLIJsonSerialization(request.details as IdentityUpdateRequestDetails);
 
       if (i < toRemove.length) {
         delete baseRequestDetailsConfig[toRemove[i]]
@@ -211,6 +222,7 @@ describe("IdentityUpdateEnvelope Serialization", () => {
 
     const request = new IdentityUpdateRequest({ details: requestDetails });
     testJsonSerialization(request);
+    testCLIJsonSerialization(request.details as IdentityUpdateRequestDetails);
   });
 
   test("Serialize/Deserialize signed IdentityUpdateRequest to/from JSON", () => {
@@ -232,6 +244,7 @@ describe("IdentityUpdateEnvelope Serialization", () => {
     });
 
     testJsonSerialization(request);
+    testCLIJsonSerialization(request.details as IdentityUpdateRequestDetails);
   });
 
   test("Serialize/Deserialize IdentityUpdateResponse to/from JSON", () => {
@@ -271,6 +284,7 @@ describe("IdentityUpdateEnvelope Serialization", () => {
     });
 
     testJsonSerialization(requestDetails);
+    testCLIJsonSerialization(requestDetails);
   });
 
   test("Serialize/Deserialize IdentityUpdateResponseDetails to/from JSON", () => {

@@ -10,6 +10,7 @@ import { SaplingPaymentAddress } from './SaplingPaymentAddress';
 import { ContentMultiMap, ContentMultiMapJson } from './ContentMultiMap';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
 import { KeyID } from './KeyID';
+import { PartialSignDataCLIJson } from './PartialSignData';
 
 export const IDENTITY_VERSION_VAULT = new BN(2, 10);
 export const IDENTITY_VERSION_PBAAS = new BN(3, 10);
@@ -26,22 +27,24 @@ const { BufferReader, BufferWriter } = bufferutils;
 
 export type Hashes = Map<string, Buffer>;
 
-export type VerusCLIVerusIDJson = {
-  contentmap?: { [key: string]: string },
-  contentmultimap?: ContentMultiMapJson,
-  flags?: number,
-  identityaddress?: string,
-  minimumsignatures?: number,
-  name?: string,
-  parent?: string,
-  primaryaddresses?: Array<string>,
-  privateaddress?: string,
-  recoveryauthority?: string,
-  revocationauthority?: string,
-  systemid?: string,
-  timelock?: number,
-  version?: number
-}
+export type VerusCLIVerusIDJsonBase<T = ContentMultiMapJson> = {
+  contentmap?: { [key: string]: string };
+  contentmultimap?: T;
+  flags?: number;
+  identityaddress?: string;
+  minimumsignatures?: number;
+  name?: string;
+  parent?: string;
+  primaryaddresses?: Array<string>;
+  privateaddress?: string;
+  recoveryauthority?: string;
+  revocationauthority?: string;
+  systemid?: string;
+  timelock?: number;
+  version?: number;
+};
+
+export type VerusCLIVerusIDJson = VerusCLIVerusIDJsonBase<ContentMultiMapJson>;
 
 export type VerusIDInitData = {
   version?: BigNumber;
@@ -511,7 +514,7 @@ export class Identity extends Principal implements SerializableEntity {
       system_id: json.systemid ? IdentityID.fromAddress(json.systemid) : undefined,
       name: json.name,
       content_map: contentmap,
-      content_multimap: json.contentmultimap ? ContentMultiMap.fromJson(json.contentmultimap) : null,
+      content_multimap: json.contentmultimap ? ContentMultiMap.fromJson(json.contentmultimap as  ContentMultiMapJson) : null,
       revocation_authority: json.revocationauthority ? IdentityID.fromAddress(json.revocationauthority) : null,
       recovery_authority: json.recoveryauthority ? IdentityID.fromAddress(json.recoveryauthority) : null,
       private_addresses: json.privateaddress == null ? [] : [SaplingPaymentAddress.fromAddressString(json.privateaddress)],

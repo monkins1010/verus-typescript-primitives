@@ -5,15 +5,17 @@ import { fromBase58Check, toBase58Check } from '../../../utils/address';
 import { HASH160_BYTE_LENGTH, I_ADDR_VERSION } from '../../../constants/vdxf';
 import createHash = require('create-hash');
 import { PartialIdentity } from '../../../pbaas/PartialIdentity';
-import { PartialSignData, PartialSignDataJson } from '../../../pbaas/PartialSignData';
+import { PartialSignData, PartialSignDataCLIJson, PartialSignDataJson } from '../../../pbaas/PartialSignData';
 import { BigNumber } from '../../../utils/types/BigNumber';
 import { BN } from 'bn.js';
-import { IdentityID, VerusCLIVerusIDJson } from '../../../pbaas';
+import { ContentMultiMapJson, IdentityID, VerusCLIVerusIDJson, VerusCLIVerusIDJsonBase } from '../../../pbaas';
 import { ResponseUri, ResponseUriJson } from '../ResponseUri';
-import { IdentityUpdateRequest } from './IdentityUpdateEnvelope';
+
 const { BufferReader, BufferWriter } = bufferutils;
 
 export type SignDataMap = Map<string, PartialSignData>;
+
+export type VerusCLIVerusIDJsonWithData = VerusCLIVerusIDJsonBase<ContentMultiMapJson | { [key: string]: { data: PartialSignDataCLIJson } }>
 
 export type IdentityUpdateRequestDetailsJson = {
   flags?: string;
@@ -333,6 +335,65 @@ export class IdentityUpdateRequestDetails {
       responseuris: json.responseuris ? json.responseuris.map(x => ResponseUri.fromJson(x)) : undefined,
       signdatamap,
       salt: json.salt ? Buffer.from(json.salt, 'hex') : undefined
+    })
+  }
+
+  toCLIJson(): VerusCLIVerusIDJsonWithData {
+    if (!this.identity) throw new Error("No identity details to update");
+
+    const idJson = (this.identity.toJson() as VerusCLIVerusIDJsonWithData);
+
+    if (this.containsSignData()) {
+      for (const [key, psd] of this.signdatamap.entries()) {
+        idJson.contentmultimap[key] = {
+          "data": psd.toCLIJson()
+        }
+      }
+    }
+
+    return idJson;
+  }
+
+  fromCLIJson(
+    json: VerusCLIVerusIDJsonWithData, 
+    systemid?: string, 
+    requestid?: string, 
+    createdat?: string, 
+    expiryheight?: string,
+    responseuris?: Array<ResponseUriJson>,
+    salt?: string
+  ): IdentityUpdateRequestDetails {
+    let identity: PartialIdentity;
+    let signdatamap: SignDataMap;
+
+    if (json.contentmultimap) {
+      const cmm = { ...json.contentmultimap };
+
+      for (const key in cmm) {
+        if (cmm[key]['data']) {
+          if (!signdatamap) signdatamap = new Map();
+
+          const psd = PartialSignData.fromCLIJson(cmm[key]['data']);
+          signdatamap.set(key, psd);
+
+          delete cmm[key];
+        }
+      }
+
+      json = { ...json, contentmultimap: cmm }
+    }
+
+    identity = PartialIdentity.fromJson(json as VerusCLIVerusIDJson);
+
+    return new IdentityUpdateRequestDetails({
+      identity,
+      signdatamap,
+      systemid: systemid ? IdentityID.fromAddress(systemid) : undefined,
+      requestid: requestid ? new BN(requestid, 10) : undefined,
+      createdat: createdat ? new BN(createdat, 10) : undefined,
+      expiryheight: expiryheight ? new BN(expiryheight, 10) : undefined,
+      responseuris: responseuris ? responseuris.map(x => ResponseUri.fromJson(x)) : undefined,
+      salt: salt ? Buffer.from(salt, 'hex') : undefined
     })
   }
 }

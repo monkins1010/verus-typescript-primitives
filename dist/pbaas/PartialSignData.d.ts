@@ -66,7 +66,7 @@ declare type MMRFields = {
     mmrhash?: AllowedHashes;
     priormmr?: Array<string>;
 };
-declare type PartialSignDataCLIJson = ((AtLeastOne<Omit<SignDataKeys, 'mmrdata'>> & BaseFields) | (AtLeastOne<SignDataKeys> & MMRFields & BaseFields));
+export declare type PartialSignDataCLIJson = ((AtLeastOne<Omit<SignDataKeys, 'mmrdata'>> & BaseFields) | (AtLeastOne<SignDataKeys> & MMRFields & BaseFields));
 export declare class PartialSignData implements SerializableEntity {
     flags: BigNumber;
     address?: IdentityID | KeyID;

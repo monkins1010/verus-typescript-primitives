@@ -93,7 +93,7 @@ type MMRFields = {
 // Conditional combination:
 // - If mmrdata exists, MMRFields are allowed
 // - If mmrdata does not exist, MMRFields are not allowed
-type PartialSignDataCLIJson = (
+export type PartialSignDataCLIJson = (
   | (AtLeastOne<Omit<SignDataKeys, 'mmrdata'>> & BaseFields) // No mmrdata, so no MMRFields
   | (AtLeastOne<SignDataKeys> & MMRFields & BaseFields)     // mmrdata exists, MMRFields allowed
 );
