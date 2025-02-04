@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UINT_256_LENGTH = exports.DEFAULT_HASH_TYPE = exports.HASH_TYPE_KECCAK256 = exports.HASH_TYPE_BLAKE2B = exports.HASH_TYPE_SHA256D = exports.HASH_TYPE_SHA256 = exports.DATA_TYPE_RAWSTRINGDATA = exports.DATA_TYPE_DATAHASH = exports.DATA_TYPE_BASE64 = exports.DATA_TYPE_HEX = exports.DATA_TYPE_VDXFDATA = exports.DATA_TYPE_MESSAGE = exports.DATA_TYPE_FILENAME = exports.DATA_TYPE_MMRDATA = exports.DATA_TYPE_UNKNOWN = void 0;
+exports.UINT_256_LENGTH = exports.HASH_NAMES = exports.DEFAULT_HASH_TYPE = exports.HASH_TYPE_KECCAK256_NAME = exports.HASH_TYPE_BLAKE2B_NAME = exports.HASH_TYPE_SHA256D_NAME = exports.HASH_TYPE_SHA256_NAME = exports.HASH_TYPE_KECCAK256 = exports.HASH_TYPE_BLAKE2B = exports.HASH_TYPE_SHA256D = exports.HASH_TYPE_SHA256 = exports.DATA_TYPE_RAWSTRINGDATA = exports.DATA_TYPE_DATAHASH = exports.DATA_TYPE_BASE64 = exports.DATA_TYPE_HEX = exports.DATA_TYPE_VDXFDATA = exports.DATA_TYPE_MESSAGE = exports.DATA_TYPE_FILENAME = exports.DATA_TYPE_MMRDATA = exports.DATA_TYPE_UNKNOWN = void 0;
 const bn_js_1 = require("bn.js");
 exports.DATA_TYPE_UNKNOWN = new bn_js_1.BN("0", 10);
 exports.DATA_TYPE_MMRDATA = new bn_js_1.BN("1", 10);
@@ -15,5 +15,10 @@ exports.HASH_TYPE_SHA256 = new bn_js_1.BN("1", 10);
 exports.HASH_TYPE_SHA256D = new bn_js_1.BN("2", 10);
 exports.HASH_TYPE_BLAKE2B = new bn_js_1.BN("3", 10);
 exports.HASH_TYPE_KECCAK256 = new bn_js_1.BN("4", 10);
+exports.HASH_TYPE_SHA256_NAME = "sha256";
+exports.HASH_TYPE_SHA256D_NAME = "sha256D";
+exports.HASH_TYPE_BLAKE2B_NAME = "blake2b";
+exports.HASH_TYPE_KECCAK256_NAME = "keccak256";
 exports.DEFAULT_HASH_TYPE = exports.HASH_TYPE_SHA256;
+exports.HASH_NAMES = [exports.HASH_TYPE_SHA256_NAME, exports.HASH_TYPE_SHA256D_NAME, exports.HASH_TYPE_BLAKE2B_NAME, exports.HASH_TYPE_KECCAK256_NAME];
 exports.UINT_256_LENGTH = 32;

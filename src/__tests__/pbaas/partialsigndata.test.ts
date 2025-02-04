@@ -80,6 +80,12 @@ describe('PartialSignData serialization/deserialization', () => {
       }
     }
 
+    function testCLIJsonSerialization(instance) {
+      const cliJson = instance.toCLIJson();
+      const fromCLIJsonInstance = PartialSignData.fromCLIJson(cliJson);
+      expect(fromCLIJsonInstance.toCLIJson()).toEqual(cliJson);
+    }
+
     // Now test finalTestData once.
     finalTestData.forEach((config, index) => {
       try {
@@ -91,6 +97,7 @@ describe('PartialSignData serialization/deserialization', () => {
   
         const reserialized = psdFromBuffer.toBuffer();
         expect(reserialized.toString('hex')).toBe(serialized.toString('hex'));
+        testCLIJsonSerialization(psd);
       } catch(e) {
         console.error("Error in finalTestData entry:");
         console.error(config);

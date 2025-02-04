@@ -2,6 +2,7 @@
 /// <reference types="bn.js" />
 import { BigNumber } from '../utils/types/BigNumber';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
+import { AllowedHashes } from '../constants/pbaas';
 export declare type PartialMMRDataUnit = {
     type: BigNumber;
     data: Buffer;
@@ -23,6 +24,18 @@ export declare type PartialMMRDataJson = {
     mmrhashtype?: string;
     priormmr?: Array<string>;
 };
+export declare type CLIMMRDataKey = "filename" | "serializedhex" | "serializedbase64" | "vdxfdata" | "message" | "datahash";
+export declare type SingleKeyMMRData = {
+    [K in CLIMMRDataKey]: {
+        [P in K]: string;
+    };
+}[CLIMMRDataKey];
+export declare type PartialMMRDataCLIJson = {
+    mmrdata: Array<SingleKeyMMRData | string>;
+    mmrsalt?: Array<string>;
+    mmrhash?: AllowedHashes;
+    priormmr?: Array<string>;
+};
 export declare class PartialMMRData implements SerializableEntity {
     flags: BigNumber;
     data: Array<PartialMMRDataUnit>;
@@ -42,4 +55,6 @@ export declare class PartialMMRData implements SerializableEntity {
     toBuffer(): Buffer;
     toJson(): PartialMMRDataJson;
     static fromJson(json: PartialMMRDataJson): PartialMMRData;
+    toCLIJson(): PartialMMRDataCLIJson;
+    static fromCLIJson(json: PartialMMRDataCLIJson): PartialMMRData;
 }

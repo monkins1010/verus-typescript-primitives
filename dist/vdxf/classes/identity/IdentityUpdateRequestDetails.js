@@ -228,6 +228,16 @@ class IdentityUpdateRequestDetails {
             salt: json.salt ? Buffer.from(json.salt, 'hex') : undefined
         });
     }
+    toCLIJson() {
+        const verusidJson = this.identity.toJson();
+        if (!this.signdatamap)
+            return verusidJson;
+        else {
+            if (!verusidJson.contentmultimap)
+                for (const [vdxfkey, psd] of this.signdatamap.entries()) {
+                }
+        }
+    }
 }
 exports.IdentityUpdateRequestDetails = IdentityUpdateRequestDetails;
 IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_INVALID = new bn_js_1.BN(0, 10);

@@ -134,6 +134,144 @@ class PartialMMRData {
             priormmr: json.priormmr ? json.priormmr.map(x => Buffer.from(x, 'hex')) : undefined,
         });
     }
+    toCLIJson() {
+        const mmrdata = [];
+        let mmrsalt;
+        let priormmr;
+        let mmrhash;
+        for (const unit of this.data) {
+            if (unit.type.eq(pbaas_1.DATA_TYPE_RAWSTRINGDATA)) {
+                mmrdata.push(unit.data.toString('hex'));
+            }
+            else if (unit.type.eq(pbaas_1.DATA_TYPE_FILENAME)) {
+                mmrdata.push({
+                    "filename": unit.data.toString('utf-8')
+                });
+            }
+            else if (unit.type.eq(pbaas_1.DATA_TYPE_MESSAGE)) {
+                mmrdata.push({
+                    "message": unit.data.toString('utf-8')
+                });
+            }
+            else if (unit.type.eq(pbaas_1.DATA_TYPE_VDXFDATA)) {
+                // mmrdata.push({
+                //   "vdxfdata": 
+                // });
+                // Implement when VdxfUniValue to/from json is completed
+                throw new Error("VDXFDATA not yet implemented");
+            }
+            else if (unit.type.eq(pbaas_1.DATA_TYPE_HEX)) {
+                mmrdata.push({
+                    "serializedhex": unit.data.toString('hex')
+                });
+            }
+            else if (unit.type.eq(pbaas_1.DATA_TYPE_BASE64)) {
+                mmrdata.push({
+                    "serializedbase64": unit.data.toString('base64')
+                });
+            }
+            else if (unit.type.eq(pbaas_1.DATA_TYPE_DATAHASH)) {
+                mmrdata.push({
+                    "datahash": unit.data.toString('hex')
+                });
+            }
+        }
+        if (this.containsSalt()) {
+            mmrsalt = this.salt.map(x => x.toString('hex'));
+        }
+        if (this.containsPriorMMR()) {
+            priormmr = this.priormmr.map(x => x.toString('hex'));
+        }
+        if (this.mmrhashtype.eq(pbaas_1.HASH_TYPE_SHA256)) {
+            mmrhash = pbaas_1.HASH_TYPE_SHA256_NAME;
+        }
+        else if (this.mmrhashtype.eq(pbaas_1.HASH_TYPE_SHA256D)) {
+            mmrhash = pbaas_1.HASH_TYPE_SHA256D_NAME;
+        }
+        else if (this.mmrhashtype.eq(pbaas_1.HASH_TYPE_BLAKE2B)) {
+            mmrhash = pbaas_1.HASH_TYPE_BLAKE2B_NAME;
+        }
+        else if (this.mmrhashtype.eq(pbaas_1.HASH_TYPE_KECCAK256)) {
+            mmrhash = pbaas_1.HASH_TYPE_KECCAK256_NAME;
+        }
+        else
+            throw new Error("Unrecognized hash type");
+        return {
+            mmrdata,
+            mmrsalt,
+            priormmr,
+            mmrhash
+        };
+    }
+    static fromCLIJson(json) {
+        const data = [];
+        let salt;
+        let priormmr;
+        let mmrhashtype;
+        for (const unit of json.mmrdata) {
+            if (typeof unit === 'string') {
+                data.push({ type: pbaas_1.DATA_TYPE_RAWSTRINGDATA, data: Buffer.from(unit, 'hex') });
+            }
+            else {
+                const unitMmrData = unit;
+                const dataKey = Object.keys(unitMmrData)[0];
+                const dataValue = unitMmrData[dataKey];
+                switch (dataKey) {
+                    case "filename":
+                        data.push({ type: pbaas_1.DATA_TYPE_FILENAME, data: Buffer.from(dataValue, 'utf-8') });
+                        break;
+                    case "message":
+                        data.push({ type: pbaas_1.DATA_TYPE_MESSAGE, data: Buffer.from(dataValue, 'utf-8') });
+                        break;
+                    case "vdxfdata":
+                        // Implement when VdxfUniValue to/from json is completed
+                        throw new Error("VDXFDATA not yet implemented");
+                        break;
+                    case "serializedhex":
+                        data.push({ type: pbaas_1.DATA_TYPE_HEX, data: Buffer.from(dataValue, 'hex') });
+                        break;
+                    case "serializedbase64":
+                        data.push({ type: pbaas_1.DATA_TYPE_BASE64, data: Buffer.from(dataValue, 'base64') });
+                        break;
+                    case "datahash":
+                        data.push({ type: pbaas_1.DATA_TYPE_DATAHASH, data: Buffer.from(dataValue, 'hex') });
+                        break;
+                    default:
+                        throw new Error("Unrecognized data key type");
+                }
+            }
+        }
+        if (json.mmrsalt) {
+            salt = json.mmrsalt.map(x => Buffer.from(x, 'hex'));
+        }
+        if (json.priormmr) {
+            priormmr = json.priormmr.map(x => Buffer.from(x, 'hex'));
+        }
+        if (json.mmrhash) {
+            switch (json.mmrhash) {
+                case pbaas_1.HASH_TYPE_SHA256_NAME:
+                    mmrhashtype = pbaas_1.HASH_TYPE_SHA256;
+                    break;
+                case pbaas_1.HASH_TYPE_SHA256D_NAME:
+                    mmrhashtype = pbaas_1.HASH_TYPE_SHA256D;
+                    break;
+                case pbaas_1.HASH_TYPE_BLAKE2B_NAME:
+                    mmrhashtype = pbaas_1.HASH_TYPE_BLAKE2B;
+                    break;
+                case pbaas_1.HASH_TYPE_KECCAK256_NAME:
+                    mmrhashtype = pbaas_1.HASH_TYPE_KECCAK256;
+                    break;
+                default:
+                    throw new Error("Unrecognized hash type");
+            }
+        }
+        return new PartialMMRData({
+            data,
+            salt,
+            priormmr,
+            mmrhashtype
+        });
+    }
 }
 exports.PartialMMRData = PartialMMRData;
 PartialMMRData.CONTAINS_SALT = new bn_js_1.BN("1", 10);

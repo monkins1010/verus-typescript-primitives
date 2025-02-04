@@ -68,4 +68,5 @@ export declare class IdentityUpdateRequestDetails {
     fromBuffer(buffer: Buffer, offset?: number, parseVdxfObjects?: boolean): number;
     toJson(): IdentityUpdateRequestDetailsJson;
     static fromJson(json: IdentityUpdateRequestDetailsJson): IdentityUpdateRequestDetails;
+    toCLIJson(): VerusCLIVerusIDJson;
 }
