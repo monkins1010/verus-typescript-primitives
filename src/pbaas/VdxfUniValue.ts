@@ -648,7 +648,7 @@ export class VdxfUniValue implements SerializableEntity {
 
         }
         else {
-          throw new Error("Unkknow vdxfkey: " + oneValValues[k]);
+          throw new Error("Unknown vdxfkey: " + oneValValues[k]);
         }
       }
     }

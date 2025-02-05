@@ -52,13 +52,13 @@ export declare class IdentityUpdateEnvelope extends VDXFObject {
     protected static internalFromJson<T>(json: IdentityUpdateEnvelopeJson, ctor: new (...args: any[]) => T, detailsFromJson: (json: IdentityUpdateDetailsJson) => IdentityUpdateDetails): T;
 }
 export declare class IdentityUpdateRequest extends IdentityUpdateEnvelope {
-    constructor(request: IdentityUpdateEnvelopeInterface);
+    constructor(request?: IdentityUpdateEnvelopeInterface);
     static fromWalletDeeplinkUri(uri: string): IdentityUpdateRequest;
     static fromQrString(qrstring: string): IdentityUpdateRequest;
     static fromJson(json: IdentityUpdateEnvelopeJson): IdentityUpdateRequest;
 }
 export declare class IdentityUpdateResponse extends IdentityUpdateEnvelope {
-    constructor(response: IdentityUpdateEnvelopeInterface);
+    constructor(response?: IdentityUpdateEnvelopeInterface);
     static fromWalletDeeplinkUri(uri: string): IdentityUpdateEnvelope;
     static fromQrString(qrstring: string): IdentityUpdateResponse;
     static fromJson(json: IdentityUpdateEnvelopeJson): IdentityUpdateResponse;

@@ -152,7 +152,7 @@ class IdentityUpdateRequestDetails {
         }
         return writer.buffer;
     }
-    fromBuffer(buffer, offset = 0, parseVdxfObjects = false) {
+    fromBuffer(buffer, offset = 0, parseVdxfObjects = true) {
         const reader = new BufferReader(buffer, offset);
         this.flags = reader.readVarInt();
         this.requestid = reader.readVarInt();

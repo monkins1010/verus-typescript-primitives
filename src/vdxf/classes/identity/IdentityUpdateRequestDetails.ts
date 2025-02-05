@@ -233,7 +233,7 @@ export class IdentityUpdateRequestDetails {
     return writer.buffer;
   }
 
-  fromBuffer(buffer: Buffer, offset: number = 0, parseVdxfObjects: boolean = false) {
+  fromBuffer(buffer: Buffer, offset: number = 0, parseVdxfObjects: boolean = true) {
     const reader = new BufferReader(buffer, offset);
 
     this.flags = reader.readVarInt();

@@ -265,7 +265,7 @@ export class IdentityUpdateEnvelope extends VDXFObject {
 }
 
 export class IdentityUpdateRequest extends IdentityUpdateEnvelope {
-  constructor(request: IdentityUpdateEnvelopeInterface) {
+  constructor(request?: IdentityUpdateEnvelopeInterface) {
     super(IDENTITY_UPDATE_REQUEST_VDXF_KEY.vdxfid, request);
   }
 
@@ -283,7 +283,7 @@ export class IdentityUpdateRequest extends IdentityUpdateEnvelope {
 }
 
 export class IdentityUpdateResponse extends IdentityUpdateEnvelope {
-  constructor(response: IdentityUpdateEnvelopeInterface) {
+  constructor(response?: IdentityUpdateEnvelopeInterface) {
     super(IDENTITY_UPDATE_RESPONSE_VDXF_KEY.vdxfid, response);
   }
 

@@ -31,6 +31,35 @@ describe("IdentityUpdateEnvelope Serialization", () => {
     }
   }
 
+  const cliIdUpdateRequestJsonHex = {
+    "name":"[32][32]",
+    "parent":"iF6hHpRXpmhLq77eksQzqQrWuminKtzmxT",
+    "contentmultimap": {
+      "i4d7U1aZhmoxZbWx8AVezh6z1YewAnuw3V": [
+        {
+          "i4GC1YGEVD21afWudGoFJVdnfjJ5XWnCQv": {
+            "version": 1,
+            "flags": 32,
+            "label": "i3bgiLuaxTr6smF8q6xLG4jvvhF1mmrkM2",
+            "objectdata": {
+              "serializedhex": "08a2ebb2c55f83a8e2a426a53320ed4d42124f4d010c012001010776657273696f6e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d011d01600a656d706c6f796d656e7404747970650a746578742f706c61696e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d011d016009446576656c6f706572057469746c650a746578742f706c61696e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d0157016044426f6479206f6620636c61696d20676f657320686572652c207768617420796f75206861766520646f6e652c207768617420796f7520686176652061636869657665642e04626f64790a746578742f706c61696e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d011d016009323031392d323032300564617465730a746578742f706c61696e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d011f01600a323032352d30312d3330066973737565640a746578742f706c61696e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d012f012020cc2b8109fb5566cf98297aaf5c80e2fb0a5051c3252a7957b13ba5433767e23a0b7265666572656e63654944"
+            }
+          }
+        },
+        {
+          "i4GC1YGEVD21afWudGoFJVdnfjJ5XWnCQv": {
+            "version": 1,
+            "flags": 32,
+            "label": "i3bgiLuaxTr6smF8q6xLG4jvvhF1mmrkM2",
+            "objectdata": {
+              "serializedhex": "08a2ebb2c55f83a8e2a426a53320ed4d42124f4d010c012001010776657273696f6e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d011d01600a656d706c6f796d656e7404747970650a746578742f706c61696e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d012301600f436869656620446576656c6f706572057469746c650a746578742f706c61696e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d0157016044426f6479206f6620636c61696d20676f657320686572652c207768617420796f75206861766520646f6e652c207768617420796f7520686176652061636869657665642e04626f64790a746578742f706c61696e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d011d016009323032312d323032340564617465730a746578742f706c61696e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d011f01600a323032352d30312d3239066973737565640a746578742f706c61696e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d015a016040373962343830376333303465383035333831666438653165376234383865353062363032613033333366663266663633636264313564363362366163383835650b7265666572656e636549440a746578742f706c61696e"
+            }
+          }
+        }
+      ]
+    }
+  }
+
   const partialIdentity = new PartialIdentity({
     flags: new BN("0"),
     version: IDENTITY_VERSION_PBAAS,
@@ -339,5 +368,31 @@ describe("IdentityUpdateEnvelope Serialization", () => {
     const req = IdentityUpdateRequestDetails.fromCLIJson(cliIdUpdateRequestJson);
 
     testCLIJsonSerialization(req);
+  })
+
+  test("Deserialize cli identity update details", () => {
+    const req = IdentityUpdateRequestDetails.fromCLIJson(
+      cliIdUpdateRequestJsonHex, 
+      systemID.toAddress() as string, 
+      requestID.toString(), 
+      createdAt.toString(), 
+      expiryHeight.toString(), 
+      [
+        ResponseUri.fromUriString("http:/127.0.0.1:8000", ResponseUri.TYPE_REDIRECT).toJson(), 
+        ResponseUri.fromUriString("http:/127.0.0.1:8000", ResponseUri.TYPE_POST).toJson()
+      ],
+      salt.toString('hex')
+    );
+
+    const env = new IdentityUpdateRequest({ details: req });
+    const envBuf = env.toBuffer();
+
+    const envFromBuf = new IdentityUpdateRequest();
+    envFromBuf.fromBuffer(envBuf);
+
+    expect(JSON.stringify(env.toJson())).toEqual(JSON.stringify(IdentityUpdateRequest.fromWalletDeeplinkUri(env.toWalletDeeplinkUri()).toJson()));
+    testCLIJsonSerialization(req);
+    testJsonSerialization(env);
+    testSerialization(env);
   })
 });

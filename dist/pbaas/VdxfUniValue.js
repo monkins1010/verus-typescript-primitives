@@ -543,7 +543,7 @@ class VdxfUniValue {
                     arrayItem.push({ [objTypeKey]: sigData });
                 }
                 else {
-                    throw new Error("Unkknow vdxfkey: " + oneValValues[k]);
+                    throw new Error("Unknown vdxfkey: " + oneValValues[k]);
                 }
             }
         }

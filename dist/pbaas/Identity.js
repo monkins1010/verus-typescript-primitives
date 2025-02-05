@@ -24,6 +24,10 @@ const { BufferReader, BufferWriter } = bufferutils_1.default;
 class Identity extends Principal_1.Principal {
     constructor(data) {
         super(data);
+        if (data === null || data === void 0 ? void 0 : data.version)
+            this.version = data.version;
+        else
+            this.version = Identity.VERSION_CURRENT;
         if (data === null || data === void 0 ? void 0 : data.parent)
             this.parent = data.parent;
         if (data === null || data === void 0 ? void 0 : data.system_id)

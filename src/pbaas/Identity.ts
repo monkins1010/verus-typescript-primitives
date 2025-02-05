@@ -84,6 +84,9 @@ export class Identity extends Principal implements SerializableEntity {
   constructor(data?: VerusIDInitData) {
     super(data)
 
+    if (data?.version) this.version = data.version;
+    else this.version = Identity.VERSION_CURRENT;
+
     if (data?.parent) this.parent = data.parent;
     if (data?.system_id) this.system_id = data.system_id;
     if (data?.name) this.name = data.name;
