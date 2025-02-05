@@ -10,6 +10,7 @@ import { TransferDestination, DEST_ID } from "../../pbaas/TransferDestination";
 import * as VDXF_Data from '../../vdxf/vdxfdatakeys';
 import { toBase58Check, fromBase58Check } from '../../utils/address';
 import { BN } from "bn.js";
+import { VdxfUniType } from "../../pbaas/VdxfUniValue";
 
 describe('Serializes and deserializes dataDescriptors', () => {
 
@@ -52,8 +53,8 @@ describe('Serializes and deserializes dataDescriptors', () => {
     evid.system_id = "i5v3h9FWVdRFbNHU7DfcpGykQjRaHtMqu7";
 
     const crossChainRef = new CrossChainDataRef(evid);
-    const dataKeyMap = new Map();
-    dataKeyMap.set(VDXF_Data.CrossChainDataRefKey.vdxfid, crossChainRef);
+    const dataKeyMap = new Array<{[key: string]: VdxfUniType}>;
+    dataKeyMap.push({[VDXF_Data.CrossChainDataRefKey.vdxfid]: crossChainRef});
     const crossChainVector = new VdxfUniValue({ values: dataKeyMap });
 
     const nestedDescriptor = DataDescriptor.fromJson({
@@ -79,8 +80,8 @@ describe('Serializes and deserializes dataDescriptors', () => {
       destination_bytes: fromBase58Check(destid).hash
     });
 
-    const destinationKeyMap = new Map();
-    destinationKeyMap.set(VDXF_Data.CrossChainDataRefKey.vdxfid, txDest);
+    const destinationKeyMap = new Array<{[key: string]: VdxfUniType}>;
+    destinationKeyMap.push({[VDXF_Data.CrossChainDataRefKey.vdxfid]: txDest});
 
     const txDestVector = new VdxfUniValue({ values: destinationKeyMap });
 
@@ -109,8 +110,8 @@ describe('Serializes and deserializes dataDescriptors', () => {
       "signature": "AgXOCgAAAUEfCiSukK9tg46cYOpHmxzKjNquWDyNc8H58+uLSOYmqlUcNUxWB8j3nzT1RHKeJGygdAwrUj5iZ/A9H3+qYV9H9g=="
     });
 
-    const sigDataMap = new Map();
-    sigDataMap.set(VDXF_Data.CrossChainDataRefKey.vdxfid, sigData);
+    const sigDataMap = new Array<{[key: string]: VdxfUniType}>;
+    sigDataMap.push({[VDXF_Data.CrossChainDataRefKey.vdxfid]: sigData});
 
     const sigUniValue = new VdxfUniValue({ values: sigDataMap });
 
@@ -155,8 +156,8 @@ describe('Serializes and deserializes dataDescriptors', () => {
       
       const urlRef = new URLRef({ version: new BN(1), url: "https://verus.io" });
   
-      const urlRefMap = new Map();
-      urlRefMap.set(VDXF_Data.CrossChainDataRefKey.vdxfid, urlRef);
+      const urlRefMap = new Array<{[key: string]: VdxfUniType}>;
+      urlRefMap.push({[VDXF_Data.CrossChainDataRefKey.vdxfid]: urlRef});
   
       const urlRefUniValue = new VdxfUniValue({ values: urlRefMap });
   
@@ -186,8 +187,8 @@ describe('Serializes and deserializes dataDescriptors', () => {
         system_id: "iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq"
       });
   
-      const idMultimapMap = new Map();
-      idMultimapMap.set(VDXF_Data.CrossChainDataRefKey.vdxfid, idMultimap);
+      const idMultimapMap = new Array<{[key: string]: VdxfUniType}>;
+      idMultimapMap.push({[VDXF_Data.CrossChainDataRefKey.vdxfid]: idMultimap});
   
       const idMultimapUniValue = new VdxfUniValue({ values: idMultimapMap });
   

@@ -116,7 +116,9 @@ export class ContentMultiMap implements SerializableEntity {
           unival.fromBuffer(reader.readVarSlice(), 0);
 
           vector.push(unival);
-        } else vector.push(reader.readVarSlice());
+        } else { 
+          vector.push(reader.readVarSlice());
+        }
       }
 
       this.kv_content.set(contentMapKey, vector);

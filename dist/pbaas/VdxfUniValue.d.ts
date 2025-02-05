@@ -10,26 +10,33 @@ import { CrossChainDataRef, CrossChainDataRefJson } from './CrossChainDataRef';
 import { SignatureData, SignatureJsonDataInterface } from './SignatureData';
 import { DataDescriptor, DataDescriptorJson } from './DataDescriptor';
 import { MMRDescriptor, MMRDescriptorJson } from './MMRDescriptor';
+import { URLRef } from './URLRef';
+import { IdentityMultimapRef } from './IdentityMultimapRef';
 export declare const VDXF_UNI_VALUE_VERSION_INVALID: import("bn.js");
 export declare const VDXF_UNI_VALUE_VERSION_CURRENT: import("bn.js");
-export declare type VdxfUniType = string | Buffer | BigNumber | CurrencyValueMap | Rating | TransferDestination | ContentMultiMapRemove | CrossChainDataRef | SignatureData | DataDescriptor | MMRDescriptor;
+export declare type VdxfUniType = string | Buffer | BigNumber | CurrencyValueMap | Rating | TransferDestination | ContentMultiMapRemove | CrossChainDataRef | SignatureData | DataDescriptor | MMRDescriptor | URLRef | IdentityMultimapRef;
 export interface VdxfUniValueJson {
     [key: string]: string | number | RatingJson | TransferDestinationJson | ContentMultiMapRemoveJson | CrossChainDataRefJson | SignatureJsonDataInterface | DataDescriptorJson | MMRDescriptorJson;
-    serializedHex?: string;
-    serializedBase64?: string;
+    serializedhex?: string;
+    serializedbase64?: string;
     message?: string;
 }
+export declare type VdxfUniValueJsonArray = Array<VdxfUniValueJson>;
 export declare type JsonSerializableObject = CurrencyValueMap | Rating | TransferDestination | ContentMultiMapRemove | CrossChainDataRef | SignatureData | DataDescriptor | MMRDescriptor;
 export declare class VdxfUniValue implements SerializableEntity {
-    values: Map<string, VdxfUniType>;
+    values: Array<{
+        [key: string]: VdxfUniType;
+    }>;
     version: BigNumber;
     constructor(data?: {
-        values: Map<string, VdxfUniType>;
+        values: Array<{
+            [key: string]: VdxfUniType;
+        }>;
         version?: BigNumber;
     });
     getByteLength(): number;
     toBuffer(): Buffer;
     fromBuffer(buffer: Buffer, offset?: number): number;
-    static fromJson(obj: VdxfUniValueJson): VdxfUniValue;
-    toJson(): VdxfUniValueJson;
+    static fromJson(obj: VdxfUniValueJson | VdxfUniValueJsonArray): VdxfUniValue;
+    toJson(): VdxfUniValueJsonArray | VdxfUniValueJson;
 }
