@@ -15,9 +15,9 @@ import { IdentityUpdateRequestDetails, IdentityUpdateRequestDetailsJson } from "
 import { IdentityID } from "../../../pbaas";
 import { IdentityUpdateResponseDetails, IdentityUpdateReponseDetailsJson } from "./IdentityUpdateResponseDetails";
 
-export const IDENTITY_UPDATE_VERSION_CURRENT = new BN(3, 10)
-export const IDENTITY_UPDATE_VERSION_FIRSTVALID = new BN(3, 10)
-export const IDENTITY_UPDATE_VERSION_LASTVALID = new BN(3, 10)
+export const IDENTITY_UPDATE_VERSION_CURRENT = new BN(1, 10)
+export const IDENTITY_UPDATE_VERSION_FIRSTVALID = new BN(1, 10)
+export const IDENTITY_UPDATE_VERSION_LASTVALID = new BN(1, 10)
 export const IDENTITY_UPDATE_VERSION_SIGNED = new BN('80000000', 16)
 export const IDENTITY_UPDATE_VERSION_MASK = IDENTITY_UPDATE_VERSION_SIGNED;
 
