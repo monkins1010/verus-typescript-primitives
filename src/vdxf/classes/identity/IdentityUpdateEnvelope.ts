@@ -13,7 +13,7 @@ import { BN } from 'bn.js';
 import { BigNumber } from "../../../utils/types/BigNumber";
 import { IdentityUpdateRequestDetails, IdentityUpdateRequestDetailsJson } from "./IdentityUpdateRequestDetails";
 import { IdentityID } from "../../../pbaas";
-import { IdentityUpdateResponseDetails, IdentityUpdateReponseDetailsJson } from "./IdentityUpdateResponseDetails";
+import { IdentityUpdateResponseDetails, IdentityUpdateResponseDetailsJson } from "./IdentityUpdateResponseDetails";
 
 export const IDENTITY_UPDATE_VERSION_CURRENT = new BN(1, 10)
 export const IDENTITY_UPDATE_VERSION_FIRSTVALID = new BN(1, 10)
@@ -22,7 +22,7 @@ export const IDENTITY_UPDATE_VERSION_SIGNED = new BN('80000000', 16)
 export const IDENTITY_UPDATE_VERSION_MASK = IDENTITY_UPDATE_VERSION_SIGNED;
 
 export type IdentityUpdateDetails = IdentityUpdateRequestDetails | IdentityUpdateResponseDetails;
-export type IdentityUpdateDetailsJson = IdentityUpdateRequestDetailsJson | IdentityUpdateReponseDetailsJson;
+export type IdentityUpdateDetailsJson = IdentityUpdateRequestDetailsJson | IdentityUpdateResponseDetailsJson;
 
 export interface IdentityUpdateEnvelopeInterface {
   details: IdentityUpdateDetails;

@@ -1,7 +1,7 @@
 /// <reference types="node" />
 /// <reference types="bn.js" />
 import { BigNumber } from '../../../utils/types/BigNumber';
-export declare type IdentityUpdateReponseDetailsJson = {
+export declare type IdentityUpdateResponseDetailsJson = {
     flags: string;
     requestid: string;
     createdat: string;
@@ -35,6 +35,6 @@ export declare class IdentityUpdateResponseDetails {
     getByteLength(): number;
     toBuffer(): Buffer;
     fromBuffer(buffer: Buffer, offset?: number): number;
-    toJson(): IdentityUpdateReponseDetailsJson;
-    static fromJson(json: IdentityUpdateReponseDetailsJson): IdentityUpdateResponseDetails;
+    toJson(): IdentityUpdateResponseDetailsJson;
+    static fromJson(json: IdentityUpdateResponseDetailsJson): IdentityUpdateResponseDetails;
 }

@@ -7,7 +7,7 @@ import { UINT_256_LENGTH } from '../../../constants/pbaas';
 import varuint from '../../../utils/varuint';
 const { BufferReader, BufferWriter } = bufferutils;
 
-export type IdentityUpdateReponseDetailsJson = {
+export type IdentityUpdateResponseDetailsJson = {
   flags: string,
   requestid: string,
   createdat: string,
@@ -149,7 +149,7 @@ export class IdentityUpdateResponseDetails {
     return reader.offset;
   }
 
-  toJson(): IdentityUpdateReponseDetailsJson {
+  toJson(): IdentityUpdateResponseDetailsJson {
     return {
       flags: this.flags.toString(10),
       requestid: this.requestid.toString(10),
@@ -159,7 +159,7 @@ export class IdentityUpdateResponseDetails {
     }
   }
 
-  static fromJson(json: IdentityUpdateReponseDetailsJson): IdentityUpdateResponseDetails {
+  static fromJson(json: IdentityUpdateResponseDetailsJson): IdentityUpdateResponseDetails {
     return new IdentityUpdateResponseDetails({
       flags: new BN(json.flags, 10),
       requestid: new BN(json.requestid, 10),

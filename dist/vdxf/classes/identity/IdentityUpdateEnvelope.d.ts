@@ -4,14 +4,14 @@ import { VDXFObject, VerusIDSignature } from "../..";
 import { BigNumber } from "../../../utils/types/BigNumber";
 import { IdentityUpdateRequestDetails, IdentityUpdateRequestDetailsJson } from "./IdentityUpdateRequestDetails";
 import { IdentityID } from "../../../pbaas";
-import { IdentityUpdateResponseDetails, IdentityUpdateReponseDetailsJson } from "./IdentityUpdateResponseDetails";
+import { IdentityUpdateResponseDetails, IdentityUpdateResponseDetailsJson } from "./IdentityUpdateResponseDetails";
 export declare const IDENTITY_UPDATE_VERSION_CURRENT: import("bn.js");
 export declare const IDENTITY_UPDATE_VERSION_FIRSTVALID: import("bn.js");
 export declare const IDENTITY_UPDATE_VERSION_LASTVALID: import("bn.js");
 export declare const IDENTITY_UPDATE_VERSION_SIGNED: import("bn.js");
 export declare const IDENTITY_UPDATE_VERSION_MASK: import("bn.js");
 export declare type IdentityUpdateDetails = IdentityUpdateRequestDetails | IdentityUpdateResponseDetails;
-export declare type IdentityUpdateDetailsJson = IdentityUpdateRequestDetailsJson | IdentityUpdateReponseDetailsJson;
+export declare type IdentityUpdateDetailsJson = IdentityUpdateRequestDetailsJson | IdentityUpdateResponseDetailsJson;
 export interface IdentityUpdateEnvelopeInterface {
     details: IdentityUpdateDetails;
     systemid?: IdentityID;
