@@ -23,10 +23,11 @@ import {
   HASH_TYPE_SHA256D,
   HASH_TYPE_SHA256D_NAME
 } from '../constants/pbaas';
+import { VdxfUniValue, VdxfUniValueJson } from './VdxfUniValue';
 
 const { BufferReader, BufferWriter } = bufferutils;
 
-export type PartialMMRDataUnit = { type: BigNumber, data: Buffer };
+export type PartialMMRDataUnit = { type: BigNumber, data: Buffer | VdxfUniValue };
 
 export type PartialMMRDataInitData = {
   flags?: BigNumber;
@@ -38,27 +39,28 @@ export type PartialMMRDataInitData = {
 
 export type PartialMMRDataJson = {
   flags?: string;
-  data?: Array<{type: string, data: string}>;
+  data?: Array<{type: string, data: string | VdxfUniValueJson}>;
   salt?: Array<string>;
   mmrhashtype?: string;
   priormmr?: Array<string>;
 }
 
-export type CLIMMRDataKey = 
+export type CLIMMRDataStringKey = 
   | "filename" 
   | "serializedhex" 
-  | "serializedbase64" 
-  | "vdxfdata" 
+  | "serializedbase64"
   | "message" 
   | "datahash";
 
+export type CLIMMRDataKey = CLIMMRDataStringKey | "vdxfdata";
+
 // Ensure that each object in the array has exactly one key from CLIMMRDataKey
 export type SingleKeyMMRData = { 
-  [K in CLIMMRDataKey]: { [P in K]: string } 
-}[CLIMMRDataKey];
+  [K in CLIMMRDataStringKey]: { [P in K]: string } 
+}[CLIMMRDataStringKey];
 
 export type PartialMMRDataCLIJson = {
-  mmrdata: Array<SingleKeyMMRData | string>;
+  mmrdata: Array<SingleKeyMMRData | string | { ['vdfxdata']: VdxfUniValueJson }>;
   mmrsalt?: Array<string>;
   mmrhashtype?: AllowedHashes;
   priormmr?: Array<string>;
@@ -118,8 +120,14 @@ export class PartialMMRData implements SerializableEntity {
 
       length += varint.encodingLength(unit.type);
 
-      length += varuint.encodingLength(unit.data.length);
-      length += unit.data.length;
+      if (unit.type.eq(DATA_TYPE_VDXFDATA)) {
+        length += (unit.data as VdxfUniValue).getByteLength();
+      } else {
+        const buf = unit.data as Buffer;
+
+        length += varuint.encodingLength(buf.length);
+        length += buf.length;
+      }
     }
 
     length += varint.encodingLength(this.mmrhashtype);
@@ -159,7 +167,16 @@ export class PartialMMRData implements SerializableEntity {
     const numData = reader.readCompactSize();
     for (let i = 0; i < numData; i++) {
       const type = reader.readVarInt();
-      const data = reader.readVarSlice();
+      let data: Buffer | VdxfUniValue;
+
+      if (type.eq(DATA_TYPE_VDXFDATA)) {
+        const vdxfData = new VdxfUniValue();
+        reader.offset = vdxfData.fromBuffer(reader.buffer, reader.offset);
+
+        data = vdxfData;
+      } else {
+        data = reader.readVarSlice();
+      }
 
       this.data.push({
         type,
@@ -190,7 +207,14 @@ export class PartialMMRData implements SerializableEntity {
 
     for (let i = 0; i < this.data.length; i++) {
       writer.writeVarInt(this.data[i].type);
-      writer.writeVarSlice(this.data[i].data);
+
+      if (this.data[i].type.eq(DATA_TYPE_VDXFDATA)) {
+        const vdxfData = this.data[i].data as VdxfUniValue;
+
+        writer.writeSlice(vdxfData.toBuffer());
+      } else {
+        writer.writeVarSlice(this.data[i].data as Buffer);
+      }
     }
 
     writer.writeVarInt(this.mmrhashtype);
@@ -210,9 +234,22 @@ export class PartialMMRData implements SerializableEntity {
     return {
       flags: this.flags ? this.flags.toString(10) : undefined,
       data: this.data ? this.data.map(x => {
-        return {
-          type: x.type.toString(10),
-          data: x.data.toString('hex')
+        if (x.type.eq(DATA_TYPE_VDXFDATA)) {
+          const uni = (x.data as VdxfUniValue).toJson();
+
+          if (Array.isArray(uni)) {
+            throw new Error("VDXF univalue arrays not supported in partialmmrdata vdxfdata");
+          } else {
+            return {
+              type: x.type.toString(10),
+              data: uni
+            };
+          }
+        } else {
+          return {
+            type: x.type.toString(10),
+            data: x.data.toString('hex')
+          };
         }
       }) : undefined,
       salt: this.salt ? this.salt.map(x => x.toString('hex')) : undefined,
@@ -225,9 +262,18 @@ export class PartialMMRData implements SerializableEntity {
     return new PartialMMRData({
       flags: json.flags ? new BN(json.flags, 10) : undefined,
       data: json.data ? json.data.map(x => {
-        return {
-          type: new BN(x.type, 10),
-          data: Buffer.from(x.data, 'hex')
+        const type = new BN(x.type, 10);
+
+        if (type.eq(DATA_TYPE_VDXFDATA)) {
+          return {
+            type: new BN(x.type, 10),
+            data: VdxfUniValue.fromJson(x.data as VdxfUniValueJson)
+          }
+        } else {
+          return {
+            type: new BN(x.type, 10),
+            data: Buffer.from(x.data as string, 'hex')
+          }
         }
       }) : undefined,
       salt: json.salt ? json.salt.map(x => Buffer.from(x, 'hex')) : undefined,
@@ -254,11 +300,15 @@ export class PartialMMRData implements SerializableEntity {
           "message": unit.data.toString('utf-8')
         });
       } else if (unit.type.eq(DATA_TYPE_VDXFDATA)) {
-        // mmrdata.push({
-        //   "vdxfdata": 
-        // });
-        // Implement when VdxfUniValue to/from json is completed
-        throw new Error("VDXFDATA not yet implemented")
+        const uni = (unit.data as VdxfUniValue).toJson();
+
+        if (Array.isArray(uni)) {
+          throw new Error("VDXF univalue arrays not supported in partialmmrdata vdxfdata");
+        } else {
+          mmrdata.push({
+            "vdxfdata": uni
+          });
+        }
       } else if (unit.type.eq(DATA_TYPE_HEX)) {
         mmrdata.push({
           "serializedhex": unit.data.toString('hex')
@@ -328,8 +378,7 @@ export class PartialMMRData implements SerializableEntity {
             data.push({ type: DATA_TYPE_MESSAGE, data: Buffer.from(dataValue, 'utf-8')});
             break;
           case "vdxfdata":
-            // Implement when VdxfUniValue to/from json is completed
-            throw new Error("VDXFDATA not yet implemented");
+            data.push({ type: DATA_TYPE_VDXFDATA, data: VdxfUniValue.fromJson(dataValue)});
             break;
           case "serializedhex":
             data.push({ type: DATA_TYPE_HEX, data: Buffer.from(dataValue, 'hex')});

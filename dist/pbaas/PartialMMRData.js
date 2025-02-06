@@ -6,6 +6,7 @@ const varint_1 = require("../utils/varint");
 const bufferutils_1 = require("../utils/bufferutils");
 const varuint_1 = require("../utils/varuint");
 const pbaas_1 = require("../constants/pbaas");
+const VdxfUniValue_1 = require("./VdxfUniValue");
 const { BufferReader, BufferWriter } = bufferutils_1.default;
 class PartialMMRData {
     constructor(data) {
@@ -42,8 +43,14 @@ class PartialMMRData {
         for (let i = 0; i < this.data.length; i++) {
             const unit = this.data[i];
             length += varint_1.default.encodingLength(unit.type);
-            length += varuint_1.default.encodingLength(unit.data.length);
-            length += unit.data.length;
+            if (unit.type.eq(pbaas_1.DATA_TYPE_VDXFDATA)) {
+                length += unit.data.getByteLength();
+            }
+            else {
+                const buf = unit.data;
+                length += varuint_1.default.encodingLength(buf.length);
+                length += buf.length;
+            }
         }
         length += varint_1.default.encodingLength(this.mmrhashtype);
         if (this.containsSalt()) {
@@ -73,7 +80,15 @@ class PartialMMRData {
         const numData = reader.readCompactSize();
         for (let i = 0; i < numData; i++) {
             const type = reader.readVarInt();
-            const data = reader.readVarSlice();
+            let data;
+            if (type.eq(pbaas_1.DATA_TYPE_VDXFDATA)) {
+                const vdxfData = new VdxfUniValue_1.VdxfUniValue();
+                reader.offset = vdxfData.fromBuffer(reader.buffer, reader.offset);
+                data = vdxfData;
+            }
+            else {
+                data = reader.readVarSlice();
+            }
             this.data.push({
                 type,
                 data
@@ -95,7 +110,13 @@ class PartialMMRData {
         writer.writeCompactSize(this.data.length);
         for (let i = 0; i < this.data.length; i++) {
             writer.writeVarInt(this.data[i].type);
-            writer.writeVarSlice(this.data[i].data);
+            if (this.data[i].type.eq(pbaas_1.DATA_TYPE_VDXFDATA)) {
+                const vdxfData = this.data[i].data;
+                writer.writeSlice(vdxfData.toBuffer());
+            }
+            else {
+                writer.writeVarSlice(this.data[i].data);
+            }
         }
         writer.writeVarInt(this.mmrhashtype);
         if (this.containsSalt()) {
@@ -110,10 +131,24 @@ class PartialMMRData {
         return {
             flags: this.flags ? this.flags.toString(10) : undefined,
             data: this.data ? this.data.map(x => {
-                return {
-                    type: x.type.toString(10),
-                    data: x.data.toString('hex')
-                };
+                if (x.type.eq(pbaas_1.DATA_TYPE_VDXFDATA)) {
+                    const uni = x.data.toJson();
+                    if (Array.isArray(uni)) {
+                        throw new Error("VDXF univalue arrays not supported in partialmmrdata vdxfdata");
+                    }
+                    else {
+                        return {
+                            type: x.type.toString(10),
+                            data: uni
+                        };
+                    }
+                }
+                else {
+                    return {
+                        type: x.type.toString(10),
+                        data: x.data.toString('hex')
+                    };
+                }
             }) : undefined,
             salt: this.salt ? this.salt.map(x => x.toString('hex')) : undefined,
             mmrhashtype: this.mmrhashtype ? this.mmrhashtype.toString(10) : undefined,
@@ -124,10 +159,19 @@ class PartialMMRData {
         return new PartialMMRData({
             flags: json.flags ? new bn_js_1.BN(json.flags, 10) : undefined,
             data: json.data ? json.data.map(x => {
-                return {
-                    type: new bn_js_1.BN(x.type, 10),
-                    data: Buffer.from(x.data, 'hex')
-                };
+                const type = new bn_js_1.BN(x.type, 10);
+                if (type.eq(pbaas_1.DATA_TYPE_VDXFDATA)) {
+                    return {
+                        type: new bn_js_1.BN(x.type, 10),
+                        data: VdxfUniValue_1.VdxfUniValue.fromJson(x.data)
+                    };
+                }
+                else {
+                    return {
+                        type: new bn_js_1.BN(x.type, 10),
+                        data: Buffer.from(x.data, 'hex')
+                    };
+                }
             }) : undefined,
             salt: json.salt ? json.salt.map(x => Buffer.from(x, 'hex')) : undefined,
             mmrhashtype: json.mmrhashtype ? new bn_js_1.BN(json.mmrhashtype, 10) : undefined,
@@ -154,11 +198,15 @@ class PartialMMRData {
                 });
             }
             else if (unit.type.eq(pbaas_1.DATA_TYPE_VDXFDATA)) {
-                // mmrdata.push({
-                //   "vdxfdata": 
-                // });
-                // Implement when VdxfUniValue to/from json is completed
-                throw new Error("VDXFDATA not yet implemented");
+                const uni = unit.data.toJson();
+                if (Array.isArray(uni)) {
+                    throw new Error("VDXF univalue arrays not supported in partialmmrdata vdxfdata");
+                }
+                else {
+                    mmrdata.push({
+                        "vdxfdata": uni
+                    });
+                }
             }
             else if (unit.type.eq(pbaas_1.DATA_TYPE_HEX)) {
                 mmrdata.push({
@@ -229,8 +277,7 @@ class PartialMMRData {
                         data.push({ type: pbaas_1.DATA_TYPE_MESSAGE, data: Buffer.from(dataValue, 'utf-8') });
                         break;
                     case "vdxfdata":
-                        // Implement when VdxfUniValue to/from json is completed
-                        throw new Error("VDXFDATA not yet implemented");
+                        data.push({ type: pbaas_1.DATA_TYPE_VDXFDATA, data: VdxfUniValue_1.VdxfUniValue.fromJson(dataValue) });
                         break;
                     case "serializedhex":
                         data.push({ type: pbaas_1.DATA_TYPE_HEX, data: Buffer.from(dataValue, 'hex') });

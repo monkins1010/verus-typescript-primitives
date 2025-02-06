@@ -15,6 +15,12 @@ import { VdxfUniType } from "../../pbaas/VdxfUniValue";
 
 
 describe('Encodes and decodes VdxfUniValue', () => {
+  function testBufferSerialization(instance) {
+    const fromBufferInstance = new instance.constructor();
+    fromBufferInstance.fromBuffer(instance.toBuffer());
+    expect(fromBufferInstance.toBuffer().toString("hex")).toBe(instance.toBuffer().toString("hex"));
+  }
+
   test('encode/decode VdxfUniValue with string data', () => {
     const values = new Array<{ [key: string]: VdxfUniType }>;
     values.push({ [DATA_TYPE_STRING.vdxfid]: "Test String 123454321" });
@@ -31,6 +37,22 @@ describe('Encodes and decodes VdxfUniValue', () => {
     expect(vFromBuf.toBuffer().toString('hex')).toBe(v.toBuffer().toString('hex'));
     expect(VdxfUniValue.fromJson(v.toJson()).toBuffer().toString('hex')).toBe(vFromBuf.toBuffer().toString('hex'));
   });
+
+  test('encode/decode vdxfunivalue non-array with string data', () => {
+    const uni = VdxfUniValue.fromJson({
+      "i4GC1YGEVD21afWudGoFJVdnfjJ5XWnCQv":{
+         "version":1,
+         "flags":96,
+         "mimetype":"text/plain",
+         "objectdata":{
+            "message":"John"
+         },
+         "label":"i4GqsotHGa4czCdtg2d8FVHKfJFzVyBPrM"
+      }
+    })
+    
+    testBufferSerialization(uni);
+  })
 
   test('fail to encode/decode VdxfUniValue with unknown data', () => {
     const values = new Array<{ [key: string]: VdxfUniType }>;

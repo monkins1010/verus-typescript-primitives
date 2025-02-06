@@ -13,6 +13,7 @@ const vdxf_1 = require("../constants/vdxf");
 const PartialMMRData_1 = require("./PartialMMRData");
 const pbaas_1 = require("../constants/pbaas");
 const address_1 = require("../utils/address");
+const VdxfUniValue_1 = require("./VdxfUniValue");
 const { BufferReader, BufferWriter } = bufferutils_1.default;
 class PartialSignData {
     constructor(data) {
@@ -116,6 +117,9 @@ class PartialSignData {
     isMMRData() {
         return this.datatype && this.datatype.eq(pbaas_1.DATA_TYPE_MMRDATA);
     }
+    isVdxfData() {
+        return this.datatype && this.datatype.eq(pbaas_1.DATA_TYPE_VDXFDATA);
+    }
     getPartialSignDataByteLength() {
         function calculateVectorLength(items, getItemLength, varlength = true) {
             let totalLength = 0;
@@ -154,6 +158,9 @@ class PartialSignData {
         if (this.containsData()) {
             length += varint_1.default.encodingLength(this.datatype);
             if (this.isMMRData()) {
+                length += this.data.getByteLength();
+            }
+            else if (this.isVdxfData()) {
                 length += this.data.getByteLength();
             }
             else {
@@ -214,6 +221,11 @@ class PartialSignData {
                 const partialMMRData = new PartialMMRData_1.PartialMMRData();
                 reader.offset = partialMMRData.fromBuffer(reader.buffer, reader.offset);
                 this.data = partialMMRData;
+            }
+            else if (this.isVdxfData()) {
+                const vdxfData = new VdxfUniValue_1.VdxfUniValue();
+                reader.offset = vdxfData.fromBuffer(reader.buffer, reader.offset);
+                this.data = vdxfData;
             }
             else {
                 this.data = reader.readVarSlice();
@@ -285,6 +297,10 @@ class PartialSignData {
                 const mmrData = this.data;
                 writer.writeSlice(mmrData.toBuffer());
             }
+            else if (this.isVdxfData()) {
+                const vdxfData = this.data;
+                writer.writeSlice(vdxfData.toBuffer());
+            }
             else {
                 writer.writeVarSlice(this.data);
             }
@@ -320,6 +336,7 @@ class PartialSignData {
             else
                 throw new Error("Unrecognized address version");
         }
+        const datatype = json.datatype ? new bn_js_1.BN(json.datatype, 10) : undefined;
         return new PartialSignData({
             flags: json.flags ? new bn_js_1.BN(json.flags, 10) : undefined,
             address: addr,
@@ -332,7 +349,16 @@ class PartialSignData {
             createmmr: json.createmmr,
             signature: json.signature ? Buffer.from(json.signature, 'base64') : undefined,
             datatype: json.datatype ? new bn_js_1.BN(json.datatype, 10) : undefined,
-            data: json.data ? typeof json.data === 'string' ? Buffer.from(json.data, 'hex') : PartialMMRData_1.PartialMMRData.fromJson(json.data) : undefined
+            data: json.data ?
+                typeof json.data === 'string' ?
+                    Buffer.from(json.data, 'hex')
+                    :
+                        datatype && datatype.eq(pbaas_1.DATA_TYPE_MMRDATA) ?
+                            PartialMMRData_1.PartialMMRData.fromJson(json.data)
+                            :
+                                VdxfUniValue_1.VdxfUniValue.fromJson(json.data)
+                :
+                    undefined
         });
     }
     toCLIJson() {
@@ -354,6 +380,12 @@ class PartialSignData {
                 ret['mmrhashtype'] = mmrCLIJson.mmrhashtype;
                 ret['priormmr'] = mmrCLIJson.priormmr;
             }
+            else if (this.datatype.eq(pbaas_1.DATA_TYPE_VDXFDATA)) {
+                const uniJson = this.data.toJson();
+                if (Array.isArray(uniJson))
+                    throw new Error("VDXF univalue arrays not supported as sign data param");
+                ret['vdxfdata'] = this.data.toJson();
+            }
             else {
                 const dataBuf = this.data;
                 if (this.datatype.eq(pbaas_1.DATA_TYPE_FILENAME)) {
@@ -361,9 +393,6 @@ class PartialSignData {
                 }
                 else if (this.datatype.eq(pbaas_1.DATA_TYPE_MESSAGE)) {
                     ret['message'] = dataBuf.toString('utf-8');
-                }
-                else if (this.datatype.eq(pbaas_1.DATA_TYPE_VDXFDATA)) {
-                    throw new Error("VDXF data not yet implemented");
                 }
                 else if (this.datatype.eq(pbaas_1.DATA_TYPE_HEX)) {
                     ret['messagehex'] = dataBuf.toString('hex');
@@ -440,7 +469,8 @@ class PartialSignData {
             config.datatype = pbaas_1.DATA_TYPE_MESSAGE;
         }
         else if (json.vdxfdata) {
-            throw new Error("VDXF data not yet implemented");
+            config.data = VdxfUniValue_1.VdxfUniValue.fromJson(json.vdxfdata);
+            config.datatype = pbaas_1.DATA_TYPE_VDXFDATA;
         }
         else if (json.messagehex) {
             config.data = Buffer.from(json.messagehex, 'hex');

@@ -6,6 +6,18 @@ import { PartialMMRData } from '../../pbaas/PartialMMRData'
 import { DATA_TYPE_MESSAGE, DATA_TYPE_MMRDATA } from '../../constants/pbaas'
 
 describe('PartialSignData serialization/deserialization', () => {
+  function testCLIJsonSerialization(instance) {
+    const cliJson = instance.toCLIJson();
+    const fromCLIJsonInstance = PartialSignData.fromCLIJson(cliJson);
+    expect(fromCLIJsonInstance.toCLIJson()).toEqual(cliJson);
+  }
+
+  function testBufferSerialization(instance) {
+    const fromBufferInstance = new instance.constructor();
+    fromBufferInstance.fromBuffer(instance.toBuffer());
+    expect(fromBufferInstance.toBuffer().toString("hex")).toBe(instance.toBuffer().toString("hex"));
+  }
+
   test('Round-trip with both standard buffer data and PartialMMRData', () => {
     // Create an instance of PartialMMRData to be used as our "MMR data"
     const mmrData = new PartialMMRData({
@@ -80,12 +92,6 @@ describe('PartialSignData serialization/deserialization', () => {
       }
     }
 
-    function testCLIJsonSerialization(instance) {
-      const cliJson = instance.toCLIJson();
-      const fromCLIJsonInstance = PartialSignData.fromCLIJson(cliJson);
-      expect(fromCLIJsonInstance.toCLIJson()).toEqual(cliJson);
-    }
-
     // Now test finalTestData once.
     finalTestData.forEach((config, index) => {
       try {
@@ -104,5 +110,14 @@ describe('PartialSignData serialization/deserialization', () => {
         throw e;
       }
     });
+  })
+
+  test('can (de)serialize signdata from CLI with vdxfdata', () => {
+    const params = {"address":"i6joVUtMohssU9pFAwojYrZfF9EmyAB95K", "createmmr":true, "encrypttoaddress":"zs1lyal620gwwyt0cyl6pwmcn8ewasu4c64hca6yfmkv4g9aw3cz67v3jn937emzl0vv4pgv506cq6","mmrdata":[{"vdxfdata":{"i4GC1YGEVD21afWudGoFJVdnfjJ5XWnCQv":{"version":1, "flags":0, "label":"i4GqsotHGa4czCdtg2d8FVHKfJFzVyBPrM", "mimetype":"text/plain", "objectdata":{"message":"John"}}}},{"vdxfdata":{"i4GC1YGEVD21afWudGoFJVdnfjJ5XWnCQv":{"version":1, "flags":0, "label":"iHybTrNB1kXRrjsCtJXd6fvBKxepqMpS5Z", "mimetype":"text/plain",  "objectdata":{"message":"Doe"}}}}]};
+
+    const psd = PartialSignData.fromCLIJson(params);
+
+    testCLIJsonSerialization(psd);
+    testBufferSerialization(psd);
   })
 })
