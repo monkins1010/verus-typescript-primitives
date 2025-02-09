@@ -161,7 +161,9 @@ class PartialSignData {
                 length += this.data.getByteLength();
             }
             else if (this.isVdxfData()) {
-                length += this.data.getByteLength();
+                const vdxfDataLen = this.data.getByteLength();
+                length += varuint_1.default.encodingLength(vdxfDataLen);
+                length += vdxfDataLen;
             }
             else {
                 const datalen = this.data.length;
@@ -224,7 +226,8 @@ class PartialSignData {
             }
             else if (this.isVdxfData()) {
                 const vdxfData = new VdxfUniValue_1.VdxfUniValue();
-                reader.offset = vdxfData.fromBuffer(reader.buffer, reader.offset);
+                const vdxfDataBuf = reader.readVarSlice();
+                vdxfData.fromBuffer(vdxfDataBuf);
                 this.data = vdxfData;
             }
             else {
@@ -299,7 +302,7 @@ class PartialSignData {
             }
             else if (this.isVdxfData()) {
                 const vdxfData = this.data;
-                writer.writeSlice(vdxfData.toBuffer());
+                writer.writeVarSlice(vdxfData.toBuffer());
             }
             else {
                 writer.writeVarSlice(this.data);

@@ -121,7 +121,10 @@ export class PartialMMRData implements SerializableEntity {
       length += varint.encodingLength(unit.type);
 
       if (unit.type.eq(DATA_TYPE_VDXFDATA)) {
-        length += (unit.data as VdxfUniValue).getByteLength();
+        const vdxfdatalen = (unit.data as VdxfUniValue).getByteLength();
+
+        length += varuint.encodingLength(vdxfdatalen);
+        length += vdxfdatalen;
       } else {
         const buf = unit.data as Buffer;
 
@@ -171,7 +174,9 @@ export class PartialMMRData implements SerializableEntity {
 
       if (type.eq(DATA_TYPE_VDXFDATA)) {
         const vdxfData = new VdxfUniValue();
-        reader.offset = vdxfData.fromBuffer(reader.buffer, reader.offset);
+        
+        const vdxfDataBuf = reader.readVarSlice();
+        vdxfData.fromBuffer(vdxfDataBuf);
 
         data = vdxfData;
       } else {
@@ -211,7 +216,7 @@ export class PartialMMRData implements SerializableEntity {
       if (this.data[i].type.eq(DATA_TYPE_VDXFDATA)) {
         const vdxfData = this.data[i].data as VdxfUniValue;
 
-        writer.writeSlice(vdxfData.toBuffer());
+        writer.writeVarSlice(vdxfData.toBuffer());
       } else {
         writer.writeVarSlice(this.data[i].data as Buffer);
       }

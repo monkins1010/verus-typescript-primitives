@@ -44,7 +44,9 @@ class PartialMMRData {
             const unit = this.data[i];
             length += varint_1.default.encodingLength(unit.type);
             if (unit.type.eq(pbaas_1.DATA_TYPE_VDXFDATA)) {
-                length += unit.data.getByteLength();
+                const vdxfdatalen = unit.data.getByteLength();
+                length += varuint_1.default.encodingLength(vdxfdatalen);
+                length += vdxfdatalen;
             }
             else {
                 const buf = unit.data;
@@ -83,7 +85,8 @@ class PartialMMRData {
             let data;
             if (type.eq(pbaas_1.DATA_TYPE_VDXFDATA)) {
                 const vdxfData = new VdxfUniValue_1.VdxfUniValue();
-                reader.offset = vdxfData.fromBuffer(reader.buffer, reader.offset);
+                const vdxfDataBuf = reader.readVarSlice();
+                vdxfData.fromBuffer(vdxfDataBuf);
                 data = vdxfData;
             }
             else {
@@ -112,7 +115,7 @@ class PartialMMRData {
             writer.writeVarInt(this.data[i].type);
             if (this.data[i].type.eq(pbaas_1.DATA_TYPE_VDXFDATA)) {
                 const vdxfData = this.data[i].data;
-                writer.writeSlice(vdxfData.toBuffer());
+                writer.writeVarSlice(vdxfData.toBuffer());
             }
             else {
                 writer.writeVarSlice(this.data[i].data);

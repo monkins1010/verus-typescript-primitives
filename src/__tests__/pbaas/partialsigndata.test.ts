@@ -113,7 +113,39 @@ describe('PartialSignData serialization/deserialization', () => {
   })
 
   test('can (de)serialize signdata from CLI with vdxfdata', () => {
-    const params = {"address":"i6joVUtMohssU9pFAwojYrZfF9EmyAB95K", "createmmr":true, "encrypttoaddress":"zs1lyal620gwwyt0cyl6pwmcn8ewasu4c64hca6yfmkv4g9aw3cz67v3jn937emzl0vv4pgv506cq6","mmrdata":[{"vdxfdata":{"i4GC1YGEVD21afWudGoFJVdnfjJ5XWnCQv":{"version":1, "flags":0, "label":"i4GqsotHGa4czCdtg2d8FVHKfJFzVyBPrM", "mimetype":"text/plain", "objectdata":{"message":"John"}}}},{"vdxfdata":{"i4GC1YGEVD21afWudGoFJVdnfjJ5XWnCQv":{"version":1, "flags":0, "label":"iHybTrNB1kXRrjsCtJXd6fvBKxepqMpS5Z", "mimetype":"text/plain",  "objectdata":{"message":"Doe"}}}}]};
+    const params = { 
+      "address": "i6joVUtMohssU9pFAwojYrZfF9EmyAB95K", 
+      "createmmr": true, 
+      "encrypttoaddress": "zs1lyal620gwwyt0cyl6pwmcn8ewasu4c64hca6yfmkv4g9aw3cz67v3jn937emzl0vv4pgv506cq6", 
+      "mmrdata": [
+        { 
+          "vdxfdata": 
+            { 
+              "i4GC1YGEVD21afWudGoFJVdnfjJ5XWnCQv": 
+                { 
+                  "version": 1, 
+                  "flags": 0, 
+                  "label": "i4GqsotHGa4czCdtg2d8FVHKfJFzVyBPrM", 
+                  "mimetype": "text/plain", 
+                  "objectdata": { "message": "John" } 
+                } 
+            } 
+        }, 
+        { 
+          "vdxfdata": 
+            { 
+              "i4GC1YGEVD21afWudGoFJVdnfjJ5XWnCQv": 
+                { 
+                  "version": 1, 
+                  "flags": 0, 
+                  "label": "iHybTrNB1kXRrjsCtJXd6fvBKxepqMpS5Z", 
+                  "mimetype": "text/plain", 
+                  "objectdata": { "message": "Doe" } 
+                } 
+            } 
+        }
+      ] 
+    };
 
     const psd = PartialSignData.fromCLIJson(params);
 

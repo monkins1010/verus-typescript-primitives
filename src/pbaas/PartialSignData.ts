@@ -300,7 +300,10 @@ export class PartialSignData implements SerializableEntity {
       if (this.isMMRData()) {
         length += (this.data as PartialMMRData).getByteLength();
       } else if (this.isVdxfData()) {
-        length += (this.data as VdxfUniValue).getByteLength();
+        const vdxfDataLen = (this.data as VdxfUniValue).getByteLength();
+
+        length += varuint.encodingLength(vdxfDataLen);
+        length += vdxfDataLen;
       } else {
         const datalen = (this.data as Buffer).length;
 
@@ -381,7 +384,9 @@ export class PartialSignData implements SerializableEntity {
         this.data = partialMMRData;
       } else if (this.isVdxfData()) {
         const vdxfData = new VdxfUniValue();
-        reader.offset = vdxfData.fromBuffer(reader.buffer, reader.offset);
+
+        const vdxfDataBuf = reader.readVarSlice();
+        vdxfData.fromBuffer(vdxfDataBuf);
 
         this.data = vdxfData;
       } else {
@@ -472,7 +477,7 @@ export class PartialSignData implements SerializableEntity {
       } else if (this.isVdxfData()) {
         const vdxfData = this.data as VdxfUniValue;
 
-        writer.writeSlice(vdxfData.toBuffer());
+        writer.writeVarSlice(vdxfData.toBuffer());
       } else {
         writer.writeVarSlice(this.data as Buffer);
       }
