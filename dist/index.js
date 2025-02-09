@@ -33,6 +33,7 @@ __exportStar(require("./pbaas/index"), exports);
 __exportStar(require("./pbaas/PartialIdentity"), exports);
 __exportStar(require("./pbaas/PartialMMRData"), exports);
 __exportStar(require("./pbaas/PartialSignData"), exports);
+__exportStar(require("./constants/pbaas"), exports);
 __exportStar(require("./identity/IdentityDefinition"), exports);
 __exportStar(require("./currency/CurrencyDefinition"), exports);
 var bn_js_1 = require("bn.js");
