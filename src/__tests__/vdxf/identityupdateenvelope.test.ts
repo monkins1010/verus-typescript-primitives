@@ -11,7 +11,7 @@ import { DATA_TYPE_MMRDATA } from "../../constants/pbaas";
 
 describe("IdentityUpdateEnvelope Serialization", () => {
   const systemID = IdentityID.fromAddress("iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq");
-  const signingID = IdentityID.fromAddress("RP4Qct9197i5vrS11qHVtdyRRoAHVNJS47");
+  const signingID = IdentityID.fromAddress("iPsFBfFoCcxtuZNzE8yxPQhXVn4dmytf8j");
   const requestID = new BN("123456", 10);
   const createdAt = new BN("1700000000", 10);
   const expiryHeight = new BN("123456");
