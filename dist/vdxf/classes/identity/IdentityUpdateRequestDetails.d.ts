@@ -5,6 +5,7 @@ import { PartialSignData, PartialSignDataCLIJson, PartialSignDataJson } from '..
 import { BigNumber } from '../../../utils/types/BigNumber';
 import { ContentMultiMapJson, IdentityID, VerusCLIVerusIDJson, VerusCLIVerusIDJsonBase } from '../../../pbaas';
 import { ResponseUri, ResponseUriJson } from '../ResponseUri';
+import { SerializableEntity } from '../../../utils/types/SerializableEntity';
 export declare type SignDataMap = Map<string, PartialSignData>;
 export declare type VerusCLIVerusIDJsonWithData = VerusCLIVerusIDJsonBase<ContentMultiMapJson | {
     [key: string]: {
@@ -24,7 +25,7 @@ export declare type IdentityUpdateRequestDetailsJson = {
     };
     salt?: string;
 };
-export declare class IdentityUpdateRequestDetails {
+export declare class IdentityUpdateRequestDetails implements SerializableEntity {
     flags?: BigNumber;
     requestid?: BigNumber;
     createdat?: BigNumber;

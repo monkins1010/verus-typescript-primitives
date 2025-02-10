@@ -384,7 +384,13 @@ describe("IdentityUpdateEnvelope Serialization", () => {
       salt.toString('hex')
     );
 
-    const env = new IdentityUpdateRequest({ details: req });
+    const env = new IdentityUpdateRequest({ 
+      details: req, 
+      signingid: signingID, 
+      systemid: systemID,
+      signature: "AeNjMwABQSAPBEuajDkRyy+OBJsWmDP3EUoqN9UjCJK9nmoSQiNoZWBK19OgGCYdEqr1CiFfBf8SFHVoUv4r2tb5Q3qsMTrp"
+    });
+
     const envBuf = env.toBuffer();
 
     const envFromBuf = new IdentityUpdateRequest();

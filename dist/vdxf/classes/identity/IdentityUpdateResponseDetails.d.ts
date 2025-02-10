@@ -1,6 +1,7 @@
 /// <reference types="node" />
 /// <reference types="bn.js" />
 import { BigNumber } from '../../../utils/types/BigNumber';
+import { SerializableEntity } from '../../../utils/types/SerializableEntity';
 export declare type IdentityUpdateResponseDetailsJson = {
     flags: string;
     requestid: string;
@@ -8,7 +9,7 @@ export declare type IdentityUpdateResponseDetailsJson = {
     txid?: string;
     salt?: string;
 };
-export declare class IdentityUpdateResponseDetails {
+export declare class IdentityUpdateResponseDetails implements SerializableEntity {
     flags?: BigNumber;
     requestid?: BigNumber;
     createdat?: BigNumber;

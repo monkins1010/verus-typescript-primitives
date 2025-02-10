@@ -10,6 +10,7 @@ import { BigNumber } from '../../../utils/types/BigNumber';
 import { BN } from 'bn.js';
 import { ContentMultiMapJson, IdentityID, VerusCLIVerusIDJson, VerusCLIVerusIDJsonBase } from '../../../pbaas';
 import { ResponseUri, ResponseUriJson } from '../ResponseUri';
+import { SerializableEntity } from '../../../utils/types/SerializableEntity';
 
 const { BufferReader, BufferWriter } = bufferutils;
 
@@ -29,7 +30,7 @@ export type IdentityUpdateRequestDetailsJson = {
   salt?: string;
 }
 
-export class IdentityUpdateRequestDetails {
+export class IdentityUpdateRequestDetails implements SerializableEntity {
   flags?: BigNumber;
   requestid?: BigNumber;              // ID of request, to be referenced in response
   createdat?: BigNumber;              // Unix timestamp of request creation

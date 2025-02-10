@@ -5,6 +5,7 @@ import { BigNumber } from '../../../utils/types/BigNumber';
 import { BN } from 'bn.js';
 import { UINT_256_LENGTH } from '../../../constants/pbaas';
 import varuint from '../../../utils/varuint';
+import { SerializableEntity } from '../../../utils/types/SerializableEntity';
 const { BufferReader, BufferWriter } = bufferutils;
 
 export type IdentityUpdateResponseDetailsJson = {
@@ -15,7 +16,7 @@ export type IdentityUpdateResponseDetailsJson = {
   salt?: string
 }
 
-export class IdentityUpdateResponseDetails {
+export class IdentityUpdateResponseDetails implements SerializableEntity {
   flags?: BigNumber;
   requestid?: BigNumber;              // ID of request, to be referenced in response
   createdat?: BigNumber;              // Unix timestamp of request creation
