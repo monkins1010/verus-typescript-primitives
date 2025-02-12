@@ -24,6 +24,7 @@ export declare type IdentityUpdateRequestDetailsJson = {
         [key: string]: PartialSignDataJson;
     };
     salt?: string;
+    txid?: string;
 };
 export declare class IdentityUpdateRequestDetails implements SerializableEntity {
     flags?: BigNumber;
@@ -35,12 +36,14 @@ export declare class IdentityUpdateRequestDetails implements SerializableEntity 
     responseuris?: Array<ResponseUri>;
     signdatamap?: SignDataMap;
     salt?: Buffer;
+    txid?: Buffer;
     static IDENTITY_UPDATE_REQUEST_INVALID: import("bn.js");
     static IDENTITY_UPDATE_REQUEST_VALID: import("bn.js");
     static IDENTITY_UPDATE_REQUEST_CONTAINS_SIGNDATA: import("bn.js");
     static IDENTITY_UPDATE_REQUEST_EXPIRES: import("bn.js");
     static IDENTITY_UPDATE_REQUEST_CONTAINS_RESPONSE_URIS: import("bn.js");
     static IDENTITY_UPDATE_REQUEST_CONTAINS_SYSTEM: import("bn.js");
+    static IDENTITY_UPDATE_REQUEST_CONTAINS_TXID: import("bn.js");
     static IDENTITY_UPDATE_REQUEST_CONTAINS_SALT: import("bn.js");
     static IDENTITY_UPDATE_REQUEST_IS_TESTNET: import("bn.js");
     constructor(data?: {
@@ -50,6 +53,7 @@ export declare class IdentityUpdateRequestDetails implements SerializableEntity 
         identity?: PartialIdentity;
         expiryheight?: BigNumber;
         systemid?: IdentityID;
+        txid?: Buffer;
         responseuris?: Array<ResponseUri>;
         signdatamap?: SignDataMap;
         salt?: Buffer;
@@ -58,6 +62,7 @@ export declare class IdentityUpdateRequestDetails implements SerializableEntity 
     expires(): boolean;
     containsSignData(): boolean;
     containsSystem(): boolean;
+    containsTxid(): boolean;
     containsResponseUris(): boolean;
     containsSalt(): boolean;
     isTestnet(): boolean;
@@ -65,6 +70,7 @@ export declare class IdentityUpdateRequestDetails implements SerializableEntity 
     toggleExpires(): void;
     toggleContainsSignData(): void;
     toggleContainsSystem(): void;
+    toggleContainsTxid(): void;
     toggleContainsResponseUris(): void;
     toggleContainsSalt(): void;
     toggleIsTestnet(): void;
@@ -75,5 +81,5 @@ export declare class IdentityUpdateRequestDetails implements SerializableEntity 
     toJson(): IdentityUpdateRequestDetailsJson;
     static fromJson(json: IdentityUpdateRequestDetailsJson): IdentityUpdateRequestDetails;
     toCLIJson(): VerusCLIVerusIDJsonWithData;
-    static fromCLIJson(json: VerusCLIVerusIDJsonWithData, systemid?: string, requestid?: string, createdat?: string, expiryheight?: string, responseuris?: Array<ResponseUriJson>, salt?: string): IdentityUpdateRequestDetails;
+    static fromCLIJson(json: VerusCLIVerusIDJsonWithData, details?: IdentityUpdateRequestDetailsJson): IdentityUpdateRequestDetails;
 }

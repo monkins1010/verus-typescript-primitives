@@ -11,6 +11,7 @@ import { BN } from 'bn.js';
 import { ContentMultiMapJson, IdentityID, VerusCLIVerusIDJson, VerusCLIVerusIDJsonBase } from '../../../pbaas';
 import { ResponseUri, ResponseUriJson } from '../ResponseUri';
 import { SerializableEntity } from '../../../utils/types/SerializableEntity';
+import { UINT_256_LENGTH } from '../../../constants/pbaas';
 
 const { BufferReader, BufferWriter } = bufferutils;
 
@@ -28,6 +29,7 @@ export type IdentityUpdateRequestDetailsJson = {
   responseuris?: Array<ResponseUriJson>;
   signdatamap?: { [key: string]: PartialSignDataJson };
   salt?: string;
+  txid?: string;
 }
 
 export class IdentityUpdateRequestDetails implements SerializableEntity {
@@ -40,6 +42,8 @@ export class IdentityUpdateRequestDetails implements SerializableEntity {
   responseuris?: Array<ResponseUri>;  // Array of uris + type to send response to (type can be post, redirect, etc. depending on how response is expected to be received)
   signdatamap?: SignDataMap;          // Map of data to pass to signdata
   salt?: Buffer;                      // Optional salt
+  txid?: Buffer;                      // 32 byte transaction ID of transaction that must be spent to update identity, on same system asked for in request
+                                      // stored in natural order, if displayed as text make sure to reverse!
 
   static IDENTITY_UPDATE_REQUEST_INVALID = new BN(0, 10);
   static IDENTITY_UPDATE_REQUEST_VALID = new BN(1, 10);
@@ -47,8 +51,9 @@ export class IdentityUpdateRequestDetails implements SerializableEntity {
   static IDENTITY_UPDATE_REQUEST_EXPIRES = new BN(4, 10);
   static IDENTITY_UPDATE_REQUEST_CONTAINS_RESPONSE_URIS = new BN(8, 10);
   static IDENTITY_UPDATE_REQUEST_CONTAINS_SYSTEM = new BN(16, 10);
-  static IDENTITY_UPDATE_REQUEST_CONTAINS_SALT = new BN(32, 10);
-  static IDENTITY_UPDATE_REQUEST_IS_TESTNET = new BN(64, 10);
+  static IDENTITY_UPDATE_REQUEST_CONTAINS_TXID = new BN(32, 10);
+  static IDENTITY_UPDATE_REQUEST_CONTAINS_SALT = new BN(64, 10);
+  static IDENTITY_UPDATE_REQUEST_IS_TESTNET = new BN(128, 10);
 
   constructor (data?: {
     flags?: BigNumber,
@@ -57,6 +62,7 @@ export class IdentityUpdateRequestDetails implements SerializableEntity {
     identity?: PartialIdentity,
     expiryheight?: BigNumber,
     systemid?: IdentityID,
+    txid?: Buffer,
     responseuris?: Array<ResponseUri>,
     signdatamap?: SignDataMap,
     salt?: Buffer
@@ -83,6 +89,11 @@ export class IdentityUpdateRequestDetails implements SerializableEntity {
     if (data?.systemid) {
       if (!this.containsSystem()) this.toggleContainsSystem();
       this.systemid = data.systemid;
+    }
+
+    if (data?.txid) {
+      if (!this.containsTxid()) this.toggleContainsTxid();
+      this.txid = data.txid;
     }
 
     if (data?.responseuris) {
@@ -117,6 +128,10 @@ export class IdentityUpdateRequestDetails implements SerializableEntity {
     return !!(this.flags.and(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_SYSTEM).toNumber());
   }
 
+  containsTxid() {
+    return !!(this.flags.and(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_TXID).toNumber());
+  }
+
   containsResponseUris() {
     return !!(this.flags.and(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_RESPONSE_URIS).toNumber());
   }
@@ -143,6 +158,10 @@ export class IdentityUpdateRequestDetails implements SerializableEntity {
 
   toggleContainsSystem() {
     this.flags = this.flags.xor(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_SYSTEM);
+  }
+
+  toggleContainsTxid() {
+    this.flags = this.flags.xor(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_TXID);
   }
 
   toggleContainsResponseUris() {
@@ -175,6 +194,10 @@ export class IdentityUpdateRequestDetails implements SerializableEntity {
     if (this.expires()) length += varint.encodingLength(this.expiryheight);
 
     if (this.containsSystem()) length += this.systemid.getByteLength();
+
+    if (this.containsTxid()) {
+      length += UINT_256_LENGTH;
+    }
 
     if (this.containsResponseUris()) {
       length += varuint.encodingLength(this.responseuris.length);
@@ -215,6 +238,12 @@ export class IdentityUpdateRequestDetails implements SerializableEntity {
 
     if (this.containsSystem()) writer.writeSlice(this.systemid.toBuffer());
 
+    if (this.containsTxid()) {
+      if (this.txid.length !== UINT_256_LENGTH) throw new Error("invalid txid length");
+
+      writer.writeSlice(this.txid);
+    }
+
     if (this.containsResponseUris()) {
       writer.writeArray(this.responseuris.map((x) => x.toBuffer()));
     }
@@ -253,6 +282,10 @@ export class IdentityUpdateRequestDetails implements SerializableEntity {
     if (this.containsSystem()) {
       this.systemid = new IdentityID();
       reader.offset = this.systemid.fromBuffer(reader.buffer, reader.offset);
+    }
+
+    if (this.containsTxid()) {
+      this.txid = reader.readSlice(UINT_256_LENGTH);
     }
 
     if (this.containsResponseUris()) {
@@ -309,6 +342,7 @@ export class IdentityUpdateRequestDetails implements SerializableEntity {
       identity: this.identity ? this.identity.toJson() : undefined,
       expiryheight: this.expiryheight ? this.expiryheight.toString(10) : undefined,
       systemid: this.systemid ? this.systemid.toAddress() : undefined,
+      txid: this.txid ? (Buffer.from(this.txid.toString('hex'), 'hex').reverse()).toString('hex') : undefined,
       responseuris: this.responseuris ? this.responseuris.map(x => x.toJson()) : undefined,
       signdatamap: signDataJson,
       salt: this.salt ? this.salt.toString('hex') : undefined
@@ -335,7 +369,8 @@ export class IdentityUpdateRequestDetails implements SerializableEntity {
       systemid: json.systemid ? IdentityID.fromAddress(json.systemid) : undefined,
       responseuris: json.responseuris ? json.responseuris.map(x => ResponseUri.fromJson(x)) : undefined,
       signdatamap,
-      salt: json.salt ? Buffer.from(json.salt, 'hex') : undefined
+      salt: json.salt ? Buffer.from(json.salt, 'hex') : undefined,
+      txid: json.txid ? Buffer.from(json.txid, 'hex').reverse() : undefined,
     })
   }
 
@@ -357,12 +392,7 @@ export class IdentityUpdateRequestDetails implements SerializableEntity {
 
   static fromCLIJson(
     json: VerusCLIVerusIDJsonWithData, 
-    systemid?: string, 
-    requestid?: string, 
-    createdat?: string, 
-    expiryheight?: string,
-    responseuris?: Array<ResponseUriJson>,
-    salt?: string
+    details?: IdentityUpdateRequestDetailsJson
   ): IdentityUpdateRequestDetails {
     let identity: PartialIdentity;
     let signdatamap: SignDataMap;
@@ -389,12 +419,13 @@ export class IdentityUpdateRequestDetails implements SerializableEntity {
     return new IdentityUpdateRequestDetails({
       identity,
       signdatamap,
-      systemid: systemid ? IdentityID.fromAddress(systemid) : undefined,
-      requestid: requestid ? new BN(requestid, 10) : undefined,
-      createdat: createdat ? new BN(createdat, 10) : undefined,
-      expiryheight: expiryheight ? new BN(expiryheight, 10) : undefined,
-      responseuris: responseuris ? responseuris.map(x => ResponseUri.fromJson(x)) : undefined,
-      salt: salt ? Buffer.from(salt, 'hex') : undefined
+      systemid: details?.systemid ? IdentityID.fromAddress(details.systemid) : undefined,
+      requestid: details?.requestid ? new BN(details.requestid, 10) : undefined,
+      createdat: details?.createdat ? new BN(details.createdat, 10) : undefined,
+      expiryheight: details?.expiryheight ? new BN(details.expiryheight, 10) : undefined,
+      responseuris: details?.responseuris ? details.responseuris.map(x => ResponseUri.fromJson(x)) : undefined,
+      salt: details?.salt ? Buffer.from(details.salt, 'hex') : undefined,
+      txid: details?.txid ? Buffer.from(details.txid, 'hex').reverse() : undefined,
     })
   }
 }

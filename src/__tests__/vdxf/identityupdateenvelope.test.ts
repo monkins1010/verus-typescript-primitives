@@ -157,7 +157,7 @@ describe("IdentityUpdateEnvelope Serialization", () => {
       identity: partialIdentity, 
       expiryheight: expiryHeight, 
       salt: salt, 
-      signdatamap 
+      signdatamap
     });
     const request = new IdentityUpdateRequest({ details: requestDetails });
     testSerialization(request);
@@ -373,15 +373,18 @@ describe("IdentityUpdateEnvelope Serialization", () => {
   test("Deserialize cli identity update details", () => {
     const req = IdentityUpdateRequestDetails.fromCLIJson(
       cliIdUpdateRequestJsonHex, 
-      systemID.toAddress() as string, 
-      requestID.toString(), 
-      createdAt.toString(), 
-      expiryHeight.toString(), 
-      [
-        ResponseUri.fromUriString("http:/127.0.0.1:8000", ResponseUri.TYPE_REDIRECT).toJson(), 
-        ResponseUri.fromUriString("http:/127.0.0.1:8000", ResponseUri.TYPE_POST).toJson()
-      ],
-      salt.toString('hex')
+      {
+        systemid: systemID.toAddress() as string, 
+        requestid: requestID.toString(), 
+        createdat: createdAt.toString(), 
+        expiryheight: expiryHeight.toString(), 
+        responseuris: [
+          ResponseUri.fromUriString("http:/127.0.0.1:8000", ResponseUri.TYPE_REDIRECT).toJson(), 
+          ResponseUri.fromUriString("http:/127.0.0.1:8000", ResponseUri.TYPE_POST).toJson()
+        ],
+        salt: salt.toString('hex'),
+        txid
+      }
     );
 
     const env = new IdentityUpdateRequest({ 
