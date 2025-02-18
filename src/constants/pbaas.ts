@@ -19,6 +19,7 @@ export const HASH_TYPE_SHA256D_NAME = "sha256D";
 export const HASH_TYPE_BLAKE2B_NAME = "blake2b";
 export const HASH_TYPE_KECCAK256_NAME = "keccak256";
 export const DEFAULT_HASH_TYPE = HASH_TYPE_SHA256;
+export const DEFAULT_HASH_TYPE_MMR = HASH_TYPE_BLAKE2B;
 export const HASH_NAMES = [HASH_TYPE_SHA256_NAME, HASH_TYPE_SHA256D_NAME, HASH_TYPE_BLAKE2B_NAME, HASH_TYPE_KECCAK256_NAME];
 export type AllowedHashes = (typeof HASH_NAMES)[number];
 

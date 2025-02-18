@@ -12,7 +12,7 @@ class PartialMMRData {
     constructor(data) {
         this.flags = data && data.flags ? data.flags : new bn_js_1.BN("0");
         this.data = data && data.data ? data.data : [];
-        this.mmrhashtype = data && data.mmrhashtype ? data.mmrhashtype : pbaas_1.DEFAULT_HASH_TYPE;
+        this.mmrhashtype = data && data.mmrhashtype ? data.mmrhashtype : pbaas_1.DEFAULT_HASH_TYPE_MMR;
         if (data === null || data === void 0 ? void 0 : data.salt) {
             if (!this.containsSalt())
                 this.toggleContainsSalt();

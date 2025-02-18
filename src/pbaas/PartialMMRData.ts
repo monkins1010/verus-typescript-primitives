@@ -12,8 +12,8 @@ import {
   DATA_TYPE_HEX, 
   DATA_TYPE_MESSAGE, 
   DATA_TYPE_RAWSTRINGDATA, 
-  DATA_TYPE_VDXFDATA, 
-  DEFAULT_HASH_TYPE, 
+  DATA_TYPE_VDXFDATA,
+  DEFAULT_HASH_TYPE_MMR, 
   HASH_TYPE_BLAKE2B, 
   HASH_TYPE_BLAKE2B_NAME, 
   HASH_TYPE_KECCAK256, 
@@ -80,7 +80,7 @@ export class PartialMMRData implements SerializableEntity {
   constructor(data?: PartialMMRDataInitData) {
     this.flags = data && data.flags ? data.flags : new BN("0");
     this.data = data && data.data ? data.data : [];
-    this.mmrhashtype = data && data.mmrhashtype ? data.mmrhashtype : DEFAULT_HASH_TYPE;
+    this.mmrhashtype = data && data.mmrhashtype ? data.mmrhashtype : DEFAULT_HASH_TYPE_MMR;
     
     if (data?.salt) {
       if (!this.containsSalt()) this.toggleContainsSalt();

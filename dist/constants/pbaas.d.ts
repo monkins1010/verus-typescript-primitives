@@ -17,6 +17,7 @@ export declare const HASH_TYPE_SHA256D_NAME = "sha256D";
 export declare const HASH_TYPE_BLAKE2B_NAME = "blake2b";
 export declare const HASH_TYPE_KECCAK256_NAME = "keccak256";
 export declare const DEFAULT_HASH_TYPE: import("bn.js");
+export declare const DEFAULT_HASH_TYPE_MMR: import("bn.js");
 export declare const HASH_NAMES: string[];
 export declare type AllowedHashes = (typeof HASH_NAMES)[number];
 export declare const UINT_256_LENGTH = 32;
