@@ -138,6 +138,14 @@ export class PartialIdentity extends Identity implements SerializableEntity {
     this.contains = this.contains.xor(PartialIdentity.PARTIAL_ID_CONTAINS_PRIMARY_ADDRS);
   }
 
+  private enableContainsFlags() {
+    this.contains = this.contains.or(PartialIdentity.PARTIAL_ID_CONTAINS_FLAGS);
+  }
+
+  private enableContainsUnlockAfter() {
+    this.contains = this.contains.or(PartialIdentity.PARTIAL_ID_CONTAINS_UNLOCK_AFTER);
+  }
+
   private getPartialIdentityByteLength(): number {
     let length = 0;
 
@@ -173,5 +181,28 @@ export class PartialIdentity extends Identity implements SerializableEntity {
 
   static fromJson(json: VerusCLIVerusIDJson): PartialIdentity {
     return Identity.internalFromJson<PartialIdentity>(json, PartialIdentity);
+  }
+
+  lock(unlockTime: BigNumber) {
+    this.enableContainsFlags();
+    this.enableContainsUnlockAfter();
+    return super.lock(unlockTime);
+  }
+
+  unlock(height: BigNumber = new BN(0), txExpiryHeight: BigNumber = new BN(0)): void {
+    this.enableContainsFlags();
+    this.enableContainsUnlockAfter();
+    return super.unlock(height, txExpiryHeight);
+  }
+
+  revoke() {
+    this.enableContainsFlags();
+    this.enableContainsUnlockAfter();
+    return super.revoke();
+  }
+
+  unrevoke() {
+    this.enableContainsFlags();
+    return super.unrevoke();
   }
 }

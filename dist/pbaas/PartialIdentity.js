@@ -107,6 +107,12 @@ class PartialIdentity extends Identity_1.Identity {
     toggleContainsPrimaryAddresses() {
         this.contains = this.contains.xor(PartialIdentity.PARTIAL_ID_CONTAINS_PRIMARY_ADDRS);
     }
+    enableContainsFlags() {
+        this.contains = this.contains.or(PartialIdentity.PARTIAL_ID_CONTAINS_FLAGS);
+    }
+    enableContainsUnlockAfter() {
+        this.contains = this.contains.or(PartialIdentity.PARTIAL_ID_CONTAINS_UNLOCK_AFTER);
+    }
     getPartialIdentityByteLength() {
         let length = 0;
         length += varint_1.default.encodingLength(this.contains);
@@ -130,6 +136,25 @@ class PartialIdentity extends Identity_1.Identity {
     }
     static fromJson(json) {
         return Identity_1.Identity.internalFromJson(json, PartialIdentity);
+    }
+    lock(unlockTime) {
+        this.enableContainsFlags();
+        this.enableContainsUnlockAfter();
+        return super.lock(unlockTime);
+    }
+    unlock(height = new bn_js_1.BN(0), txExpiryHeight = new bn_js_1.BN(0)) {
+        this.enableContainsFlags();
+        this.enableContainsUnlockAfter();
+        return super.unlock(height, txExpiryHeight);
+    }
+    revoke() {
+        this.enableContainsFlags();
+        this.enableContainsUnlockAfter();
+        return super.revoke();
+    }
+    unrevoke() {
+        this.enableContainsFlags();
+        return super.unrevoke();
     }
 }
 exports.PartialIdentity = PartialIdentity;

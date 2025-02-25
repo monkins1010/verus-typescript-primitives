@@ -42,9 +42,15 @@ export declare class PartialIdentity extends Identity implements SerializableEnt
     private toggleContainsVersion;
     private toggleContainsMinSigs;
     private toggleContainsPrimaryAddresses;
+    private enableContainsFlags;
+    private enableContainsUnlockAfter;
     private getPartialIdentityByteLength;
     getByteLength(): number;
     fromBuffer(buffer: Buffer, offset?: number, parseVdxfObjects?: boolean): number;
     toBuffer(): Buffer;
     static fromJson(json: VerusCLIVerusIDJson): PartialIdentity;
+    lock(unlockTime: BigNumber): void;
+    unlock(height?: BigNumber, txExpiryHeight?: BigNumber): void;
+    revoke(): void;
+    unrevoke(): void;
 }
