@@ -33,6 +33,8 @@ import { GetAddressMempoolResponse } from './GetAddressMempool/GetAddressMempool
 import { GetAddressMempoolRequest } from './GetAddressMempool/GetAddressMempoolRequest'
 import { SendCurrencyRequest } from './SendCurrency/SendCurrencyRequest'
 import { SendCurrencyResponse } from './SendCurrency/SendCurrencyResponse'
+import { UpdateIdentityRequest } from './UpdateIdentity/UpdateIdentityRequest'
+import { UpdateIdentityResponse } from './UpdateIdentity/UpdateIdentityResponse'
 import { FundRawTransactionRequest } from './FundRawTransaction/FundRawTransactionRequest'
 import { FundRawTransactionResponse } from './FundRawTransaction/FundRawTransactionResponse'
 import { GetCurrencyConvertersRequest } from './GetCurrencyConverters/GetCurrencyConvertersRequest'
@@ -80,6 +82,8 @@ export {
   SignDataResponse,
   SendCurrencyRequest,
   SendCurrencyResponse,
+  UpdateIdentityRequest,
+  UpdateIdentityResponse,
   FundRawTransactionRequest,
   FundRawTransactionResponse,
   GetCurrencyConvertersRequest,
@@ -111,6 +115,7 @@ export type RpcRequest =
   | typeof SignMessageRequest
   | typeof SignDataRequest
   | typeof SendCurrencyRequest
+  | typeof UpdateIdentityRequest
   | typeof FundRawTransactionRequest
   | typeof GetCurrencyConvertersRequest
   | typeof ListCurrenciesRequest
@@ -135,6 +140,7 @@ export type RpcResponse =
   | typeof SignMessageResponse
   | typeof SignDataResponse
   | typeof SendCurrencyResponse
+  | typeof UpdateIdentityResponse
   | typeof FundRawTransactionResponse
   | typeof GetCurrencyConvertersResponse
   | typeof ListCurrenciesResponse
