@@ -8,7 +8,7 @@ import { PartialIdentity } from '../../../pbaas/PartialIdentity';
 import { PartialSignData, PartialSignDataCLIJson, PartialSignDataJson } from '../../../pbaas/PartialSignData';
 import { BigNumber } from '../../../utils/types/BigNumber';
 import { BN } from 'bn.js';
-import { ContentMultiMapJson, IdentityID, VerusCLIVerusIDJson, VerusCLIVerusIDJsonBase } from '../../../pbaas';
+import { ContentMultiMapJsonValue, IdentityID, VerusCLIVerusIDJson, VerusCLIVerusIDJsonBase } from '../../../pbaas';
 import { ResponseUri, ResponseUriJson } from '../ResponseUri';
 import { SerializableEntity } from '../../../utils/types/SerializableEntity';
 import { UINT_256_LENGTH } from '../../../constants/pbaas';
@@ -17,7 +17,7 @@ const { BufferReader, BufferWriter } = bufferutils;
 
 export type SignDataMap = Map<string, PartialSignData>;
 
-export type VerusCLIVerusIDJsonWithData = VerusCLIVerusIDJsonBase<ContentMultiMapJson | { [key: string]: { data: PartialSignDataCLIJson } }>
+export type VerusCLIVerusIDJsonWithData = VerusCLIVerusIDJsonBase<{ [key: string]: ContentMultiMapJsonValue | { data: PartialSignDataCLIJson } }>
 
 export type IdentityUpdateRequestDetailsJson = {
   flags?: string;
