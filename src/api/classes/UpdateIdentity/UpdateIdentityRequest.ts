@@ -5,18 +5,18 @@ import { VerusCLIVerusIDJsonWithData } from "../../../vdxf/classes";
 
 export class UpdateIdentityRequest extends ApiRequest {
   jsonidentity: VerusCLIVerusIDJsonWithData;
-  returntx: boolean;
-  tokenupdate: boolean;
-  feeoffer: number;
-  sourceoffunds: string;
+  returntx?: boolean;
+  tokenupdate?: boolean;
+  feeoffer?: number;
+  sourceoffunds?: string;
 
   constructor(
     chain: string, 
     jsonidentity: VerusCLIVerusIDJsonWithData, 
-    returntx: boolean, 
-    tokenupdate: boolean, 
-    feeoffer: number, 
-    sourceoffunds: string
+    returntx?: boolean, 
+    tokenupdate?: boolean, 
+    feeoffer?: number, 
+    sourceoffunds?: string
   ) {
     super(chain, UPDATE_IDENTITY);
     this.jsonidentity = jsonidentity;
