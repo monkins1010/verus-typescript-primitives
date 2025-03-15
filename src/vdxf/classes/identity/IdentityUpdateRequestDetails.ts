@@ -1,7 +1,7 @@
 import varint from '../../../utils/varint'
 import varuint from '../../../utils/varuint'
 import bufferutils from '../../../utils/bufferutils'
-import { fromBase58Check, toBase58Check } from '../../../utils/address';
+import { fromBase58Check, nameAndParentAddrToIAddr, toBase58Check } from '../../../utils/address';
 import { HASH160_BYTE_LENGTH, I_ADDR_VERSION } from '../../../constants/vdxf';
 import createHash = require('create-hash');
 import { PartialIdentity } from '../../../pbaas/PartialIdentity';
@@ -178,6 +178,18 @@ export class IdentityUpdateRequestDetails implements SerializableEntity {
 
   toSha256() {
     return createHash("sha256").update(this.toBuffer()).digest();
+  }
+
+  getIdentityAddress() {
+    if (this.identity.name === "VRSC" || this.identity.name === "VRSCTEST") {
+      return nameAndParentAddrToIAddr(this.identity.name);
+    } else if (this.identity.parent) {
+      return this.identity.getIdentityAddress();
+    } else if (this.isTestnet()) {
+      return nameAndParentAddrToIAddr(this.identity.name, nameAndParentAddrToIAddr("VRSCTEST"));
+    } else {
+      return nameAndParentAddrToIAddr(this.identity.name, nameAndParentAddrToIAddr("VRSC"));
+    }
   }
 
   getByteLength(): number {

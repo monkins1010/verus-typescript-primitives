@@ -404,4 +404,38 @@ describe("IdentityUpdateEnvelope Serialization", () => {
     testJsonSerialization(env);
     testSerialization(env);
   })
+
+  test("Deserialize cli identity update details", () => {
+    const detailsProps = {
+      requestid: requestID.toString(), 
+      createdat: createdAt.toString(), 
+      expiryheight: expiryHeight.toString(), 
+      responseuris: [
+        ResponseUri.fromUriString("http:/127.0.0.1:8000", ResponseUri.TYPE_REDIRECT).toJson(), 
+        ResponseUri.fromUriString("http:/127.0.0.1:8000", ResponseUri.TYPE_POST).toJson()
+      ],
+      salt: salt.toString('hex'),
+      txid
+    };
+
+    expect(IdentityUpdateRequestDetails.fromCLIJson(
+      { name: "data" }, 
+      detailsProps
+    ).getIdentityAddress()).toEqual("iHhi8aSwJcA5SzP2jE2M3wcsuVcnMdh6Fr");
+
+    expect(IdentityUpdateRequestDetails.fromCLIJson(
+      { name: "Mozek86", parent: "iQ2TqQot9W7mLrcCRJKnAZmaPTTY6sx4S4" }, 
+      detailsProps
+    ).getIdentityAddress()).toEqual("i6joVUtMohssU9pFAwojYrZfF9EmyAB95K");
+
+    expect(IdentityUpdateRequestDetails.fromCLIJson(
+      { name: "VRSC" }, 
+      detailsProps
+    ).getIdentityAddress()).toEqual("i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV");
+    
+    expect(IdentityUpdateRequestDetails.fromCLIJson(
+      { name: "VRSCTEST" }, 
+      detailsProps
+    ).getIdentityAddress()).toEqual("iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq");
+  })
 });

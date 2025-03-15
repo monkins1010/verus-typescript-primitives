@@ -75,6 +75,7 @@ export declare class IdentityUpdateRequestDetails implements SerializableEntity 
     toggleContainsSalt(): void;
     toggleIsTestnet(): void;
     toSha256(): Buffer;
+    getIdentityAddress(): string;
     getByteLength(): number;
     toBuffer(): Buffer;
     fromBuffer(buffer: Buffer, offset?: number, parseVdxfObjects?: boolean): number;

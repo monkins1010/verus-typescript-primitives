@@ -112,6 +112,20 @@ class IdentityUpdateRequestDetails {
     toSha256() {
         return createHash("sha256").update(this.toBuffer()).digest();
     }
+    getIdentityAddress() {
+        if (this.identity.name === "VRSC" || this.identity.name === "VRSCTEST") {
+            return (0, address_1.nameAndParentAddrToIAddr)(this.identity.name);
+        }
+        else if (this.identity.parent) {
+            return this.identity.getIdentityAddress();
+        }
+        else if (this.isTestnet()) {
+            return (0, address_1.nameAndParentAddrToIAddr)(this.identity.name, (0, address_1.nameAndParentAddrToIAddr)("VRSCTEST"));
+        }
+        else {
+            return (0, address_1.nameAndParentAddrToIAddr)(this.identity.name, (0, address_1.nameAndParentAddrToIAddr)("VRSC"));
+        }
+    }
     getByteLength() {
         let length = 0;
         length += varint_1.default.encodingLength(this.flags);
