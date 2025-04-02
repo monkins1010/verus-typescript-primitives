@@ -373,3 +373,13 @@ export const DATA_TYPE_STRING: VDXFKeyInterface =
       "name": "vrsc::data.type.string"
     },
 };
+
+export const DATA_TYPE_DEFINEDKEY: VDXFKeyInterface = {
+  "vdxfid": "iD3yzD6KnrSG75d8RzirMD6SyvrAS2HxjH",
+  "indexid": "xHt6T1XQeAevjFWAHgP1Kbcz1asBJp9Kbs",
+  "hash160result": "5dd4e0d5f7bd891d55ca8060a044390b64060d69",
+  "qualifiedname": {
+    "namespace": "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV",
+    "name": "vrsc::data.type.definedkey"
+  }
+}

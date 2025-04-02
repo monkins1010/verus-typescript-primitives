@@ -1,4 +1,5 @@
 import { BN } from "bn.js";
+import { toBase58Check } from "../utils/address";
 
 export const DATA_TYPE_UNKNOWN = new BN("0", 10);
 export const DATA_TYPE_MMRDATA = new BN("1", 10);
@@ -25,3 +26,8 @@ export type AllowedHashes = (typeof HASH_NAMES)[number];
 
 
 export const UINT_256_LENGTH = 32;
+
+export const DEFAULT_VERUS_CHAINID = "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV";
+export const DEFAULT_VERUS_CHAINNAME = "VRSC";
+export const KOMODO_ASSETCHAIN_MAXLEN = 65;
+export const NULL_I_ADDR = "i3UXS5QPRQGNRDDqVnyWTnmFCTHDbzmsYk";

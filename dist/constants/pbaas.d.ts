@@ -21,3 +21,7 @@ export declare const DEFAULT_HASH_TYPE_MMR: import("bn.js");
 export declare const HASH_NAMES: string[];
 export declare type AllowedHashes = (typeof HASH_NAMES)[number];
 export declare const UINT_256_LENGTH = 32;
+export declare const DEFAULT_VERUS_CHAINID = "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV";
+export declare const DEFAULT_VERUS_CHAINNAME = "VRSC";
+export declare const KOMODO_ASSETCHAIN_MAXLEN = 65;
+export declare const NULL_I_ADDR = "i3UXS5QPRQGNRDDqVnyWTnmFCTHDbzmsYk";
