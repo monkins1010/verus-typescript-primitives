@@ -16,7 +16,7 @@ const pbaas_2 = require("../../../constants/pbaas");
 const { BufferReader, BufferWriter } = bufferutils_1.default;
 class IdentityUpdateRequestDetails {
     constructor(data) {
-        this.flags = data && data.flags ? data.flags : new bn_js_1.BN("1", 10);
+        this.flags = data && data.flags ? data.flags : new bn_js_1.BN("0", 10);
         if (data === null || data === void 0 ? void 0 : data.requestid) {
             this.requestid = data.requestid;
         }
@@ -61,9 +61,6 @@ class IdentityUpdateRequestDetails {
             this.salt = data.salt;
         }
     }
-    isValid() {
-        return !!(this.flags.and(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_VALID).toNumber());
-    }
     expires() {
         return !!(this.flags.and(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_EXPIRES).toNumber());
     }
@@ -84,9 +81,6 @@ class IdentityUpdateRequestDetails {
     }
     isTestnet() {
         return !!(this.flags.and(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_IS_TESTNET).toNumber());
-    }
-    toggleIsValid() {
-        this.flags = this.flags.xor(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_VALID);
     }
     toggleExpires() {
         this.flags = this.flags.xor(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_EXPIRES);
@@ -314,12 +308,11 @@ class IdentityUpdateRequestDetails {
 }
 exports.IdentityUpdateRequestDetails = IdentityUpdateRequestDetails;
 // stored in natural order, if displayed as text make sure to reverse!
-IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_INVALID = new bn_js_1.BN(0, 10);
-IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_VALID = new bn_js_1.BN(1, 10);
-IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_SIGNDATA = new bn_js_1.BN(2, 10);
-IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_EXPIRES = new bn_js_1.BN(4, 10);
-IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_RESPONSE_URIS = new bn_js_1.BN(8, 10);
-IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_SYSTEM = new bn_js_1.BN(16, 10);
-IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_TXID = new bn_js_1.BN(32, 10);
-IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_SALT = new bn_js_1.BN(64, 10);
-IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_IS_TESTNET = new bn_js_1.BN(128, 10);
+IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_VALID = new bn_js_1.BN(0, 10);
+IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_SIGNDATA = new bn_js_1.BN(1, 10);
+IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_EXPIRES = new bn_js_1.BN(2, 10);
+IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_RESPONSE_URIS = new bn_js_1.BN(4, 10);
+IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_SYSTEM = new bn_js_1.BN(8, 10);
+IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_TXID = new bn_js_1.BN(16, 10);
+IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_SALT = new bn_js_1.BN(32, 10);
+IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_IS_TESTNET = new bn_js_1.BN(64, 10);

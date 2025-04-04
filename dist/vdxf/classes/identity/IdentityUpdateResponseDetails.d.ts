@@ -15,7 +15,6 @@ export declare class IdentityUpdateResponseDetails implements SerializableEntity
     createdat?: BigNumber;
     txid?: Buffer;
     salt?: Buffer;
-    static IDENTITY_UPDATE_RESPONSE_INVALID: import("bn.js");
     static IDENTITY_UPDATE_RESPONSE_VALID: import("bn.js");
     static IDENTITY_UPDATE_RESPONSE_CONTAINS_TXID: import("bn.js");
     static IDENTITY_UPDATE_RESPONSE_CONTAINS_SALT: import("bn.js");
@@ -26,10 +25,8 @@ export declare class IdentityUpdateResponseDetails implements SerializableEntity
         txid?: Buffer;
         salt?: Buffer;
     });
-    isValid(): boolean;
     containsTxid(): boolean;
     containsSalt(): boolean;
-    toggleIsValid(): void;
     toggleContainsTxid(): void;
     toggleContainsSalt(): void;
     toSha256(): Buffer;

@@ -24,10 +24,9 @@ export class IdentityUpdateResponseDetails implements SerializableEntity {
                                       // stored in natural order, if displayed as text make sure to reverse!
   salt?: Buffer;                      // Optional salt
 
-  static IDENTITY_UPDATE_RESPONSE_INVALID = new BN(0, 10);
-  static IDENTITY_UPDATE_RESPONSE_VALID = new BN(1, 10);
-  static IDENTITY_UPDATE_RESPONSE_CONTAINS_TXID = new BN(2, 10);
-  static IDENTITY_UPDATE_RESPONSE_CONTAINS_SALT = new BN(4, 10);
+  static IDENTITY_UPDATE_RESPONSE_VALID = new BN(0, 10);
+  static IDENTITY_UPDATE_RESPONSE_CONTAINS_TXID = new BN(1, 10);
+  static IDENTITY_UPDATE_RESPONSE_CONTAINS_SALT = new BN(2, 10);
 
   constructor (data?: {
     flags?: BigNumber,
@@ -36,7 +35,7 @@ export class IdentityUpdateResponseDetails implements SerializableEntity {
     txid?: Buffer,
     salt?: Buffer
   }) {
-    this.flags = data && data.flags ? data.flags : new BN("1", 10);
+    this.flags = data && data.flags ? data.flags : new BN("0", 10);
 
     if (data?.requestid) {
       this.requestid = data.requestid;
@@ -57,20 +56,12 @@ export class IdentityUpdateResponseDetails implements SerializableEntity {
     }
   }
 
-  isValid() {
-    return !!(this.flags.and(IdentityUpdateResponseDetails.IDENTITY_UPDATE_RESPONSE_VALID).toNumber());
-  }
-
   containsTxid() {
     return !!(this.flags.and(IdentityUpdateResponseDetails.IDENTITY_UPDATE_RESPONSE_CONTAINS_TXID).toNumber());
   }
 
   containsSalt() {
     return !!(this.flags.and(IdentityUpdateResponseDetails.IDENTITY_UPDATE_RESPONSE_CONTAINS_SALT).toNumber());
-  }
-
-  toggleIsValid() {
-    this.flags = this.flags.xor(IdentityUpdateResponseDetails.IDENTITY_UPDATE_RESPONSE_VALID);
   }
 
   toggleContainsTxid() {

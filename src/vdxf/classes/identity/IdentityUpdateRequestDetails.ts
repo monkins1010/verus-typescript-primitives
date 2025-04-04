@@ -45,15 +45,14 @@ export class IdentityUpdateRequestDetails implements SerializableEntity {
   txid?: Buffer;                      // 32 byte transaction ID of transaction that must be spent to update identity, on same system asked for in request
                                       // stored in natural order, if displayed as text make sure to reverse!
 
-  static IDENTITY_UPDATE_REQUEST_INVALID = new BN(0, 10);
-  static IDENTITY_UPDATE_REQUEST_VALID = new BN(1, 10);
-  static IDENTITY_UPDATE_REQUEST_CONTAINS_SIGNDATA = new BN(2, 10);
-  static IDENTITY_UPDATE_REQUEST_EXPIRES = new BN(4, 10);
-  static IDENTITY_UPDATE_REQUEST_CONTAINS_RESPONSE_URIS = new BN(8, 10);
-  static IDENTITY_UPDATE_REQUEST_CONTAINS_SYSTEM = new BN(16, 10);
-  static IDENTITY_UPDATE_REQUEST_CONTAINS_TXID = new BN(32, 10);
-  static IDENTITY_UPDATE_REQUEST_CONTAINS_SALT = new BN(64, 10);
-  static IDENTITY_UPDATE_REQUEST_IS_TESTNET = new BN(128, 10);
+  static IDENTITY_UPDATE_REQUEST_VALID = new BN(0, 10);
+  static IDENTITY_UPDATE_REQUEST_CONTAINS_SIGNDATA = new BN(1, 10);
+  static IDENTITY_UPDATE_REQUEST_EXPIRES = new BN(2, 10);
+  static IDENTITY_UPDATE_REQUEST_CONTAINS_RESPONSE_URIS = new BN(4, 10);
+  static IDENTITY_UPDATE_REQUEST_CONTAINS_SYSTEM = new BN(8, 10);
+  static IDENTITY_UPDATE_REQUEST_CONTAINS_TXID = new BN(16, 10);
+  static IDENTITY_UPDATE_REQUEST_CONTAINS_SALT = new BN(32, 10);
+  static IDENTITY_UPDATE_REQUEST_IS_TESTNET = new BN(64, 10);
 
   constructor (data?: {
     flags?: BigNumber,
@@ -67,7 +66,7 @@ export class IdentityUpdateRequestDetails implements SerializableEntity {
     signdatamap?: SignDataMap,
     salt?: Buffer
   }) {
-    this.flags = data && data.flags ? data.flags : new BN("1", 10);
+    this.flags = data && data.flags ? data.flags : new BN("0", 10);
 
     if (data?.requestid) {
       this.requestid = data.requestid;
@@ -112,10 +111,6 @@ export class IdentityUpdateRequestDetails implements SerializableEntity {
     }
   }
 
-  isValid() {
-    return !!(this.flags.and(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_VALID).toNumber());
-  }
-
   expires() {
     return !!(this.flags.and(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_EXPIRES).toNumber());
   }
@@ -142,10 +137,6 @@ export class IdentityUpdateRequestDetails implements SerializableEntity {
 
   isTestnet() {
     return !!(this.flags.and(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_IS_TESTNET).toNumber());
-  }
-
-  toggleIsValid() {
-    this.flags = this.flags.xor(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_VALID);
   }
 
   toggleExpires() {

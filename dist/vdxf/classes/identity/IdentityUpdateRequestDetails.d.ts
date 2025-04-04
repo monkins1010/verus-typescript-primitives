@@ -37,7 +37,6 @@ export declare class IdentityUpdateRequestDetails implements SerializableEntity 
     signdatamap?: SignDataMap;
     salt?: Buffer;
     txid?: Buffer;
-    static IDENTITY_UPDATE_REQUEST_INVALID: import("bn.js");
     static IDENTITY_UPDATE_REQUEST_VALID: import("bn.js");
     static IDENTITY_UPDATE_REQUEST_CONTAINS_SIGNDATA: import("bn.js");
     static IDENTITY_UPDATE_REQUEST_EXPIRES: import("bn.js");
@@ -58,7 +57,6 @@ export declare class IdentityUpdateRequestDetails implements SerializableEntity 
         signdatamap?: SignDataMap;
         salt?: Buffer;
     });
-    isValid(): boolean;
     expires(): boolean;
     containsSignData(): boolean;
     containsSystem(): boolean;
@@ -66,7 +64,6 @@ export declare class IdentityUpdateRequestDetails implements SerializableEntity 
     containsResponseUris(): boolean;
     containsSalt(): boolean;
     isTestnet(): boolean;
-    toggleIsValid(): void;
     toggleExpires(): void;
     toggleContainsSignData(): void;
     toggleContainsSystem(): void;
