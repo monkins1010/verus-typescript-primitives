@@ -28,3 +28,4 @@ export * from './SaltedData';
 export * from './SignatureData';
 export * from './URLRef';
 export * from './UTXORef';
+export * from './DefinedKey';

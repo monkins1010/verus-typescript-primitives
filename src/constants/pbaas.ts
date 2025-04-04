@@ -28,6 +28,7 @@ export type AllowedHashes = (typeof HASH_NAMES)[number];
 export const UINT_256_LENGTH = 32;
 
 export const DEFAULT_VERUS_CHAINID = "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV";
+export const TESTNET_VERUS_CHAINID = "iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq";
 export const DEFAULT_VERUS_CHAINNAME = "VRSC";
 export const KOMODO_ASSETCHAIN_MAXLEN = 65;
 export const NULL_I_ADDR = "i3UXS5QPRQGNRDDqVnyWTnmFCTHDbzmsYk";
