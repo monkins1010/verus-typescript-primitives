@@ -30,7 +30,10 @@ describe('Address tests', () => {
     ]
 
     for (const key of keys) {
-      expect(getDataKey(key.qualifiedname.name)).toBe(key.vdxfid);
+      const dataKey = getDataKey(key.qualifiedname.name);
+
+      expect(dataKey.id).toBe(key.vdxfid);
+      expect(dataKey.namespace).toBe(key.qualifiedname.namespace);
     }
   });
 });

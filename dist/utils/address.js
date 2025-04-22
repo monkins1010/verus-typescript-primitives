@@ -237,6 +237,6 @@ function getDataKey(keyName, nameSpaceID, verusChainId = pbaas_1.DEFAULT_VERUS_C
         nameSpaceID = verusChainId;
     }
     const parent = getID("::", nameSpaceID);
-    return getID(keyCopy, parent);
+    return { id: getID(keyCopy, parent), namespace: nameSpaceID };
 }
 exports.getDataKey = getDataKey;

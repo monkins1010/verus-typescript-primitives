@@ -30,7 +30,9 @@ export declare class DefinedKey implements SerializableEntity {
     combinesHash(): boolean;
     combinesIndexNum(): boolean;
     getFqnBuffer(): Buffer;
+    private getDataKey;
     getIAddr(testnet?: boolean): string;
+    getNameSpaceID(testnet?: boolean): string;
     private getSelfByteLength;
     getByteLength(): number;
     toBuffer(): Buffer;

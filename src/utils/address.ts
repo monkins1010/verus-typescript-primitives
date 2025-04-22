@@ -293,7 +293,7 @@ export function getDataKey(
   keyName: string,
   nameSpaceID?: string,
   verusChainId: string = DEFAULT_VERUS_CHAINID
-): string {
+): { id: string; namespace: string } {
   let keyCopy = keyName;
   const addressParts = keyName.split(":");
 
@@ -314,5 +314,5 @@ export function getDataKey(
   }
 
   const parent = getID("::", nameSpaceID);
-  return getID(keyCopy, parent);
+  return { id: getID(keyCopy, parent), namespace: nameSpaceID };
 }

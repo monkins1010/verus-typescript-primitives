@@ -44,7 +44,7 @@ class DefinedKey {
     getFqnBuffer() {
         return Buffer.from(this.vdxfuri, 'utf8');
     }
-    getIAddr(testnet = false) {
+    getDataKey(testnet = false) {
         if (this.combinedvdxfkey || this.combinedhash || this.indexnum) {
             throw new Error("Combining keys not supported yet.");
         }
@@ -55,6 +55,12 @@ class DefinedKey {
         }
         else
             return (0, address_1.getDataKey)(this.vdxfuri);
+    }
+    getIAddr(testnet = false) {
+        return this.getDataKey(testnet).id;
+    }
+    getNameSpaceID(testnet = false) {
+        return this.getDataKey(testnet).namespace;
     }
     getSelfByteLength() {
         let byteLength = 0;

@@ -76,7 +76,7 @@ export class DefinedKey implements SerializableEntity {
     return Buffer.from(this.vdxfuri, 'utf8');
   }
 
-  getIAddr(testnet: boolean = false) {
+  private getDataKey(testnet: boolean = false) {
     if (this.combinedvdxfkey || this.combinedhash || this.indexnum) {
       throw new Error("Combining keys not supported yet.")
     }
@@ -85,6 +85,14 @@ export class DefinedKey implements SerializableEntity {
     else if (testnet) {
       return getDataKey(this.vdxfuri, null, TESTNET_VERUS_CHAINID);
     } else return getDataKey(this.vdxfuri);
+  }
+
+  getIAddr(testnet: boolean = false) {
+    return this.getDataKey(testnet).id;
+  }
+
+  getNameSpaceID(testnet: boolean = false) {
+    return this.getDataKey(testnet).namespace;
   }
 
   private getSelfByteLength() {
