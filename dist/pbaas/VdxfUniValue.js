@@ -71,7 +71,7 @@ class VdxfUniValue {
                 const valBuf = Buffer.from(value, "utf-8");
                 length += varint_1.default.encodingLength(new bn_js_1.BN(1));
                 // NOTE: 3 is from ss type + ver + vdxfIdVersion 
-                length += varuint_1.default.encodingLength(valBuf.length + 3);
+                length += varuint_1.default.encodingLength(valBuf.length + varuint_1.default.encodingLength(valBuf.length));
                 length += varuint_1.default.encodingLength(valBuf.length);
                 length += valBuf.length;
             }

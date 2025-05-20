@@ -170,6 +170,26 @@ describe('Serializes and deserializes identity properly', () => {
     expect(identity_frombuf.toBuffer().toString('hex')).toBe(serializedIdentity);
   });
 
+  test('deserialize a daemon generated VerusID with a contentmultimap with private addr', async () => {
+    const serializedIdentity = "0300000000000000021455f51a22c79018a00ced41e758560f5df7d4d35d143e3c1a4f0dc6852eff0b312bec2e4dd382d2939701000000a6ef9ea235635e328124ff3429db9f9e91b64e2d076d6f6e6b696e73010c97dcf31b5f73aeb42c1d86bfb92660d5c3d24601af2af2a488d317c76af6f764ec2c04009a9e358bb4019901a6ef9ea235635e328124ff3429db9f9e91b64e2d0120b793323968ea80de4df1fb78963cfb8b604b524f6a7c9069293085e076f44d5df478f668655e60f6b49e2424053166ba2cf2413901000000490205d65f00000141205e483e50265341623cd9a089baf4b913f969b5377d588044c09b7d239870d7f7205a4a4581f440db7d01049ebdfe95f5de7a6b07113f9c7f79dc6fd3da69f24500f478f668655e60f6b49e2424053166ba2cf24139f478f668655e60f6b49e2424053166ba2cf2413900a6ef9ea235635e328124ff3429db9f9e91b64e2d000000001b04030f01011504f478f668655e60f6b49e2424053166ba2cf241391b04031001011504f478f668655e60f6b49e2424053166ba2cf24139752f646202000000001976a914b6d26204cff33aa40449de239012b4e400183bca88ac00000000705108000000000000000000000000";
+
+    const identity_frombuf = new Identity();
+    identity_frombuf.fromBuffer(Buffer.from(serializedIdentity, 'hex'), 0 , true);
+
+    const contMultiMap = {"contentmultimap":{"i4d7U1aZhmoxZbWx8AVezh6z1YewAnuw3V":[
+      {"i7PcVF9wwPtQ6p6jDtCVpohX65pTZuP2ah":{
+			"version": 1,
+			"systemid": "iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq",
+			"hashtype": 1,
+			"signaturehash": "5d4df476e085302969907c6a4f524b608bfb3c9678fbf14dde80ea68393293b7",
+			"identityid": "iRmBDWNs2WahXDAvS2TEsJyJwwHXhwcs7w",
+			"signaturetype": 1,
+			"signature": "AgXWXwAAAUEgXkg+UCZTQWI82aCJuvS5E/lptTd9WIBEwJt9I5hw1/cgWkpFgfRA230BBJ69/pX13nprBxE/nH953G/T2mnyRQ=="
+		  }}]}}
+
+    expect(identity_frombuf.toBuffer().toString('hex')).toBe(serializedIdentity);
+  });
+
   test('(de)serialize a daemon generated VerusID from a CLI json', async () => {
     const identityJson = {
       "contentmap": {},

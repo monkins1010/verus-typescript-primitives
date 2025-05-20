@@ -115,10 +115,12 @@ export class VDXFObject implements VDXFObjectInterface {
     if (includeKey) {
       writer.writeSlice(key.hash);
     }
-
+    
     writer.writeVarInt(new BN(this.version, 10));
 
-    writer.writeVarSlice(this.toDataBuffer());
+    if (dataLength) {      
+      writer.writeVarSlice(this.toDataBuffer());
+    }
 
     return writer.buffer;
   }

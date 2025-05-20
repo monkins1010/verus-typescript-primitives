@@ -274,6 +274,9 @@ class RequestedPermission extends __1.VDXFObject {
     }
     dataByteLength() {
         let length = 0;
+        if (this.data.length === 0) {
+            return length;
+        }
         length += varuint_1.default.encodingLength(this.data.length);
         for (let i = 0; i < this.data.length; i++) {
             length += 20;
@@ -291,7 +294,7 @@ class RequestedPermission extends __1.VDXFObject {
     }
     fromDataBuffer(buffer, offset) {
         const reader = new bufferutils_1.default.BufferReader(buffer, offset);
-        const contextLength = reader.readCompactSize();
+        //const contextLength = reader.readCompactSize();
         const numKeys = reader.readCompactSize();
         this.data = [];
         for (let i = 0; i < numKeys; i++) {

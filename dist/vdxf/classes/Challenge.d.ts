@@ -28,7 +28,7 @@ export declare class Attestation extends Utf8DataVdxfObject {
 export interface ChallengeInterface {
     challenge_id: string;
     requested_access?: Array<RequestedPermission> | null;
-    requested_access_audience?: Array<Audience> | null;
+    requested_access_audience?: Array<RequestedPermission> | null;
     subject?: Array<Subject>;
     provisioning_info?: Array<ProvisioningInfo>;
     alt_auth_factors?: Array<AltAuthFactor> | null;
@@ -43,7 +43,7 @@ export interface ChallengeInterface {
 export declare class Challenge extends VDXFObject implements ChallengeInterface {
     challenge_id: string;
     requested_access?: Array<RequestedPermission> | null;
-    requested_access_audience?: Array<Audience> | null;
+    requested_access_audience?: Array<RequestedPermission> | null;
     subject?: Array<Subject>;
     provisioning_info?: Array<ProvisioningInfo>;
     alt_auth_factors?: Array<AltAuthFactor> | null;
@@ -62,7 +62,7 @@ export declare class Challenge extends VDXFObject implements ChallengeInterface 
         vdxfkey: string;
         challenge_id: string;
         requested_access: RequestedPermission[];
-        requested_access_audience: Audience[];
+        requested_access_audience: RequestedPermission[];
         subject: Subject[];
         provisioning_info: ProvisioningInfo[];
         alt_auth_factors: AltAuthFactor[];

@@ -84,7 +84,7 @@ export interface ChallengeInterface {
   requested_access?: Array<RequestedPermission> | null;
 
   // Array of members that will have access to scope
-  requested_access_audience?: Array<Audience> | null;
+  requested_access_audience?: Array<RequestedPermission> | null;
 
   // Information about the ID you have to log in with, array of VDXF objects
   subject?: Array<Subject>;
@@ -123,7 +123,7 @@ export interface ChallengeInterface {
 export class Challenge extends VDXFObject implements ChallengeInterface {
   challenge_id: string;
   requested_access?: Array<RequestedPermission> | null;
-  requested_access_audience?: Array<Audience> | null;
+  requested_access_audience?: Array<RequestedPermission> | null;
   subject?: Array<Subject>;
   provisioning_info?: Array<ProvisioningInfo>;
   alt_auth_factors?: Array<AltAuthFactor> | null;
@@ -434,7 +434,9 @@ export class RequestedPermission extends VDXFObject {
   dataByteLength(): number {
 
     let length = 0;
-
+    if(this.data.length === 0) {
+      return length;
+    }
     length += varuint.encodingLength(this.data.length);
 
     for (let i = 0; i < this.data.length; i++) {
@@ -460,7 +462,7 @@ export class RequestedPermission extends VDXFObject {
 
   fromDataBuffer(buffer: Buffer, offset?: number): number {
     const reader = new bufferutils.BufferReader(buffer, offset);
-    const contextLength = reader.readCompactSize();
+    //const contextLength = reader.readCompactSize();
     const numKeys = reader.readCompactSize();
 
     this.data = [];

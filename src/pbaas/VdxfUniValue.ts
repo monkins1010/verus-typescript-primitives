@@ -99,7 +99,7 @@ export class VdxfUniValue implements SerializableEntity {
         const valBuf = Buffer.from(value as string, "utf-8");
         length += varint.encodingLength(new BN(1));
         // NOTE: 3 is from ss type + ver + vdxfIdVersion 
-        length += varuint.encodingLength(valBuf.length + 3);
+        length += varuint.encodingLength(valBuf.length + varuint.encodingLength(valBuf.length));
         length += varuint.encodingLength(valBuf.length);
         length += valBuf.length;
       }
