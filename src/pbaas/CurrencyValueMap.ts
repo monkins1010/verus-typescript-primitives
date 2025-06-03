@@ -7,7 +7,7 @@ import { BigNumber } from '../utils/types/BigNumber';
 import { I_ADDR_VERSION } from '../constants/vdxf';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
 const { BufferReader, BufferWriter } = bufferutils
-
+import { bnToDecimal, decimalToBn } from '../utils/numberConversion';
 export class CurrencyValueMap implements SerializableEntity {
   value_map: Map<string,BigNumber>;
   multivalue: boolean;
@@ -93,7 +93,7 @@ export class CurrencyValueMap implements SerializableEntity {
     const value_map: {[key: string]: string} = {};
 
     for (let [key, value] of this.value_map) {
-      value_map[key] = value.toString()
+      value_map[key] = bnToDecimal(value)
     }
 
     return value_map;
@@ -104,7 +104,7 @@ export class CurrencyValueMap implements SerializableEntity {
     const value_map = new Map<string,BigNumber>();
 
     for (let key in data) {
-      value_map.set(key, new BN(data[key]))
+      value_map.set(key, decimalToBn(data[key]))
     }
 
     return new CurrencyValueMap({ value_map, multivalue })

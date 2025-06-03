@@ -81,7 +81,7 @@ describe('Encodes and decodes VdxfUniValue', () => {
 
     const currencyMap = v.values[0]['iMrGhzkZq5fpWWSa1RambRySFPb7CuvKuX'] as CurrencyValueMap;
 
-    const jsonCurrencyMap = { "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV": "10000000000000" };
+    const jsonCurrencyMap = { "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV": "100000.00000000" };
     const currencyMapFromJson = CurrencyValueMap.fromJson(jsonCurrencyMap, true);
 
     expect(currencyMap.toBuffer().toString('hex')).toBe(currencyMapFromJson.toBuffer().toString('hex'));
@@ -234,8 +234,6 @@ describe('Encodes and decodes VdxfUniValue', () => {
     const currencyValueMapObject = new VdxfUniValue();
     currencyValueMapObject.fromBuffer(Buffer.from(currencyValueMapData, 'hex'));
 
-    const sdsdf = currencyValueMapObject.toJson();  
-
     expect(currencyValueMapObject.toJson()).toStrictEqual(jsonData.find(item => item[VDXF_Data.DataCurrencyMapKey.vdxfid] != undefined));
     expect(currencyValueMapObject.toBuffer().toString('hex')).toBe(currencyValueMapData);
 
@@ -244,7 +242,7 @@ describe('Encodes and decodes VdxfUniValue', () => {
     const ratingData = '979e0d9bc8c91be03c57bab5b45ddcf17fd5ca32016001000000020239a34181d4d91a55d7bd8100580e5eca59265ca4203428665f7b02feb976dd53394b1518893428665f7b02feb976dd53394b151889a6ef9ea235635e328124ff3429db9f9e91b64e2d103cc8db378593b7a6d32883a3948bb1d0'
     const ratingObject = new VdxfUniValue();
     ratingObject.fromBuffer(Buffer.from(ratingData, 'hex'));
-    expect(ratingObject.values[0]).toStrictEqual(jsonData.find(item => item[VDXF_Data.DataRatingsKey.vdxfid] != undefined));
+    expect(ratingObject.toJson()).toStrictEqual(jsonData.find(item => item[VDXF_Data.DataRatingsKey.vdxfid] != undefined));
     expect(ratingObject.toBuffer().toString('hex')).toBe(ratingData);
 
 
@@ -252,21 +250,22 @@ describe('Encodes and decodes VdxfUniValue', () => {
     const transferDestiantionData = '3cac111c0c35ea486ab13760148393847387f392022e4214e5880d57bad810578d87dc5028a9a1c7be12e91f01160414a7414cd89c2d282bac9b61ed5bf3679d4b66a5f6'
     const transferDestinationObject = new VdxfUniValue();
     transferDestinationObject.fromBuffer(Buffer.from(transferDestiantionData, 'hex'));
-    expect(transferDestinationObject.values[0]).toStrictEqual(jsonData.find(item => item[VDXF_Data.DataTransferDestinationKey.vdxfid] != undefined));
+    const test1 = transferDestinationObject.toJson()
+    expect(transferDestinationObject.toJson()).toStrictEqual(jsonData.find(item => item[VDXF_Data.DataTransferDestinationKey.vdxfid] != undefined));
     expect(transferDestinationObject.toBuffer().toString('hex')).toBe(transferDestiantionData);
 
     // CMM Remove
     const CMMData = '16ed9d732d8886b1972dc8beb72df8e486b993d30136010184d881e355c1c87dd84baa2e068dc3829e140d3c11433137d09fd7d15ae7a04b0a20b28a35b20ff76d1dc1af3157b54037b02161'
     const CMMObject = new VdxfUniValue();
     CMMObject.fromBuffer(Buffer.from(CMMData, 'hex'));
-    expect(CMMObject.values[0]).toStrictEqual(jsonData.find(item => item[VDXF_Data.ContentMultiMapRemoveKey.vdxfid] != undefined));
+    expect(CMMObject.toJson()).toStrictEqual(jsonData.find(item => item[VDXF_Data.ContentMultiMapRemoveKey.vdxfid] != undefined));
     expect(CMMObject.toBuffer().toString('hex')).toBe(CMMData);
 
     // Cross Chain Data Ref
     const crossChainDataRefData = 'd6ae5ac0571b22d161261b87c748f6e0aee0334d01650101073cac111c0c35ea486ab13760148393847387f392904cc869a56610c8174ead6c547fbae1954852af866881b095400016a39b1f74372fe316624e2e11c1bd1b48ee111411b5dccb8d47a6341623e4a6ef9ea235635e328124ff3429db9f9e91b64e2d'
     const crossChainDataRefObject = new VdxfUniValue();
     crossChainDataRefObject.fromBuffer(Buffer.from(crossChainDataRefData, 'hex'));
-    expect(crossChainDataRefObject.values[0]).toStrictEqual(jsonData.find(item => item[VDXF_Data.CrossChainDataRefKey.vdxfid] != undefined));
+    expect(crossChainDataRefObject.toJson()).toStrictEqual(jsonData.find(item => item[VDXF_Data.CrossChainDataRefKey.vdxfid] != undefined));
     expect(crossChainDataRefObject.toBuffer().toString('hex')).toBe(crossChainDataRefData);
 
 
@@ -274,7 +273,7 @@ describe('Encodes and decodes VdxfUniValue', () => {
     const encryptedDataDescriptorData = '08a2ebb2c55f83a8e2a426a53320ed4d42124f4d01ad010d68645f601c64bb1df7dc62732869e0e74590a33d3132035d0a1475425ee8d674c67c3649de6e0882296bd238ea6d7f6b730eac708424a1b9bff64e4610c5483a178f5bbc17ca65eea19e36246d8564523bd43b37c5fa168cc216a83332bb1d784d4620e73c54585c81207654be28752898669fb4aa5b0a8cfed358ebb0c7755879afa1daf5474335f58c20cfe44d214ba3ecc2942dd3df2d0486c788c3ec0bb7415811ba8a0074088d1406'
     const encryptedDataDescriptorObject = new VdxfUniValue();
     encryptedDataDescriptorObject.fromBuffer(Buffer.from(encryptedDataDescriptorData, 'hex'));
-    expect(encryptedDataDescriptorObject.values[0]).toStrictEqual(jsonData.find(item => item[VDXF_Data.DataDescriptorKey.vdxfid] != undefined));
+    expect(encryptedDataDescriptorObject.toJson()).toStrictEqual(jsonData.find(item => item[VDXF_Data.DataDescriptorKey.vdxfid] != undefined));
     expect(encryptedDataDescriptorObject.toBuffer().toString('hex')).toBe(encryptedDataDescriptorData);
 
   
@@ -282,14 +281,14 @@ describe('Encodes and decodes VdxfUniValue', () => {
     const mmrData = '4382a62b73169697c3698d2f00bed6024c3a279701fdb0010105050100683e9ebbf6c7cc1cffde3d8fe5c62d2919e1bf6eb99ed9d5dfb305bba71b6c9f1373b50267b0bb2c08d99ea76b09430018125a9748486650995dc1831701b90e82a394ea99fa2770c68bcecd484732a07dab3aac72751593b321c3e6c9273adb0309b9fc5917e74399010068ba128a8ec42f1541895d1cefcae1b452543dce5653ae71d9c6e56c316833ba15f8d7d977878aadef2e42894e68c25ddd4d96bed0d257ba8e000b009946702ffa9e64e6cdb3fa8d81522ba39da177b050fef0ba89884c4f0e084de007df3d5ef7f410e5d9f388a71602010068544338da640c2a9ed9d646be434a044c6a03c29c875f0ae93fbd3a59433f260027d97b5d8e569b37a906db1789e9c2280744b4ae7d90959c12f3b617a07024ab96b08db8e9606c6cd8b5929518c3057bdecae9859d41c953a7def5af72f297efc9e0b181719fed3401006807809896a9c50e7396f01a12b3bf7ed4006962840e95c646290d9e1731b9705b2fd867fd781aecaa0e34b13beeefdea3f924b67d87c189f9c1dc662ef58ac59dc93d360e97f86d65a03304141f68a66a84af74884c35df54a856db003e8afd10d3db89f722d48689'
     const mmrObject = new VdxfUniValue();
     mmrObject.fromBuffer(Buffer.from(mmrData, 'hex'));
-    expect(mmrObject.values[0]).toStrictEqual(jsonData.find(item => item[VDXF_Data.MMRDescriptorKey.vdxfid] != undefined));
+    expect(mmrObject.toJson()).toStrictEqual(jsonData.find(item => item[VDXF_Data.MMRDescriptorKey.vdxfid] != undefined));
     expect(mmrObject.toBuffer().toString('hex')).toBe(mmrData);
     
     // Signature Data
     const signatureData = '2af2a488d317c76af6f764ec2c04009a9e358bb401ef01a6ef9ea235635e328124ff3429db9f9e91b64e2d0520ad35af52bb6931b5c87a56007ccef84c524cecd55a1abdcf6657742c317de3e2904cc869a56610c8174ead6c547fbae1954852af01018abf682d52180134b2f1094355fc199742a88d7d012269473839796a676e5145715356763364536850487054556b43744a743936677a565501e2e37d312c745766cfbd1a5ad5ec4c524cf8ce7c00567ac8b53169bb52af35ad48012f5b0800014120c89dfcbd5dda8abc52c37198b019fe194f35196c6fc01e217cb1ee4e7eb0532c54f6d3618eafb050ec3dd4d399b2464bcae0fea563f506e393971d5604850a81'
     const signatureObject = new VdxfUniValue();
     signatureObject.fromBuffer(Buffer.from(signatureData, 'hex'));
-    expect(signatureObject.values[0]).toStrictEqual(jsonData.find(item => item[VDXF_Data.SignatureDataKey.vdxfid] != undefined));
+    expect(signatureObject.toJson()).toStrictEqual(jsonData.find(item => item[VDXF_Data.SignatureDataKey.vdxfid] != undefined));
     expect(signatureObject.toBuffer().toString('hex')).toBe(signatureData);
 
 

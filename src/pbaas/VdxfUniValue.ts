@@ -112,9 +112,7 @@ export class VdxfUniValue implements SerializableEntity {
       }
       else if (key == VDXF_Data.DataCurrencyMapKey.vdxfid) {
 
-        const destinations = Object.keys(value);
-        const values = Object.values(value);
-        const oneCurMap = new CurrencyValueMap({ value_map: new Map(destinations.map((key, index) => [key, new BN(values[index])])), multivalue: true });
+        const oneCurMap = new CurrencyValueMap(value as CurrencyValueMap);
         length += varint.encodingLength(new BN(1));
         length += varuint.encodingLength(oneCurMap.getByteLength());
         length += oneCurMap.getByteLength();
@@ -257,9 +255,7 @@ export class VdxfUniValue implements SerializableEntity {
       }
       else if (key == VDXF_Data.DataCurrencyMapKey.vdxfid) {
 
-        const destinations = Object.keys(value);
-        const values = Object.values(value);
-        const oneCurMap = new CurrencyValueMap({ value_map: new Map(destinations.map((key, index) => [key, new BN(values[index])])), multivalue: true });
+        const oneCurMap = new CurrencyValueMap(value as CurrencyValueMap);
 
         writer.writeSlice(fromBase58Check(key).hash);
         writer.writeVarInt(new BN(1));
@@ -278,7 +274,6 @@ export class VdxfUniValue implements SerializableEntity {
       else if (key == VDXF_Data.DataTransferDestinationKey.vdxfid) {
 
         const transferDest = new TransferDestination(value as TransferDestination);
-        const writer = new BufferWriter(Buffer.alloc(length));
 
         writer.writeSlice(fromBase58Check(key).hash);
         writer.writeVarInt(transferDest.typeNoFlags());

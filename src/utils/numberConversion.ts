@@ -15,9 +15,16 @@ export function bnToDecimal(value: BigNumber): string {
     const integerPart = absInput.div(divisor).toString();
     let decimalPart = absInput.mod(divisor).toString();
 
-    // Pad decimal part with leading zeros to ensure 8 digits
+    // Remove trailing zeros from decimal part
     while (decimalPart.length < 8) {
         decimalPart = '0' + decimalPart;
+    }
+
+    if (decimalPart === '00000000') {
+        return (isNegative ? '-' : '') + integerPart;
+    } else {
+        // Remove trailing zeros from the right of decimalPart
+        decimalPart = decimalPart.replace(/0+$/, '');
     }
 
     const resultStr = (isNegative ? '-' : '') + integerPart + '.' + decimalPart;

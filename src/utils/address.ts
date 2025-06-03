@@ -98,3 +98,26 @@ export const toIAddress = (fullyqualifiedname: string, rootSystemName: string = 
 
   return toBase58Check(hash160(idHash), 102);
 }
+
+export const decodeDestination = (destination: string): Buffer => {
+
+  try {
+    const data = fromBase58Check(destination);
+    return data.hash;
+  
+  } catch (e) {
+    throw new Error("Invalid destination address: " + destination);
+  }
+}
+ 
+export const decodeEthDestination = (destination: string): Buffer => {
+  if (destination.startsWith("0x")) {
+    destination = destination.slice(2);
+  }
+
+  if (destination.length !== 40) {
+    throw new Error("Invalid Ethereum address: " + destination);
+  }
+
+  return Buffer.from(destination, "hex");
+}
