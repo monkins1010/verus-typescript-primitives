@@ -143,7 +143,7 @@ export class VdxfUniValue implements SerializableEntity {
       }
       else if (key == VDXF_Data.CrossChainDataRefKey.vdxfid) {
 
-        const transferDest = new CrossChainDataRef(value);
+        const transferDest = (value as CrossChainDataRef);
 
         length += varint.encodingLength(VDXF_OBJECT_DEFAULT_VERSION);
         length += varuint.encodingLength(transferDest.getByteLength());
@@ -291,7 +291,7 @@ export class VdxfUniValue implements SerializableEntity {
       }
       else if (key == VDXF_Data.CrossChainDataRefKey.vdxfid) {
 
-        const transferDest = new CrossChainDataRef(value as CrossChainDataRef);
+        const transferDest = (value as CrossChainDataRef);
 
         writer.writeSlice(fromBase58Check(key).hash);
         writer.writeVarInt(VDXF_OBJECT_DEFAULT_VERSION);

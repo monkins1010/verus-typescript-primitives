@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.toIAddress = exports.nameAndParentAddrToIAddr = exports.toBase58Check = exports.fromBase58Check = void 0;
+exports.decodeEthDestination = exports.decodeDestination = exports.toIAddress = exports.nameAndParentAddrToIAddr = exports.toBase58Check = exports.fromBase58Check = void 0;
 const hash_1 = require("./hash");
 const bs58check = require("bs58check");
 const fromBase58Check = (address) => {
@@ -84,3 +84,23 @@ const toIAddress = (fullyqualifiedname, rootSystemName = "") => {
     return (0, exports.toBase58Check)((0, hash_1.hash160)(idHash), 102);
 };
 exports.toIAddress = toIAddress;
+const decodeDestination = (destination) => {
+    try {
+        const data = (0, exports.fromBase58Check)(destination);
+        return data.hash;
+    }
+    catch (e) {
+        throw new Error("Invalid destination address: " + destination);
+    }
+};
+exports.decodeDestination = decodeDestination;
+const decodeEthDestination = (destination) => {
+    if (destination.startsWith("0x")) {
+        destination = destination.slice(2);
+    }
+    if (destination.length !== 40) {
+        throw new Error("Invalid Ethereum address: " + destination);
+    }
+    return Buffer.from(destination, "hex");
+};
+exports.decodeEthDestination = decodeEthDestination;

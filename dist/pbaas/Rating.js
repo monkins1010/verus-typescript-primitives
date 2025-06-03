@@ -60,9 +60,9 @@ class Rating {
             ratings[key] = value.toString('hex');
         });
         return {
-            version: this.version.toString(),
-            trust_level: this.trust_level.toString(),
-            ratings: ratings
+            version: this.version.toNumber(),
+            trustlevel: this.trust_level.toNumber(),
+            ratingsmap: ratings
         };
     }
     static fromJson(json) {

@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContentMultiMapRemove = void 0;
+const varint_1 = require("../utils/varint");
 const address_1 = require("../utils/address");
 const bufferutils_1 = require("../utils/bufferutils");
 const bn_js_1 = require("bn.js");
@@ -15,8 +16,8 @@ class ContentMultiMapRemove {
     }
     getByteLength() {
         let byteLength = 0;
-        byteLength += 4; // version uint32
-        byteLength += 4; // action uint32
+        byteLength += varint_1.default.encodingLength(this.version);
+        byteLength += varint_1.default.encodingLength(this.action);
         if (this.action != ContentMultiMapRemove.ACTION_CLEAR_MAP) {
             byteLength += 20;
             if (this.action != ContentMultiMapRemove.ACTION_REMOVE_ALL_KEY) {
@@ -27,8 +28,8 @@ class ContentMultiMapRemove {
     }
     toBuffer() {
         const bufferWriter = new BufferWriter(Buffer.alloc(this.getByteLength()));
-        bufferWriter.writeUInt32(this.version.toNumber());
-        bufferWriter.writeUInt32(this.action.toNumber());
+        bufferWriter.writeVarInt(this.version);
+        bufferWriter.writeVarInt(this.action);
         if (this.action != ContentMultiMapRemove.ACTION_CLEAR_MAP) {
             bufferWriter.writeSlice((0, address_1.fromBase58Check)(this.entry_key).hash);
             if (this.action != ContentMultiMapRemove.ACTION_REMOVE_ALL_KEY) {
@@ -39,11 +40,11 @@ class ContentMultiMapRemove {
     }
     fromBuffer(buffer, offset = 0) {
         const reader = new BufferReader(buffer, offset);
-        this.version = new bn_js_1.BN(reader.readUInt32());
-        this.action = new bn_js_1.BN(reader.readUInt32());
-        if (this.action != ContentMultiMapRemove.ACTION_CLEAR_MAP) {
+        this.version = new bn_js_1.BN(reader.readVarInt());
+        this.action = new bn_js_1.BN(reader.readVarInt());
+        if (!this.action.eq(ContentMultiMapRemove.ACTION_CLEAR_MAP)) {
             this.entry_key = (0, address_1.toBase58Check)(reader.readSlice(20), vdxf_1.I_ADDR_VERSION);
-            if (this.action != ContentMultiMapRemove.ACTION_REMOVE_ALL_KEY) {
+            if (!this.action.eq(ContentMultiMapRemove.ACTION_REMOVE_ALL_KEY)) {
                 this.value_hash = reader.readSlice(32);
             }
         }
@@ -54,7 +55,7 @@ class ContentMultiMapRemove {
             version: new bn_js_1.BN(data.version),
             action: new bn_js_1.BN(data.action),
             entry_key: data.entrykey,
-            value_hash: Buffer.from(data.valuehash, 'hex')
+            value_hash: Buffer.from(data.valuehash, 'hex').reverse() // Unit256 Reverse to match the original hash order
         });
     }
     toJson() {
@@ -62,7 +63,7 @@ class ContentMultiMapRemove {
             version: this.version.toNumber(),
             action: this.action.toNumber(),
             entrykey: this.entry_key,
-            valuehash: this.value_hash.toString('hex')
+            valuehash: Buffer.from(this.value_hash).reverse().toString('hex')
         };
     }
     isValid() {

@@ -8,6 +8,7 @@ const bufferutils_1 = require("../utils/bufferutils");
 const bn_js_1 = require("bn.js");
 const vdxf_1 = require("../constants/vdxf");
 const { BufferReader, BufferWriter } = bufferutils_1.default;
+const numberConversion_1 = require("../utils/numberConversion");
 class CurrencyValueMap {
     constructor(data = {}) {
         this.value_map = new Map(data.value_map || []);
@@ -70,14 +71,14 @@ class CurrencyValueMap {
     toJson() {
         const value_map = {};
         for (let [key, value] of this.value_map) {
-            value_map[key] = value.toString();
+            value_map[key] = (0, numberConversion_1.bnToDecimal)(value);
         }
         return value_map;
     }
     static fromJson(data, multivalue = false) {
         const value_map = new Map();
         for (let key in data) {
-            value_map.set(key, new bn_js_1.BN(data[key]));
+            value_map.set(key, (0, numberConversion_1.decimalToBn)(data[key]));
         }
         return new CurrencyValueMap({ value_map, multivalue });
     }
