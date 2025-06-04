@@ -199,11 +199,13 @@ export class TransferDestination implements SerializableEntity {
 
     let auxDests = [];
     let fees = null;
-    if (type.and(FLAG_DEST_GATEWAY).gt(new BN(0)) && data.auxdests.length > 0) {
+    if (type.and(FLAG_DEST_AUX).gt(new BN(0)) && data.auxdests.length > 0) {
       auxDests = data.auxdests.map(x => TransferDestination.fromJson(x));
-      fees = decimalToBn(data.fees);
     }
 
+    if (type.and(FLAG_DEST_GATEWAY).gt(new BN(0)) && data.auxdests.length > 0) {
+      fees = decimalToBn(data.fees);
+    }
 
     return new TransferDestination({
       type: type,

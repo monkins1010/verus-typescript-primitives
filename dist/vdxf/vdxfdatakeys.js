@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VectorUint256Key = exports.VectorUint256KeyName = exports.SignatureDataKey = exports.SignatureDataKeyName = exports.DataDescriptorKey = exports.DataDescriptorKeyName = exports.SaltedDataKey = exports.SaltedDataKeyName = exports.EncryptionDescriptorKey = exports.EncryptionDescriptorKeyName = exports.CrossChainDataRefKey = exports.CrossChainDataRefKeyName = exports.UTXORefKey = exports.UTXORefKeyName = exports.DataTransferDestinationKey = exports.DataTransferDestinationKeyName = exports.DataURLKey = exports.DataURLKeyName = exports.DataRatingsKey = exports.DataRatingsKeyName = exports.DataCurrencyMapKey = exports.DataCurrencyMapKeyName = exports.DataInt64VectorKey = exports.DataInt64VectorKeyName = exports.DataInt32VectorKey = exports.DataInt32VectorKeyName = exports.DataByteVectorKey = exports.DataByteVectorKeyName = exports.DataVectorKey = exports.DataVectorKeyName = exports.DataStringKey = exports.DataStringKeyName = exports.DataUint256Key = exports.DataUint256KeyName = exports.DataUint160Key = exports.DataUint160KeyName = exports.DataUint64Key = exports.DataUint64KeyName = exports.DataInt64Key = exports.DataInt64KeyName = exports.DataUint32Key = exports.DataUint32KeyName = exports.DataInt32Key = exports.DataInt32KeyName = exports.DataUint16Key = exports.DataUint16KeyName = exports.DataInt16Key = exports.DataInt16KeyName = exports.DataByteKey = exports.DataByteKeyName = void 0;
-exports.EvidenceDataKey = exports.EvidenceDataKeyName = exports.CurrencyStartNotarizationKey = exports.CurrencyStartNotarizationKeyName = exports.ZMemoSignatureKey = exports.ZMemoSignatureKeyName = exports.ZMemoMessageKey = exports.ZMemoMessageKeyName = exports.ProfileMediaKey = exports.ProfileMediaKeyName = exports.ContentMultiMapRemoveKey = exports.ContentMultiMapRemoveKeyName = exports.MultiMapKey = exports.MultiMapKeyName = exports.TypeDefinitionKey = exports.TypeDefinitionKeyName = exports.MMRDescriptorKey = exports.MMRDescriptorKeyName = exports.MMRLinksKey = exports.MMRLinksKeyName = void 0;
+exports.CredentialKey = exports.CredentialKeyName = exports.EvidenceDataKey = exports.EvidenceDataKeyName = exports.CurrencyStartNotarizationKey = exports.CurrencyStartNotarizationKeyName = exports.ZMemoSignatureKey = exports.ZMemoSignatureKeyName = exports.ZMemoMessageKey = exports.ZMemoMessageKeyName = exports.ProfileMediaKey = exports.ProfileMediaKeyName = exports.ContentMultiMapRemoveKey = exports.ContentMultiMapRemoveKeyName = exports.MultiMapKey = exports.MultiMapKeyName = exports.TypeDefinitionKey = exports.TypeDefinitionKeyName = exports.MMRDescriptorKey = exports.MMRDescriptorKeyName = exports.MMRLinksKey = exports.MMRLinksKeyName = void 0;
 exports.DataByteKeyName = "vrsc::data.type.byte";
 exports.DataByteKey = {
     "vdxfid": "iBXUHbh4iacbeZnzDRxishvBSrYk2S2k7t",
@@ -353,5 +353,15 @@ exports.EvidenceDataKey = {
     "qualifiedname": {
         "namespace": "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV",
         "name": "vrsc::system.crosschain.evidencedata"
+    }
+};
+exports.CredentialKeyName = "vrsc::data.type.object.credential";
+exports.CredentialKey = {
+    "vdxfid": "iDTG49YLqmkHMYRyuQBYgEyTByQwAzqGd6",
+    "indexid": "xJHNWwyRh5xwyiK1m5qhedVzDdRx3pe2c7",
+    "hash160result": "09fbc202710c9f2dacb87e5623e97e2e4101746d",
+    "qualifiedname": {
+        "namespace": "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV",
+        "name": "vrsc::data.type.object.credential"
     }
 };

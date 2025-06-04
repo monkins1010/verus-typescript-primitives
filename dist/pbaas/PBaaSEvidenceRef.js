@@ -56,7 +56,7 @@ class PBaaSEvidenceRef {
         this.version = reader.readVarInt();
         this.flags = reader.readVarInt();
         this.output = new UTXORef_1.UTXORef();
-        offset = this.output.fromBuffer(reader.buffer, reader.offset);
+        reader.offset = this.output.fromBuffer(reader.buffer, reader.offset);
         this.object_num = reader.readVarInt();
         this.sub_object = reader.readVarInt();
         if (this.flags.and(IdentityMultimapRef_1.IdentityMultimapRef.FLAG_HAS_DATAHASH).gt(new bn_js_1.BN(0))) {

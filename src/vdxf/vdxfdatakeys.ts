@@ -448,3 +448,16 @@ export const EvidenceDataKey: VDXFKeyInterface = {
     "name": "vrsc::system.crosschain.evidencedata"
   }
 }
+
+export const CredentialKeyName = "vrsc::data.type.object.credential";
+
+export const CredentialKey: VDXFKeyInterface = {
+  "vdxfid": "iDTG49YLqmkHMYRyuQBYgEyTByQwAzqGd6",
+  "indexid": "xJHNWwyRh5xwyiK1m5qhedVzDdRx3pe2c7",
+  "hash160result": "09fbc202710c9f2dacb87e5623e97e2e4101746d",
+  "qualifiedname": {
+    "namespace": "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV",
+    "name": "vrsc::data.type.object.credential"
+  }
+}
+

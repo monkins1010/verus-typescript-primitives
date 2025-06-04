@@ -31,15 +31,34 @@ class CurrencyValueMap {
     toBuffer() {
         const bufferWriter = new BufferWriter(Buffer.alloc(this.getByteLength()));
         if (this.multivalue) {
+            const entries = [];
             bufferWriter.writeCompactSize(this.value_map.size);
+            // Convert entries to array with [Buffer, BigNumber]
+            for (const [key, value] of this.value_map) {
+                const { hash } = (0, address_1.fromBase58Check)(key);
+                entries.push({ [hash.toString('hex')]: value });
+            }
+            // Sort by Buffer (vkey) value, smallest first
+            entries.sort((a, b) => {
+                const aKey = Object.keys(a)[0];
+                const bKey = Object.keys(b)[0];
+                const aBuf = Buffer.from(aKey, 'hex');
+                const bBuf = Buffer.from(bKey, 'hex');
+                return aBuf.compare(bBuf);
+            });
+            for (const value of entries) {
+                const key = Object.keys(value)[0];
+                const innervalue = value[key];
+                bufferWriter.writeSlice(Buffer.from(key, 'hex'));
+                bufferWriter.writeInt64(innervalue);
+            }
         }
-        for (const [key, value] of this.value_map) {
-            const { hash } = (0, address_1.fromBase58Check)(key);
-            bufferWriter.writeSlice(hash);
-            if (this.multivalue)
-                bufferWriter.writeInt64(value);
-            else
+        else {
+            for (const [key, value] of this.value_map) {
+                const { hash } = (0, address_1.fromBase58Check)(key);
+                bufferWriter.writeSlice(hash);
                 bufferWriter.writeVarInt(value);
+            }
         }
         return bufferWriter.buffer;
     }
@@ -77,7 +96,9 @@ class CurrencyValueMap {
     }
     static fromJson(data, multivalue = false) {
         const value_map = new Map();
-        for (let key in data) {
+        // Object.entries preserves the insertion order of the object's keys
+        // If the input object is created with insertion order in mind, this will preserve it
+        for (const key of Object.keys(data)) {
             value_map.set(key, (0, numberConversion_1.decimalToBn)(data[key]));
         }
         return new CurrencyValueMap({ value_map, multivalue });

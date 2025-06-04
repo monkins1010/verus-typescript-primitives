@@ -164,9 +164,10 @@ export class IdentityMultimapRef implements SerializableEntity {
       version: new BN(data.version),
       flags: new BN(data.flags),
       key: data.vdxfkey,
+      id_ID: data.identityid,
       height_start: new BN(data.startheight),
       height_end: new BN(data.endheight),
-      data_hash: Buffer.from(data.datahash, 'hex'),
+      data_hash: Buffer.from(data.datahash, 'hex').reverse(),
       system_id: data.systemid
     })
   }

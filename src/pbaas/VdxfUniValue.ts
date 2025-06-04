@@ -15,6 +15,7 @@ import { CrossChainDataRef, CrossChainDataRefJson } from './CrossChainDataRef';
 import { SignatureData, SignatureJsonDataInterface } from './SignatureData';
 import { DataDescriptor, DataDescriptorJson } from './DataDescriptor';
 import { MMRDescriptor, MMRDescriptorJson } from './MMRDescriptor';
+import { Credential, CredentialJson } from './Credential';
 import { URLRef } from './URLRef';
 import {IdentityMultimapRef} from './IdentityMultimapRef';
 import * as VDXF_Data from '../vdxf/vdxfdatakeys';
@@ -24,10 +25,10 @@ export const VDXF_UNI_VALUE_VERSION_CURRENT = new BN(1, 10);
 
 const { BufferWriter, BufferReader } = bufferutils
 
-// TODO: Add other type definitions
+
 export type VdxfUniType = string | Buffer | BigNumber | CurrencyValueMap | Rating |
   TransferDestination | ContentMultiMapRemove | CrossChainDataRef | SignatureData |
-  DataDescriptor | MMRDescriptor | URLRef | IdentityMultimapRef;
+  DataDescriptor | MMRDescriptor | URLRef | IdentityMultimapRef | Credential;
 
 export interface VdxfUniValueJson {
   [key: string]: string | number | RatingJson | TransferDestinationJson |
@@ -41,7 +42,7 @@ export type VdxfUniValueJsonArray = Array<VdxfUniValueJson>;
 
 export type JsonSerializableObject = CurrencyValueMap | Rating |
   TransferDestination | ContentMultiMapRemove | CrossChainDataRef | SignatureData |
-  DataDescriptor | MMRDescriptor;
+  DataDescriptor | MMRDescriptor | Credential;
 // This UniValue class was adapted from C++ code for encoding JSON objects into bytes. It is not serialization and
 // therefore doesn't have a fromBuffer function, as you can't reliably decode it, only encode.
 export class VdxfUniValue implements SerializableEntity {
@@ -112,7 +113,7 @@ export class VdxfUniValue implements SerializableEntity {
       }
       else if (key == VDXF_Data.DataCurrencyMapKey.vdxfid) {
 
-        const oneCurMap = new CurrencyValueMap(value as CurrencyValueMap);
+        const oneCurMap = new CurrencyValueMap({...value as object, multivalue: true} as CurrencyValueMap);
         length += varint.encodingLength(new BN(1));
         length += varuint.encodingLength(oneCurMap.getByteLength());
         length += oneCurMap.getByteLength();
@@ -124,6 +125,14 @@ export class VdxfUniValue implements SerializableEntity {
         length += varint.encodingLength(oneRatingMap.version);
         length += varuint.encodingLength(oneRatingMap.getByteLength());
         length += oneRatingMap.getByteLength();
+      }
+      else if (key == VDXF_Data.CredentialKey.vdxfid) {
+
+        const oneCredential = new Credential(value as Credential);
+
+        length += varint.encodingLength(oneCredential.version);
+        length += varuint.encodingLength(oneCredential.getByteLength());
+        length += oneCredential.getByteLength();
       }
       else if (key == VDXF_Data.DataTransferDestinationKey.vdxfid) {
 
@@ -255,7 +264,7 @@ export class VdxfUniValue implements SerializableEntity {
       }
       else if (key == VDXF_Data.DataCurrencyMapKey.vdxfid) {
 
-        const oneCurMap = new CurrencyValueMap(value as CurrencyValueMap);
+        const oneCurMap = new CurrencyValueMap({...value as object, multivalue: true} as CurrencyValueMap)
 
         writer.writeSlice(fromBase58Check(key).hash);
         writer.writeVarInt(new BN(1));
@@ -271,6 +280,16 @@ export class VdxfUniValue implements SerializableEntity {
         writer.writeCompactSize(oneRatingMap.getByteLength());
         writer.writeSlice(oneRatingMap.toBuffer());
       }
+
+      else if (key == VDXF_Data.CredentialKey.vdxfid) {
+
+        const oneCredential = (value as Credential);
+        writer.writeSlice(fromBase58Check(key).hash);
+        writer.writeVarInt(oneCredential.version);
+        writer.writeCompactSize(oneCredential.getByteLength());
+        writer.writeSlice(oneCredential.toBuffer());
+      }
+
       else if (key == VDXF_Data.DataTransferDestinationKey.vdxfid) {
 
         const transferDest = new TransferDestination(value as TransferDestination);
@@ -368,6 +387,15 @@ export class VdxfUniValue implements SerializableEntity {
           reader.offset = oneRatingObj.fromBuffer(reader.buffer, reader.offset);
           if (oneRatingObj.isValid()) {
             objectUni = { key: checkVal, value: oneRatingObj };
+          }
+        }
+        else if (checkVal == VDXF_Data.CredentialKey.vdxfid) {
+          const credentialObj = new Credential();
+          version = reader.readVarInt();
+          objSize = reader.readCompactSize();
+          reader.offset = credentialObj.fromBuffer(reader.buffer, reader.offset);
+          if (credentialObj.isValid()) {
+            objectUni = { key: checkVal, value: credentialObj };
           }
         }
         else if (checkVal == VDXF_Data.DataTransferDestinationKey.vdxfid) {
@@ -476,7 +504,7 @@ export class VdxfUniValue implements SerializableEntity {
     return reader.offset;
   }
 
-  static fromJson(obj: VdxfUniValueJson | VdxfUniValueJsonArray): VdxfUniValue {
+  static fromJson(obj): VdxfUniValue {
     const arrayItem = new Array<{ [key: string]: VdxfUniType }>;
 
     if (!Array.isArray(obj)) {
@@ -593,10 +621,7 @@ export class VdxfUniValue implements SerializableEntity {
         }
         else if (objTypeKey == VDXF_Data.DataCurrencyMapKey.vdxfid) {
 
-          const destinations = Object.keys(oneValValues[k]);
-          const values = Object.values(oneValValues[k]);
-
-          const oneCurMap = new CurrencyValueMap({ value_map: new Map(destinations.map((key, index) => [key, new BN(values[index] as number)])), multivalue: true });
+          const oneCurMap = CurrencyValueMap.fromJson(oneValValues[k] as {[key: string]: string}, true);
           arrayItem.push({ [objTypeKey]: oneCurMap });
 
         }

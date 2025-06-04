@@ -35,7 +35,7 @@ class SignatureData {
             signatureData.hash_type = new bn_js_1.BN(data.hashtype);
             signatureData.identity_ID = data.identityid;
             signatureData.sig_type = new bn_js_1.BN(data.signaturetype);
-            if (signatureData.hash_type == new bn_js_1.BN(DataDescriptor_1.EHashTypes.HASH_SHA256)) {
+            if (signatureData.hash_type.eq(new bn_js_1.BN(Number(DataDescriptor_1.EHashTypes.HASH_SHA256)))) {
                 signatureData.signature_hash = Buffer.from(data.signaturehash, 'hex');
             }
             else {
@@ -138,11 +138,11 @@ class SignatureData {
             systemid: this.system_ID,
             hashtype: this.hash_type.toNumber()
         };
-        if (this.hash_type == new bn_js_1.BN(DataDescriptor_1.EHashTypes.HASH_SHA256)) {
-            returnObj['signaturehash'] = this.signature_hash.reverse().toString('hex');
+        if (this.hash_type.eq(new bn_js_1.BN(Number(DataDescriptor_1.EHashTypes.HASH_SHA256)))) {
+            returnObj['signaturehash'] = Buffer.from(this.signature_hash).toString('hex');
         }
         else {
-            returnObj['signaturehash'] = this.signature_hash.toString('hex');
+            returnObj['signaturehash'] = Buffer.from(this.signature_hash).reverse().toString('hex');
         }
         returnObj['identityid'] = this.identity_ID;
         returnObj['signaturetype'] = this.sig_type.toNumber();

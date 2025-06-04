@@ -71,7 +71,7 @@ export class SignatureData implements SerializableEntity {
       signatureData.identity_ID = data.identityid;
       signatureData.sig_type = new BN(data.signaturetype);
 
-      if (signatureData.hash_type == new BN(EHashTypes.HASH_SHA256)) {
+      if (signatureData.hash_type.eq(new BN(Number(EHashTypes.HASH_SHA256)))) {
         signatureData.signature_hash = Buffer.from(data.signaturehash, 'hex');
       } else {
         signatureData.signature_hash = Buffer.from(data.signaturehash, 'hex').reverse();
@@ -201,10 +201,10 @@ export class SignatureData implements SerializableEntity {
       hashtype: this.hash_type.toNumber()
     }
 
-    if (this.hash_type == new BN(EHashTypes.HASH_SHA256)) {
-      returnObj['signaturehash'] = this.signature_hash.reverse().toString('hex');
+    if (this.hash_type.eq(new BN(Number(EHashTypes.HASH_SHA256)))) {
+      returnObj['signaturehash'] = Buffer.from(this.signature_hash).toString('hex');
     } else {
-      returnObj['signaturehash'] = this.signature_hash.toString('hex');
+      returnObj['signaturehash'] = Buffer.from(this.signature_hash).reverse().toString('hex');
     }
 
     returnObj['identityid'] = this.identity_ID;

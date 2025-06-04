@@ -112,9 +112,10 @@ class IdentityMultimapRef {
             version: new bn_js_1.BN(data.version),
             flags: new bn_js_1.BN(data.flags),
             key: data.vdxfkey,
+            id_ID: data.identityid,
             height_start: new bn_js_1.BN(data.startheight),
             height_end: new bn_js_1.BN(data.endheight),
-            data_hash: Buffer.from(data.datahash, 'hex'),
+            data_hash: Buffer.from(data.datahash, 'hex').reverse(),
             system_id: data.systemid
         });
     }

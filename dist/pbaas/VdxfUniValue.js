@@ -16,6 +16,7 @@ const CrossChainDataRef_1 = require("./CrossChainDataRef");
 const SignatureData_1 = require("./SignatureData");
 const DataDescriptor_1 = require("./DataDescriptor");
 const MMRDescriptor_1 = require("./MMRDescriptor");
+const Credential_1 = require("./Credential");
 const VDXF_Data = require("../vdxf/vdxfdatakeys");
 exports.VDXF_UNI_VALUE_VERSION_INVALID = new bn_js_1.BN(0, 10);
 exports.VDXF_UNI_VALUE_VERSION_CURRENT = new bn_js_1.BN(1, 10);
@@ -83,7 +84,7 @@ class VdxfUniValue {
                 length += valBuf.length;
             }
             else if (key == VDXF_Data.DataCurrencyMapKey.vdxfid) {
-                const oneCurMap = new CurrencyValueMap_1.CurrencyValueMap(value);
+                const oneCurMap = new CurrencyValueMap_1.CurrencyValueMap(Object.assign(Object.assign({}, value), { multivalue: true }));
                 length += varint_1.default.encodingLength(new bn_js_1.BN(1));
                 length += varuint_1.default.encodingLength(oneCurMap.getByteLength());
                 length += oneCurMap.getByteLength();
@@ -93,6 +94,12 @@ class VdxfUniValue {
                 length += varint_1.default.encodingLength(oneRatingMap.version);
                 length += varuint_1.default.encodingLength(oneRatingMap.getByteLength());
                 length += oneRatingMap.getByteLength();
+            }
+            else if (key == VDXF_Data.CredentialKey.vdxfid) {
+                const oneCredential = new Credential_1.Credential(value);
+                length += varint_1.default.encodingLength(oneCredential.version);
+                length += varuint_1.default.encodingLength(oneCredential.getByteLength());
+                length += oneCredential.getByteLength();
             }
             else if (key == VDXF_Data.DataTransferDestinationKey.vdxfid) {
                 const transferDest = new TransferDestination_1.TransferDestination(value);
@@ -203,7 +210,7 @@ class VdxfUniValue {
                 writer.writeVarSlice(valBuf);
             }
             else if (key == VDXF_Data.DataCurrencyMapKey.vdxfid) {
-                const oneCurMap = new CurrencyValueMap_1.CurrencyValueMap(value);
+                const oneCurMap = new CurrencyValueMap_1.CurrencyValueMap(Object.assign(Object.assign({}, value), { multivalue: true }));
                 writer.writeSlice((0, address_1.fromBase58Check)(key).hash);
                 writer.writeVarInt(new bn_js_1.BN(1));
                 writer.writeCompactSize(oneCurMap.getByteLength());
@@ -215,6 +222,13 @@ class VdxfUniValue {
                 writer.writeVarInt(oneRatingMap.version);
                 writer.writeCompactSize(oneRatingMap.getByteLength());
                 writer.writeSlice(oneRatingMap.toBuffer());
+            }
+            else if (key == VDXF_Data.CredentialKey.vdxfid) {
+                const oneCredential = value;
+                writer.writeSlice((0, address_1.fromBase58Check)(key).hash);
+                writer.writeVarInt(oneCredential.version);
+                writer.writeCompactSize(oneCredential.getByteLength());
+                writer.writeSlice(oneCredential.toBuffer());
             }
             else if (key == VDXF_Data.DataTransferDestinationKey.vdxfid) {
                 const transferDest = new TransferDestination_1.TransferDestination(value);
@@ -294,6 +308,15 @@ class VdxfUniValue {
                     reader.offset = oneRatingObj.fromBuffer(reader.buffer, reader.offset);
                     if (oneRatingObj.isValid()) {
                         objectUni = { key: checkVal, value: oneRatingObj };
+                    }
+                }
+                else if (checkVal == VDXF_Data.CredentialKey.vdxfid) {
+                    const credentialObj = new Credential_1.Credential();
+                    version = reader.readVarInt();
+                    objSize = reader.readCompactSize();
+                    reader.offset = credentialObj.fromBuffer(reader.buffer, reader.offset);
+                    if (credentialObj.isValid()) {
+                        objectUni = { key: checkVal, value: credentialObj };
                     }
                 }
                 else if (checkVal == VDXF_Data.DataTransferDestinationKey.vdxfid) {
@@ -504,9 +527,7 @@ class VdxfUniValue {
                     arrayItem.push({ [objTypeKey]: Buffer.from(oneValValues[k], "hex") });
                 }
                 else if (objTypeKey == VDXF_Data.DataCurrencyMapKey.vdxfid) {
-                    const destinations = Object.keys(oneValValues[k]);
-                    const values = Object.values(oneValValues[k]);
-                    const oneCurMap = new CurrencyValueMap_1.CurrencyValueMap({ value_map: new Map(destinations.map((key, index) => [key, new bn_js_1.BN(values[index])])), multivalue: true });
+                    const oneCurMap = CurrencyValueMap_1.CurrencyValueMap.fromJson(oneValValues[k], true);
                     arrayItem.push({ [objTypeKey]: oneCurMap });
                 }
                 else if (objTypeKey == VDXF_Data.DataRatingsKey.vdxfid) {
