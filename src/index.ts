@@ -17,6 +17,9 @@ export * from './utils/cccustom'
 
 export * from './pbaas/index'
 export * from './pbaas/PartialIdentity'
+export * from './pbaas/PartialMMRData'
+export * from './pbaas/PartialSignData'
+export * from './constants/pbaas'
 
 export * from './identity/IdentityDefinition'
 export * from './currency/CurrencyDefinition'

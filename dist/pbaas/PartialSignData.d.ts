@@ -5,7 +5,9 @@ import { SerializableEntity } from '../utils/types/SerializableEntity';
 import { IdentityID } from './IdentityID';
 import { KeyID } from './KeyID';
 import { SaplingPaymentAddress } from './SaplingPaymentAddress';
-import { PartialMMRData, PartialMMRDataJson } from './PartialMMRData';
+import { PartialMMRData, PartialMMRDataJson, SingleKeyMMRData } from './PartialMMRData';
+import { AllowedHashes } from '../constants/pbaas';
+import { VdxfUniValue, VdxfUniValueJson } from './VdxfUniValue';
 export declare type PartialSignDataInitData = {
     flags?: BigNumber;
     address?: IdentityID | KeyID;
@@ -18,7 +20,7 @@ export declare type PartialSignDataInitData = {
     createmmr?: boolean;
     signature?: Buffer;
     datatype?: BigNumber;
-    data?: Buffer | PartialMMRData;
+    data?: Buffer | PartialMMRData | VdxfUniValue;
 };
 export declare type PartialSignDataJson = {
     flags?: string;
@@ -32,8 +34,40 @@ export declare type PartialSignDataJson = {
     createmmr?: boolean;
     signature?: string;
     datatype?: string;
-    data?: string | PartialMMRDataJson;
+    data?: string | PartialMMRDataJson | VdxfUniValueJson;
 };
+export declare type CLISignDataKey = "filename" | "message" | "messagehex" | "messagebase64" | "datahash" | "mmrdata" | "vdxfdata";
+declare type AtLeastOne<T, U = {
+    [K in keyof T]: Pick<T, K>;
+}> = Partial<T> & U[keyof U];
+declare type SignDataKeys = {
+    filename?: string;
+    message?: string;
+    messagehex?: string;
+    messagebase64?: string;
+    datahash?: string;
+    vdxfdata?: VdxfUniValueJson;
+    mmrdata?: Array<SingleKeyMMRData | string>;
+};
+declare type BaseFields = {
+    address?: string;
+    prefixstring?: string;
+    vdxfkeys?: Array<string>;
+    vdxfkeynames?: Array<string>;
+    boundhashes?: Array<string>;
+    hashtype?: string;
+    encrypttoaddress?: string;
+    createmmr?: boolean;
+    signature?: string;
+    datatype?: string;
+    data?: string;
+};
+declare type MMRFields = {
+    mmrsalt?: Array<string>;
+    mmrhashtype?: AllowedHashes;
+    priormmr?: Array<string>;
+};
+export declare type PartialSignDataCLIJson = ((AtLeastOne<Omit<SignDataKeys, 'mmrdata'>> & BaseFields) | (AtLeastOne<SignDataKeys> & MMRFields & BaseFields));
 export declare class PartialSignData implements SerializableEntity {
     flags: BigNumber;
     address?: IdentityID | KeyID;
@@ -46,7 +80,7 @@ export declare class PartialSignData implements SerializableEntity {
     createmmr?: boolean;
     signature?: Buffer;
     datatype?: BigNumber;
-    data?: Buffer | PartialMMRData;
+    data?: Buffer | PartialMMRData | VdxfUniValue;
     static CONTAINS_DATA: import("bn.js");
     static CONTAINS_ADDRESS: import("bn.js");
     static CONTAINS_ENCRYPTTOADDRESS: import("bn.js");
@@ -73,10 +107,14 @@ export declare class PartialSignData implements SerializableEntity {
     private toggleContainsVdxfKeyNames;
     private toggleContainsBoundHashes;
     isMMRData(): boolean;
+    isVdxfData(): boolean;
     private getPartialSignDataByteLength;
     getByteLength(): number;
     fromBuffer(buffer: Buffer, offset?: number): number;
     toBuffer(): Buffer;
     toJson(): PartialSignDataJson;
     static fromJson(json: PartialSignDataJson): PartialSignData;
+    toCLIJson(): PartialSignDataCLIJson;
+    static fromCLIJson(json: PartialSignDataCLIJson): PartialSignData;
 }
+export {};

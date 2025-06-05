@@ -11,9 +11,9 @@ const bn_js_1 = require("bn.js");
 const IdentityUpdateRequestDetails_1 = require("./IdentityUpdateRequestDetails");
 const pbaas_1 = require("../../../pbaas");
 const IdentityUpdateResponseDetails_1 = require("./IdentityUpdateResponseDetails");
-exports.IDENTITY_UPDATE_VERSION_CURRENT = new bn_js_1.BN(3, 10);
-exports.IDENTITY_UPDATE_VERSION_FIRSTVALID = new bn_js_1.BN(3, 10);
-exports.IDENTITY_UPDATE_VERSION_LASTVALID = new bn_js_1.BN(3, 10);
+exports.IDENTITY_UPDATE_VERSION_CURRENT = new bn_js_1.BN(1, 10);
+exports.IDENTITY_UPDATE_VERSION_FIRSTVALID = new bn_js_1.BN(1, 10);
+exports.IDENTITY_UPDATE_VERSION_LASTVALID = new bn_js_1.BN(1, 10);
 exports.IDENTITY_UPDATE_VERSION_SIGNED = new bn_js_1.BN('80000000', 16);
 exports.IDENTITY_UPDATE_VERSION_MASK = exports.IDENTITY_UPDATE_VERSION_SIGNED;
 class IdentityUpdateEnvelope extends __1.VDXFObject {

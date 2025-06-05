@@ -4,14 +4,14 @@ import { VDXFObject, VerusIDSignature } from "../..";
 import { BigNumber } from "../../../utils/types/BigNumber";
 import { IdentityUpdateRequestDetails, IdentityUpdateRequestDetailsJson } from "./IdentityUpdateRequestDetails";
 import { IdentityID } from "../../../pbaas";
-import { IdentityUpdateResponseDetails, IdentityUpdateReponseDetailsJson } from "./IdentityUpdateResponseDetails";
+import { IdentityUpdateResponseDetails, IdentityUpdateResponseDetailsJson } from "./IdentityUpdateResponseDetails";
 export declare const IDENTITY_UPDATE_VERSION_CURRENT: import("bn.js");
 export declare const IDENTITY_UPDATE_VERSION_FIRSTVALID: import("bn.js");
 export declare const IDENTITY_UPDATE_VERSION_LASTVALID: import("bn.js");
 export declare const IDENTITY_UPDATE_VERSION_SIGNED: import("bn.js");
 export declare const IDENTITY_UPDATE_VERSION_MASK: import("bn.js");
 export declare type IdentityUpdateDetails = IdentityUpdateRequestDetails | IdentityUpdateResponseDetails;
-export declare type IdentityUpdateDetailsJson = IdentityUpdateRequestDetailsJson | IdentityUpdateReponseDetailsJson;
+export declare type IdentityUpdateDetailsJson = IdentityUpdateRequestDetailsJson | IdentityUpdateResponseDetailsJson;
 export interface IdentityUpdateEnvelopeInterface {
     details: IdentityUpdateDetails;
     systemid?: IdentityID;
@@ -52,13 +52,13 @@ export declare class IdentityUpdateEnvelope extends VDXFObject {
     protected static internalFromJson<T>(json: IdentityUpdateEnvelopeJson, ctor: new (...args: any[]) => T, detailsFromJson: (json: IdentityUpdateDetailsJson) => IdentityUpdateDetails): T;
 }
 export declare class IdentityUpdateRequest extends IdentityUpdateEnvelope {
-    constructor(request: IdentityUpdateEnvelopeInterface);
+    constructor(request?: IdentityUpdateEnvelopeInterface);
     static fromWalletDeeplinkUri(uri: string): IdentityUpdateRequest;
     static fromQrString(qrstring: string): IdentityUpdateRequest;
     static fromJson(json: IdentityUpdateEnvelopeJson): IdentityUpdateRequest;
 }
 export declare class IdentityUpdateResponse extends IdentityUpdateEnvelope {
-    constructor(response: IdentityUpdateEnvelopeInterface);
+    constructor(response?: IdentityUpdateEnvelopeInterface);
     static fromWalletDeeplinkUri(uri: string): IdentityUpdateEnvelope;
     static fromQrString(qrstring: string): IdentityUpdateResponse;
     static fromJson(json: IdentityUpdateEnvelopeJson): IdentityUpdateResponse;

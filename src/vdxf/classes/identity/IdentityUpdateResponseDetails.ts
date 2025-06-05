@@ -5,9 +5,10 @@ import { BigNumber } from '../../../utils/types/BigNumber';
 import { BN } from 'bn.js';
 import { UINT_256_LENGTH } from '../../../constants/pbaas';
 import varuint from '../../../utils/varuint';
+import { SerializableEntity } from '../../../utils/types/SerializableEntity';
 const { BufferReader, BufferWriter } = bufferutils;
 
-export type IdentityUpdateReponseDetailsJson = {
+export type IdentityUpdateResponseDetailsJson = {
   flags: string,
   requestid: string,
   createdat: string,
@@ -15,7 +16,7 @@ export type IdentityUpdateReponseDetailsJson = {
   salt?: string
 }
 
-export class IdentityUpdateResponseDetails {
+export class IdentityUpdateResponseDetails implements SerializableEntity {
   flags?: BigNumber;
   requestid?: BigNumber;              // ID of request, to be referenced in response
   createdat?: BigNumber;              // Unix timestamp of request creation
@@ -23,10 +24,9 @@ export class IdentityUpdateResponseDetails {
                                       // stored in natural order, if displayed as text make sure to reverse!
   salt?: Buffer;                      // Optional salt
 
-  static IDENTITY_UPDATE_RESPONSE_INVALID = new BN(0, 10);
-  static IDENTITY_UPDATE_RESPONSE_VALID = new BN(1, 10);
-  static IDENTITY_UPDATE_RESPONSE_CONTAINS_TXID = new BN(2, 10);
-  static IDENTITY_UPDATE_RESPONSE_CONTAINS_SALT = new BN(4, 10);
+  static IDENTITY_UPDATE_RESPONSE_VALID = new BN(0, 10);
+  static IDENTITY_UPDATE_RESPONSE_CONTAINS_TXID = new BN(1, 10);
+  static IDENTITY_UPDATE_RESPONSE_CONTAINS_SALT = new BN(2, 10);
 
   constructor (data?: {
     flags?: BigNumber,
@@ -35,7 +35,7 @@ export class IdentityUpdateResponseDetails {
     txid?: Buffer,
     salt?: Buffer
   }) {
-    this.flags = data && data.flags ? data.flags : new BN("1", 10);
+    this.flags = data && data.flags ? data.flags : new BN("0", 10);
 
     if (data?.requestid) {
       this.requestid = data.requestid;
@@ -56,20 +56,12 @@ export class IdentityUpdateResponseDetails {
     }
   }
 
-  isValid() {
-    return !!(this.flags.and(IdentityUpdateResponseDetails.IDENTITY_UPDATE_RESPONSE_VALID).toNumber());
-  }
-
   containsTxid() {
     return !!(this.flags.and(IdentityUpdateResponseDetails.IDENTITY_UPDATE_RESPONSE_CONTAINS_TXID).toNumber());
   }
 
   containsSalt() {
     return !!(this.flags.and(IdentityUpdateResponseDetails.IDENTITY_UPDATE_RESPONSE_CONTAINS_SALT).toNumber());
-  }
-
-  toggleIsValid() {
-    this.flags = this.flags.xor(IdentityUpdateResponseDetails.IDENTITY_UPDATE_RESPONSE_VALID);
   }
 
   toggleContainsTxid() {
@@ -149,7 +141,7 @@ export class IdentityUpdateResponseDetails {
     return reader.offset;
   }
 
-  toJson(): IdentityUpdateReponseDetailsJson {
+  toJson(): IdentityUpdateResponseDetailsJson {
     return {
       flags: this.flags.toString(10),
       requestid: this.requestid.toString(10),
@@ -159,7 +151,7 @@ export class IdentityUpdateResponseDetails {
     }
   }
 
-  static fromJson(json: IdentityUpdateReponseDetailsJson): IdentityUpdateResponseDetails {
+  static fromJson(json: IdentityUpdateResponseDetailsJson): IdentityUpdateResponseDetails {
     return new IdentityUpdateResponseDetails({
       flags: new BN(json.flags, 10),
       requestid: new BN(json.requestid, 10),

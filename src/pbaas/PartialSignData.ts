@@ -9,9 +9,10 @@ import { SaplingPaymentAddress } from './SaplingPaymentAddress';
 import varuint from '../utils/varuint';
 import { Hash160SerEnt } from '../vdxf/classes/Hash160';
 import { HASH160_BYTE_LENGTH, I_ADDR_VERSION, R_ADDR_VERSION } from '../constants/vdxf';
-import { PartialMMRData, PartialMMRDataJson } from './PartialMMRData';
-import { DATA_TYPE_MMRDATA, DEFAULT_HASH_TYPE } from '../constants/pbaas';
+import { PartialMMRData, PartialMMRDataJson, SingleKeyMMRData } from './PartialMMRData';
+import { AllowedHashes, DATA_TYPE_BASE64, DATA_TYPE_DATAHASH, DATA_TYPE_FILENAME, DATA_TYPE_HEX, DATA_TYPE_MESSAGE, DATA_TYPE_MMRDATA, DATA_TYPE_RAWSTRINGDATA, DATA_TYPE_VDXFDATA, DEFAULT_HASH_TYPE, HASH_TYPE_BLAKE2B, HASH_TYPE_BLAKE2B_NAME, HASH_TYPE_KECCAK256, HASH_TYPE_KECCAK256_NAME, HASH_TYPE_SHA256, HASH_TYPE_SHA256_NAME, HASH_TYPE_SHA256D, HASH_TYPE_SHA256D_NAME } from '../constants/pbaas';
 import { fromBase58Check } from '../utils/address';
+import { VdxfUniValue, VdxfUniValueJson } from './VdxfUniValue';
 
 const { BufferReader, BufferWriter } = bufferutils;
 
@@ -27,7 +28,7 @@ export type PartialSignDataInitData = {
   createmmr?: boolean;
   signature?: Buffer;
   datatype?: BigNumber;
-  data?: Buffer | PartialMMRData;
+  data?: Buffer | PartialMMRData | VdxfUniValue;
 }
 
 export type PartialSignDataJson = {
@@ -42,8 +43,61 @@ export type PartialSignDataJson = {
   createmmr?: boolean;
   signature?: string;
   datatype?: string;
-  data?: string | PartialMMRDataJson;
+  data?: string | PartialMMRDataJson | VdxfUniValueJson;
 }
+
+export type CLISignDataKey = 
+  | "filename" 
+  | "message" 
+  | "messagehex" 
+  | "messagebase64" 
+  | "datahash"
+  | "mmrdata"
+  | "vdxfdata";
+
+// Utility type to enforce at least one key from T
+type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> & U[keyof U];
+
+// Define SignDataKeys where mmrdata is an Array
+type SignDataKeys = {
+  filename?: string;
+  message?: string;
+  messagehex?: string;
+  messagebase64?: string;
+  datahash?: string;
+  vdxfdata?: VdxfUniValueJson;
+  mmrdata?: Array<SingleKeyMMRData | string>;
+};
+
+// Base fields (always optional)
+type BaseFields = {
+  address?: string;
+  prefixstring?: string;
+  vdxfkeys?: Array<string>;
+  vdxfkeynames?: Array<string>;
+  boundhashes?: Array<string>;
+  hashtype?: string;
+  encrypttoaddress?: string;
+  createmmr?: boolean;
+  signature?: string;
+  datatype?: string;
+  data?: string;
+};
+
+// MMR fields (only allowed if mmrdata is present)
+type MMRFields = {
+  mmrsalt?: Array<string>;
+  mmrhashtype?: AllowedHashes;
+  priormmr?: Array<string>;
+};
+
+// Conditional combination:
+// - If mmrdata exists, MMRFields are allowed
+// - If mmrdata does not exist, MMRFields are not allowed
+export type PartialSignDataCLIJson = (
+  | (AtLeastOne<Omit<SignDataKeys, 'mmrdata'>> & BaseFields) // No mmrdata, so no MMRFields
+  | (AtLeastOne<SignDataKeys> & MMRFields & BaseFields)     // mmrdata exists, MMRFields allowed
+);
 
 export class PartialSignData implements SerializableEntity {
   flags: BigNumber;
@@ -58,7 +112,7 @@ export class PartialSignData implements SerializableEntity {
   signature?: Buffer;
 
   datatype?: BigNumber;
-  data?: Buffer | PartialMMRData;
+  data?: Buffer | PartialMMRData | VdxfUniValue;
 
   static CONTAINS_DATA = new BN("1", 10);
   static CONTAINS_ADDRESS = new BN("2", 10);
@@ -93,11 +147,11 @@ export class PartialSignData implements SerializableEntity {
       this.vdxfkeynames = data.vdxfkeynames;
     }
 
-    if (data?.boundhashes) {
-      if (data?.hashtype) {
-        this.hashtype = data.hashtype;
-      } else this.hashtype = DEFAULT_HASH_TYPE;
+    if (data?.hashtype) {
+      this.hashtype = data.hashtype;
+    } else this.hashtype = DEFAULT_HASH_TYPE;
 
+    if (data?.boundhashes) {
       if (!this.containsBoundhashes()) this.toggleContainsBoundHashes();
       this.boundhashes = data.boundhashes;
     }
@@ -187,6 +241,10 @@ export class PartialSignData implements SerializableEntity {
     return this.datatype && this.datatype.eq(DATA_TYPE_MMRDATA);
   }
 
+  isVdxfData(): boolean {
+    return this.datatype && this.datatype.eq(DATA_TYPE_VDXFDATA);
+  }
+
   private getPartialSignDataByteLength(): number {
     function calculateVectorLength(items: any[], getItemLength: (item: any) => number, varlength: boolean = true): number {
       let totalLength = 0;
@@ -223,9 +281,10 @@ export class PartialSignData implements SerializableEntity {
     if (this.containsVdxfKeyNames()) {
       length += calculateVectorLength(this.vdxfkeynames!, (vdxfname) => vdxfname.length);
     }
+
+    length += varint.encodingLength(this.hashtype);
     
     if (this.containsBoundhashes()) {
-      length += varint.encodingLength(this.hashtype);
       length += calculateVectorLength(this.boundhashes!, (hash) => hash.length);
     }
 
@@ -240,6 +299,11 @@ export class PartialSignData implements SerializableEntity {
 
       if (this.isMMRData()) {
         length += (this.data as PartialMMRData).getByteLength();
+      } else if (this.isVdxfData()) {
+        const vdxfDataLen = (this.data as VdxfUniValue).getByteLength();
+
+        length += varuint.encodingLength(vdxfDataLen);
+        length += vdxfDataLen;
       } else {
         const datalen = (this.data as Buffer).length;
 
@@ -293,9 +357,10 @@ export class PartialSignData implements SerializableEntity {
     if (this.containsVdxfKeyNames()) {
       this.vdxfkeynames = reader.readVector();
     }
+
+    this.hashtype = reader.readVarInt();
     
     if (this.containsBoundhashes()) {
-      this.hashtype = reader.readVarInt();
       this.boundhashes = reader.readVector();
     }
     
@@ -317,6 +382,13 @@ export class PartialSignData implements SerializableEntity {
         reader.offset = partialMMRData.fromBuffer(reader.buffer, reader.offset);
 
         this.data = partialMMRData;
+      } else if (this.isVdxfData()) {
+        const vdxfData = new VdxfUniValue();
+
+        const vdxfDataBuf = reader.readVarSlice();
+        vdxfData.fromBuffer(vdxfDataBuf);
+
+        this.data = vdxfData;
       } else {
         this.data = reader.readVarSlice();
       }
@@ -368,13 +440,15 @@ export class PartialSignData implements SerializableEntity {
       }
       writer.writeVector(this.vdxfkeynames);
     }
+
+    writer.writeVarInt(this.hashtype);
   
     // Bound hashes
     if (this.containsBoundhashes()) {
-      if (!this.boundhashes || !this.hashtype) {
+      if (!this.boundhashes) {
         throw new Error("Bound hashes are required but not provided");
       }
-      writer.writeVarInt(this.hashtype);
+
       writer.writeVector(this.boundhashes);
     }
   
@@ -400,6 +474,10 @@ export class PartialSignData implements SerializableEntity {
         const mmrData = this.data as PartialMMRData;
 
         writer.writeSlice(mmrData.toBuffer());
+      } else if (this.isVdxfData()) {
+        const vdxfData = this.data as VdxfUniValue;
+
+        writer.writeVarSlice(vdxfData.toBuffer());
       } else {
         writer.writeVarSlice(this.data as Buffer);
       }
@@ -414,7 +492,7 @@ export class PartialSignData implements SerializableEntity {
       address: this.address ? this.address.toAddress() : undefined,
       prefixstring: this.prefixstring ? this.prefixstring.toString('utf-8') : undefined,
       vdxfkeys: this.vdxfkeys ? this.vdxfkeys.map(x => x.toAddress()) : undefined,
-      vdxfkeynames: this.vdxfkeys ? this.vdxfkeynames.map(x => x.toString('utf-8')) : undefined,
+      vdxfkeynames: this.vdxfkeynames ? this.vdxfkeynames.map(x => x.toString('utf-8')) : undefined,
       boundhashes: this.boundhashes ? this.boundhashes.map(x => x.toString('hex')) : undefined,
       hashtype: this.hashtype ? this.hashtype.toString(10) : undefined,
       encrypttoaddress: this.encrypttoaddress ? this.encrypttoaddress.toAddressString() : undefined,
@@ -438,6 +516,8 @@ export class PartialSignData implements SerializableEntity {
       } else throw new Error("Unrecognized address version");
     }
 
+    const datatype = json.datatype ? new BN(json.datatype, 10) : undefined;
+
     return new PartialSignData({
       flags: json.flags ? new BN(json.flags, 10) : undefined,
       address: addr,
@@ -450,7 +530,152 @@ export class PartialSignData implements SerializableEntity {
       createmmr: json.createmmr,
       signature: json.signature ? Buffer.from(json.signature, 'base64') : undefined,
       datatype: json.datatype ? new BN(json.datatype, 10) : undefined,
-      data: json.data ? typeof json.data === 'string' ? Buffer.from(json.data, 'hex') : PartialMMRData.fromJson(json.data) : undefined
+      data: json.data ? 
+        typeof json.data === 'string' ? 
+          Buffer.from(json.data, 'hex') 
+          : 
+          datatype && datatype.eq(DATA_TYPE_MMRDATA) ? 
+            PartialMMRData.fromJson(json.data as PartialMMRDataJson) 
+            : 
+            VdxfUniValue.fromJson(json.data as VdxfUniValueJson) 
+              : 
+              undefined
     })
+  }
+
+  toCLIJson(): PartialSignDataCLIJson {
+    const ret: PartialSignDataCLIJson = {
+      address: this.address ? this.address.toAddress() : undefined,
+      prefixstring: this.prefixstring ? this.prefixstring.toString('utf-8') : undefined,
+      vdxfkeys: this.vdxfkeys ? this.vdxfkeys.map(x => x.toAddress()) : undefined,
+      vdxfkeynames: this.vdxfkeynames ? this.vdxfkeynames.map(x => x.toString('utf-8')) : undefined,
+      boundhashes: this.boundhashes ? this.boundhashes.map(x => x.toString('hex')) : undefined,
+      encrypttoaddress: this.encrypttoaddress ? this.encrypttoaddress.toAddressString() : undefined,
+      createmmr: this.createmmr,
+      signature: this.signature ? this.signature.toString('base64') : undefined
+    };
+
+    if (this.containsData() && this.data && this.datatype) {
+      if (this.datatype.eq(DATA_TYPE_MMRDATA)) {
+        const mmrCLIJson = (this.data as PartialMMRData).toCLIJson();
+  
+        ret['mmrdata'] = mmrCLIJson.mmrdata;
+        ret['mmrsalt'] = mmrCLIJson.mmrsalt;
+        ret['mmrhashtype'] = mmrCLIJson.mmrhashtype;
+        ret['priormmr'] = mmrCLIJson.priormmr;
+      } else if (this.datatype.eq(DATA_TYPE_VDXFDATA)) {
+        const uniJson = (this.data as VdxfUniValue).toJson();
+
+        if (Array.isArray(uniJson)) throw new Error("VDXF univalue arrays not supported as sign data param")
+
+        ret['vdxfdata'] = (this.data as VdxfUniValue).toJson() as VdxfUniValueJson;
+      } else {
+        const dataBuf = this.data as Buffer;
+  
+        if (this.datatype.eq(DATA_TYPE_FILENAME)){
+          ret['filename'] = dataBuf.toString('utf-8');
+        } else if (this.datatype.eq(DATA_TYPE_MESSAGE)) {
+          ret['message'] = dataBuf.toString('utf-8');
+        } else if (this.datatype.eq(DATA_TYPE_HEX)) {
+          ret['messagehex'] = dataBuf.toString('hex');
+        } else if (this.datatype.eq(DATA_TYPE_BASE64)) {
+          ret['messagebase64'] = dataBuf.toString('base64');
+        } else if (this.datatype.eq(DATA_TYPE_DATAHASH)) {
+          ret['datahash'] = dataBuf.toString('hex');
+        } else throw new Error("Unrecognized datatype");
+      }
+    }
+
+    if (this.hashtype.eq(HASH_TYPE_SHA256)){
+      ret['hashtype'] = HASH_TYPE_SHA256_NAME;
+    } else if (this.hashtype.eq(HASH_TYPE_SHA256D)) {
+      ret['hashtype'] = HASH_TYPE_SHA256D_NAME;
+    } else if (this.hashtype.eq(HASH_TYPE_BLAKE2B)) {
+      ret['hashtype'] = HASH_TYPE_BLAKE2B_NAME;
+    } else if (this.hashtype.eq(HASH_TYPE_KECCAK256)) {
+      ret['hashtype'] = HASH_TYPE_KECCAK256_NAME;
+    } else throw new Error("Unrecognized hash type");
+
+    for (const key in ret) {
+      if (ret[key] === undefined) delete ret[key]
+    }
+
+    return ret;
+  }
+
+  static fromCLIJson(json: PartialSignDataCLIJson): PartialSignData {
+    let addr: IdentityID | KeyID;
+
+    if (json.address) {
+      const { version, hash } = fromBase58Check(json.address);
+
+      if (version === I_ADDR_VERSION) {
+        addr = new IdentityID(hash);
+      } else if (version === R_ADDR_VERSION) {
+        addr = new KeyID(hash);
+      } else throw new Error("Unrecognized address version");
+    }
+
+    const config: PartialSignDataInitData = {
+      address: addr,
+      prefixstring: json.prefixstring ? Buffer.from(json.prefixstring, 'utf-8') : undefined,
+      vdxfkeys: json.vdxfkeys ? json.vdxfkeys.map(x => IdentityID.fromAddress(x)) : undefined,
+      vdxfkeynames: json.vdxfkeynames ? json.vdxfkeynames.map(x => Buffer.from(x, 'utf-8')) : undefined,
+      boundhashes: json.boundhashes ? json.boundhashes.map(x => Buffer.from(x, 'hex')) : undefined,
+      encrypttoaddress: json.encrypttoaddress ? SaplingPaymentAddress.fromAddressString(json.encrypttoaddress) : undefined,
+      createmmr: json.createmmr,
+      signature: json.signature ? Buffer.from(json.signature, 'base64') : undefined
+    };
+
+    if ('mmrdata' in json) {
+      const pmd = PartialMMRData.fromCLIJson({
+        mmrdata: json.mmrdata,
+        mmrsalt: json.mmrsalt,
+        mmrhashtype: json.mmrhashtype,
+        priormmr: json.priormmr
+      })
+
+      config.data = pmd;
+      config.datatype = DATA_TYPE_MMRDATA;
+    } else if (json.filename) {
+      config.data = Buffer.from(json.filename, 'utf-8');
+      config.datatype = DATA_TYPE_FILENAME;
+    } else if (json.message) {
+      config.data = Buffer.from(json.message, 'utf-8');
+      config.datatype = DATA_TYPE_MESSAGE;
+    } else if (json.vdxfdata) {
+      config.data = VdxfUniValue.fromJson(json.vdxfdata);
+      config.datatype = DATA_TYPE_VDXFDATA;
+    } else if (json.messagehex) {
+      config.data = Buffer.from(json.messagehex, 'hex');
+      config.datatype = DATA_TYPE_HEX;
+    } else if (json.messagebase64) {
+      config.data = Buffer.from(json.messagebase64, 'base64');
+      config.datatype = DATA_TYPE_BASE64;
+    } else if (json.datahash) {
+      config.data = Buffer.from(json.datahash, 'hex');
+      config.datatype = DATA_TYPE_DATAHASH;
+    }
+
+    if (json.hashtype) {
+      switch (json.hashtype) {
+        case HASH_TYPE_SHA256_NAME:
+          config.hashtype = HASH_TYPE_SHA256;
+          break;
+        case HASH_TYPE_SHA256D_NAME:
+          config.hashtype = HASH_TYPE_SHA256D;
+          break;
+        case HASH_TYPE_BLAKE2B_NAME:
+          config.hashtype = HASH_TYPE_BLAKE2B;
+          break;
+        case HASH_TYPE_KECCAK256_NAME:
+          config.hashtype = HASH_TYPE_KECCAK256;
+          break;
+        default:
+          throw new Error("Unrecognized hash type");
+      }
+    }
+
+    return new PartialSignData(config);
   }
 }

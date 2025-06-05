@@ -17,11 +17,11 @@ export declare const IDENTITY_FLAG_TOKENIZED_CONTROL: import("bn.js");
 export declare const IDENTITY_MAX_UNLOCK_DELAY: import("bn.js");
 export declare const IDENTITY_MAX_NAME_LEN: import("bn.js");
 export declare type Hashes = Map<string, Buffer>;
-export declare type VerusCLIVerusIDJson = {
+export declare type VerusCLIVerusIDJsonBase<T = ContentMultiMapJson> = {
     contentmap?: {
         [key: string]: string;
     };
-    contentmultimap?: ContentMultiMapJson;
+    contentmultimap?: T;
     flags?: number;
     identityaddress?: string;
     minimumsignatures?: number;
@@ -35,6 +35,7 @@ export declare type VerusCLIVerusIDJson = {
     timelock?: number;
     version?: number;
 };
+export declare type VerusCLIVerusIDJson = VerusCLIVerusIDJsonBase<ContentMultiMapJson>;
 export declare type VerusIDInitData = {
     version?: BigNumber;
     flags?: BigNumber;

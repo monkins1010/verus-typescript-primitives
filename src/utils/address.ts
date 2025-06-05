@@ -1,3 +1,5 @@
+import { DEFAULT_VERUS_CHAINID, DEFAULT_VERUS_CHAINNAME, KOMODO_ASSETCHAIN_MAXLEN, NULL_I_ADDR } from "../constants/pbaas";
+import { I_ADDR_VERSION } from "../constants/vdxf";
 import { hash, hash160 } from "./hash";
 
 const bs58check = require("bs58check")
@@ -97,6 +99,222 @@ export const toIAddress = (fullyqualifiedname: string, rootSystemName: string = 
   }
 
   return toBase58Check(hash160(idHash), 102);
+}
+
+function trimSpaces(
+  name: string,
+  removeDuals: boolean
+): string {
+  // Unicode "dual spaces" — visually space-like but potentially problematic
+  const dualSpaces = [
+    "\u0020", "\u00A0", "\u1680", "\u2000", "\u2001", "\u2002", "\u2003", "\u2004",
+    "\u2005", "\u2006", "\u2007", "\u2008", "\u2009", "\u200A", "\u200C", "\u200D",
+    "\u202F", "\u205F", "\u3000"
+  ];
+
+  const isDual = (char: string) => dualSpaces.includes(char);
+  const chars = [...name];
+  const toRemove: number[] = [];
+  const allDuals: number[] = [];
+
+  for (let i = 0; i < chars.length; i++) {
+    const char = chars[i];
+
+    if (isDual(char)) {
+      const wasLastDual = allDuals.length && allDuals[allDuals.length - 1] === i - 1;
+
+      const shouldRemove =
+        removeDuals ||
+        i === allDuals.length ||
+        i === chars.length - 1 ||
+        (removeDuals && wasLastDual);
+
+      if (shouldRemove) {
+        toRemove.push(i);
+      }
+
+      allDuals.push(i);
+
+      // Edge case: chain of duals at the end
+      if (
+        i > 0 &&
+        i === chars.length - 1 &&
+        wasLastDual
+      ) {
+        let toRemoveIdx = toRemove.length - 1;
+        let nextDual = 0;
+
+        for (let j = allDuals.length - 1; j >= 0; j--) {
+          const idx = allDuals[j];
+          if (nextDual && idx !== nextDual - 1) break;
+
+          if (toRemoveIdx < 0 || toRemove[toRemoveIdx] !== idx) {
+            toRemove.splice(++toRemoveIdx, 0, idx);
+          }
+
+          toRemoveIdx--;
+          nextDual = idx;
+        }
+      }
+    }
+  }
+
+  // Remove characters from end to start
+  for (let i = toRemove.length - 1; i >= 0; i--) {
+    chars.splice(toRemove[i], 1);
+  }
+
+  return chars.join("");
+}
+
+function parseSubNames(
+  name: string,
+  addVerus?: boolean,
+  removeDuals: boolean = false,
+  verusChainName: string = DEFAULT_VERUS_CHAINNAME
+): { names: string[]; chain: string } {
+  const parts = name.split("@");
+  if (
+    parts.length === 0 ||
+    parts.length > 2 ||
+    (parts.length > 1 && trimSpaces(parts[1], removeDuals) !== parts[1])
+  ) {
+    return { names: [], chain: "" };
+  }
+
+  let chain = "";
+  let explicitChain = false;
+
+  if (parts.length === 2 && parts[1] !== "") {
+    chain = parts[1];
+    explicitChain = true;
+  }
+
+  let retNames = parts[0].split(".");
+
+  // If the name ends with a dot, it's an indicator to not add Verus
+  if (retNames[retNames.length - 1] === "") {
+    addVerus = false;
+    retNames.pop();
+  }
+
+  const verusChainNameLc = verusChainName.toLowerCase();
+
+  if (addVerus) {
+    if (explicitChain) {
+      const chainParts = chain.split(".");
+      const lastChainPart = chainParts[chainParts.length - 1].toLowerCase();
+
+      if (lastChainPart !== "" && lastChainPart !== verusChainNameLc) {
+        chainParts.push(verusChainNameLc);
+        chain = chainParts.join(".");
+      } else if (lastChainPart === "") {
+        chainParts.pop();
+        chain = chainParts.join(".");
+      }
+    }
+
+    const lastName = retNames[retNames.length - 1]?.toLowerCase();
+    if (lastName !== "" && lastName !== verusChainNameLc) {
+      retNames.push(verusChainNameLc);
+    } else if (lastName === "") {
+      retNames.pop();
+    }
+  }
+
+  for (let i = 0; i < retNames.length; i++) {
+    if (retNames[i].length > KOMODO_ASSETCHAIN_MAXLEN - 1) {
+      retNames[i] = retNames[i].slice(0, KOMODO_ASSETCHAIN_MAXLEN - 1);
+    }
+
+    if (
+      retNames[i].length === 0 ||
+      retNames[i] !== trimSpaces(retNames[i], removeDuals)
+    ) {
+      return { names: [], chain: "" };
+    }
+  }
+
+  return { names: retNames, chain };
+}
+
+function cleanName(
+  name: string,
+  parent: string | null,
+  removeDuals: boolean = false,
+  verusChainName: string = DEFAULT_VERUS_CHAINNAME
+): { name: string; parent: string } {
+  const { names: subNames } = parseSubNames(name, false, removeDuals, verusChainName);
+
+  if (subNames.length === 0) {
+    throw new Error("No subnames found in name");
+  }
+
+  let newParent = parent ? fromBase58Check(parent).hash : null;
+
+  // Remove "verus" suffix if already handled and parent is not null
+  const last = subNames[subNames.length - 1];
+  if (
+    newParent &&
+    subNames.length > 1 &&
+    last.toLowerCase() === verusChainName.toLowerCase()
+  ) {
+    subNames.pop();
+  }
+
+  // Build up the parent hash from right to left
+  for (let i = subNames.length - 1; i > 0; i--) {
+    const parentNameStr = Buffer.from(subNames[i].toLowerCase(), 'utf8');
+
+    let idHash: Buffer;
+
+    if (!newParent) {
+      idHash = hash(parentNameStr); // Hash from a string
+    } else {
+      const combined = hash(parentNameStr); // First hash
+      idHash = hash(newParent, combined);  // Combine with parent
+    }
+
+    newParent = hash160(idHash); // Get new parent as uint160
+  }
+
+  return { name: subNames[0], parent: newParent ? toBase58Check(newParent, I_ADDR_VERSION) : null };
+}
+
+function getID(name: string, parent: string, verusChainName: string = DEFAULT_VERUS_CHAINNAME): string {
+  const _cleanName = name === "::" ? { name, parent } : cleanName(name, parent, false, verusChainName);
+
+  if (_cleanName.name.length == 0) return NULL_I_ADDR;
+
+  return nameAndParentAddrToIAddr(_cleanName.name, _cleanName.parent);
+}
+
+export function getDataKey(
+  keyName: string,
+  nameSpaceID?: string,
+  verusChainId: string = DEFAULT_VERUS_CHAINID
+): { id: string; namespace: string } {
+  let keyCopy = keyName;
+  const addressParts = keyName.split(":");
+
+  // If the first part of the address is a namespace, it is followed by a double colon
+  // Namespace specifiers have no implicit root
+  if (addressParts.length > 2 && addressParts[1] === "") {
+    nameSpaceID = toIAddress(addressParts[0]);
+
+    keyName = addressParts.join(":");
+
+    for (let i = 2; i < addressParts.length; i++) {
+      keyCopy = i === 2 ? addressParts[i] : keyCopy + ":" + addressParts[i];
+    }
+  }
+
+  if (!nameSpaceID) {
+    nameSpaceID = verusChainId;
+  }
+
+  const parent = getID("::", nameSpaceID);
+  return { id: getID(keyCopy, parent), namespace: nameSpaceID };
 }
 
 export const decodeDestination = (destination: string): Buffer => {

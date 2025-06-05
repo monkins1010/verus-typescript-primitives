@@ -24,6 +24,11 @@ export { ProvisioningResponseInterface as LoginConsentProvisioningResponseInterf
 export { ProvisioningDecisionInterface as LoginConsentProvisioningDecisionInterface } from "./provisioning/ProvisioningDecision";
 export { ProvisioningResultInterface as LoginConsentProvisioningResultInterface } from "./provisioning/ProvisioningResult";
 
+export * from "./identity/IdentityUpdateEnvelope";
+export * from "./identity/IdentityUpdateRequestDetails";
+export * from "./identity/IdentityUpdateResponseDetails";
+export * from './ResponseUri';
+
 export { Hash160 } from './Hash160'
 export {
   RedirectUri,

@@ -96,20 +96,26 @@ export class VdxfUniValue implements SerializableEntity {
 
       length += HASH160_BYTE_LENGTH;
 
+      function totalStreamLength(bufLen: number): number {
+        const encodeStreamLen = varuint.encodingLength(bufLen + varuint.encodingLength(bufLen));
+
+        return bufLen + encodeStreamLen;
+      }
+
       if (key == VDXF_Data.DataStringKey.vdxfid) {
         const valBuf = Buffer.from(value as string, "utf-8");
         length += varint.encodingLength(new BN(1));
         // NOTE: 3 is from ss type + ver + vdxfIdVersion 
-        length += varuint.encodingLength(valBuf.length + varuint.encodingLength(valBuf.length));
         length += varuint.encodingLength(valBuf.length);
-        length += valBuf.length;
+
+        length += totalStreamLength(valBuf.length);
       }
       else if (key == VDXF_Data.DataByteVectorKey.vdxfid) {
         const valBuf = Buffer.from(value as string, "hex");
         length += varint.encodingLength(new BN(1));
-        length += varuint.encodingLength(valBuf.length + varuint.encodingLength(valBuf.length));
         length += varuint.encodingLength(valBuf.length)
-        length += valBuf.length;
+
+        length += totalStreamLength(valBuf.length);
       }
       else if (key == VDXF_Data.DataCurrencyMapKey.vdxfid) {
 
@@ -119,7 +125,6 @@ export class VdxfUniValue implements SerializableEntity {
         length += oneCurMap.getByteLength();
       }
       else if (key == VDXF_Data.DataRatingsKey.vdxfid) {
-
         const oneRatingMap = new Rating(value as Rating);
 
         length += varint.encodingLength(oneRatingMap.version);
@@ -135,7 +140,6 @@ export class VdxfUniValue implements SerializableEntity {
         length += oneCredential.getByteLength();
       }
       else if (key == VDXF_Data.DataTransferDestinationKey.vdxfid) {
-
         const transferDest = new TransferDestination(value as TransferDestination);
 
         length += varint.encodingLength(transferDest.typeNoFlags());
@@ -143,7 +147,6 @@ export class VdxfUniValue implements SerializableEntity {
         length += transferDest.getByteLength();
       }
       else if (key == VDXF_Data.ContentMultiMapRemoveKey.vdxfid) {
-
         const transferDest = new ContentMultiMapRemove(value as ContentMultiMapRemove);
 
         length += varint.encodingLength(transferDest.version);
@@ -159,7 +162,6 @@ export class VdxfUniValue implements SerializableEntity {
         length += transferDest.getByteLength();
       }
       else if (key == VDXF_Data.DataDescriptorKey.vdxfid) {
-
         const descr = new DataDescriptor(value as DataDescriptor);
 
         length += varint.encodingLength(descr.version);
@@ -167,7 +169,6 @@ export class VdxfUniValue implements SerializableEntity {
         length += descr.getByteLength();
       }
       else if (key == VDXF_Data.MMRDescriptorKey.vdxfid) {
-
         const descr = new MMRDescriptor(value as MMRDescriptor);
 
         length += varint.encodingLength(descr.version);
@@ -175,7 +176,6 @@ export class VdxfUniValue implements SerializableEntity {
         length += descr.getByteLength();
       }
       else if (key == VDXF_Data.SignatureDataKey.vdxfid) {
-
         const sigData = new SignatureData(value as SignatureData);
 
         length += varint.encodingLength(sigData.version);
@@ -250,7 +250,7 @@ export class VdxfUniValue implements SerializableEntity {
 
         writer.writeSlice(fromBase58Check(key).hash);
         writer.writeVarInt(new BN(1));
-        writer.writeCompactSize(varuint.encodingLength(valBuf.length) + valBuf.length);
+        writer.writeCompactSize(valBuf.length + varuint.encodingLength(valBuf.length));
         writer.writeVarSlice(valBuf);
       }
       else if (key == VDXF_Data.DataByteVectorKey.vdxfid) {
@@ -668,7 +668,7 @@ export class VdxfUniValue implements SerializableEntity {
 
         }
         else {
-          throw new Error("Unkknow vdxfkey: " + oneValValues[k]);
+          throw new Error("Unknown vdxfkey: " + oneValValues[k]);
         }
       }
     }
