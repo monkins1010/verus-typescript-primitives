@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getDataKey = exports.toIAddress = exports.nameAndParentAddrToIAddr = exports.toBase58Check = exports.fromBase58Check = void 0;
+exports.decodeEthDestination = exports.decodeDestination = exports.getDataKey = exports.toIAddress = exports.nameAndParentAddrToIAddr = exports.toBase58Check = exports.fromBase58Check = void 0;
 const pbaas_1 = require("../constants/pbaas");
 const vdxf_1 = require("../constants/vdxf");
 const hash_1 = require("./hash");
@@ -240,3 +240,23 @@ function getDataKey(keyName, nameSpaceID, verusChainId = pbaas_1.DEFAULT_VERUS_C
     return { id: getID(keyCopy, parent), namespace: nameSpaceID };
 }
 exports.getDataKey = getDataKey;
+const decodeDestination = (destination) => {
+    try {
+        const data = (0, exports.fromBase58Check)(destination);
+        return data.hash;
+    }
+    catch (e) {
+        throw new Error("Invalid destination address: " + destination);
+    }
+};
+exports.decodeDestination = decodeDestination;
+const decodeEthDestination = (destination) => {
+    if (destination.startsWith("0x")) {
+        destination = destination.slice(2);
+    }
+    if (destination.length !== 40) {
+        throw new Error("Invalid Ethereum address: " + destination);
+    }
+    return Buffer.from(destination, "hex");
+};
+exports.decodeEthDestination = decodeEthDestination;
