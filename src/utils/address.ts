@@ -1,5 +1,7 @@
 import { DEFAULT_VERUS_CHAINID, DEFAULT_VERUS_CHAINNAME, KOMODO_ASSETCHAIN_MAXLEN, NULL_I_ADDR } from "../constants/pbaas";
 import { I_ADDR_VERSION } from "../constants/vdxf";
+import { DEFAULT_VERUS_CHAINID, DEFAULT_VERUS_CHAINNAME, KOMODO_ASSETCHAIN_MAXLEN, NULL_I_ADDR } from "../constants/pbaas";
+import { I_ADDR_VERSION } from "../constants/vdxf";
 import { hash, hash160 } from "./hash";
 
 const bs58check = require("bs58check")
