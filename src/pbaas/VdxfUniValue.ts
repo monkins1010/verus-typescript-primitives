@@ -102,12 +102,6 @@ export class VdxfUniValue implements SerializableEntity {
         return bufLen + encodeStreamLen;
       }
 
-      function totalStreamLength(bufLen: number): number {
-        const encodeStreamLen = varuint.encodingLength(bufLen + varuint.encodingLength(bufLen));
-
-        return bufLen + encodeStreamLen;
-      }
-
       if (key == VDXF_Data.DataStringKey.vdxfid) {
         const valBuf = Buffer.from(value as string, "utf-8");
         length += varint.encodingLength(new BN(1));
@@ -115,15 +109,11 @@ export class VdxfUniValue implements SerializableEntity {
         length += varuint.encodingLength(valBuf.length);
 
         length += totalStreamLength(valBuf.length);
-
-        length += totalStreamLength(valBuf.length);
       }
       else if (key == VDXF_Data.DataByteVectorKey.vdxfid) {
         const valBuf = Buffer.from(value as string, "hex");
         length += varint.encodingLength(new BN(1));
         length += varuint.encodingLength(valBuf.length)
-
-        length += totalStreamLength(valBuf.length);
 
         length += totalStreamLength(valBuf.length);
       }
