@@ -89,6 +89,7 @@ export class EvidenceData implements SerializableEntity {
 
   getByteLength() {
     let byteLength = 0;
+    //yes read twice
     byteLength += varint.encodingLength(new BN(this.version));
     byteLength += varint.encodingLength(new BN(this.version));
     byteLength += varint.encodingLength(new BN(this.type));
@@ -106,7 +107,7 @@ export class EvidenceData implements SerializableEntity {
 
   toBuffer() {
     const bufferWriter = new BufferWriter(Buffer.alloc(this.getByteLength()))
-
+    //yes read twice
     bufferWriter.writeVarInt(this.version);
     bufferWriter.writeVarInt(this.version);
     bufferWriter.writeVarInt(this.type);
@@ -124,7 +125,7 @@ export class EvidenceData implements SerializableEntity {
 
   fromBuffer(buffer: Buffer, offset: number = 0) {
     const reader = new BufferReader(buffer, offset);
-
+   //yes read twice
     this.version = reader.readVarInt();
     this.version = reader.readVarInt();
     this.type = reader.readVarInt();
