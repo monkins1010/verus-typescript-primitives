@@ -240,7 +240,6 @@ export class VdxfUniValue implements SerializableEntity {
         writer.writeSlice(fromBase58Check(key).hash);
         writer.writeVarInt(new BN(1));
         writer.writeCompactSize(valBuf.length + varuint.encodingLength(valBuf.length));
-        writer.writeCompactSize(valBuf.length + varuint.encodingLength(valBuf.length));
         writer.writeVarSlice(valBuf);
       }
       else if (key == VDXF_Data.DataByteVectorKey.vdxfid) {
