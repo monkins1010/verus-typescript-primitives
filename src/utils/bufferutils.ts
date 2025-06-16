@@ -160,7 +160,6 @@ class BufferReader {
     const result = this.buffer.readUInt16LE(this.offset);
     this.offset += 2;
     return result;
-    return result;
   }
 
   readInt32() {

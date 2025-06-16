@@ -22,14 +22,14 @@ export declare enum CHAIN_OBJECT_TYPES {
 }
 export declare class CrossChainProof implements SerializableEntity {
     version: BigNumber;
-    chainObjects: Array<EvidenceData>;
+    chain_objects: Array<EvidenceData>;
     static VERSION_INVALID: import("bn.js");
     static VERSION_FIRST: import("bn.js");
     static VERSION_CURRENT: import("bn.js");
     static VERSION_LAST: import("bn.js");
     constructor(data?: {
         version: any;
-        chainObjects: any;
+        chain_objects: any;
     });
     static KnownVDXFKeys(): Map<string, CHAIN_OBJECT_TYPES>;
     getByteLength(): number;

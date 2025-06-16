@@ -31,19 +31,19 @@ export enum ETypes {
 
 export class MultiPartDescriptor implements SerializableEntity {
   index: BigNumber
-  totalLength: BigNumber;
+  total_length: BigNumber;
   start: BigNumber;
 
-  constructor(data?: { index, totalLength, start }) {
+  constructor(data?: { index, total_length, start }) {
     this.index = data?.index || new BN(0, 10);
-    this.totalLength = data?.totalLength || new BN(0, 10);
+    this.total_length = data?.total_length || new BN(0, 10);
     this.start = data?.start || new BN(0, 10);
   }
 
   getByteLength() {
     let byteLength = 0;
     byteLength += varint.encodingLength(this.index);
-    byteLength += varint.encodingLength(this.totalLength);
+    byteLength += varint.encodingLength(this.total_length);
     byteLength += varint.encodingLength(this.start);
     return byteLength
   }
@@ -51,7 +51,7 @@ export class MultiPartDescriptor implements SerializableEntity {
   toBuffer() {
     const bufferWriter = new BufferWriter(Buffer.alloc(this.getByteLength()))
     bufferWriter.writeVarInt(this.index);
-    bufferWriter.writeVarInt(this.totalLength);
+    bufferWriter.writeVarInt(this.total_length);
     bufferWriter.writeVarInt(this.start);
     return bufferWriter.buffer
   }
@@ -59,7 +59,7 @@ export class MultiPartDescriptor implements SerializableEntity {
   fromBuffer(buffer: Buffer, offset: number = 0) {
     const reader = new BufferReader(buffer, offset);
     this.index = reader.readVarInt();
-    this.totalLength = reader.readVarInt();
+    this.total_length = reader.readVarInt();
     this.start = reader.readVarInt();
     return reader.offset;
   }
@@ -72,19 +72,19 @@ export class EvidenceData implements SerializableEntity {
   md: MultiPartDescriptor;            // if this is multipart, there is no VDXF descriptor
   vdxfd: string;
 
-  dataVec: Buffer;
+  data_vec: Buffer;
 
   static VERSION_INVALID = new BN(0);
   static VERSION_FIRST = new BN(1);
   static VERSION_CURRENT = new BN(1);
   static VERSION_LAST = new BN(1);
 
-  constructor(data?: { version, type, md, vdxfd, dataVec }) {
+  constructor(data?: { version, type, md, vdxfd, data_vec }) {
     this.version = data?.version || new BN(1, 10);
     this.type = data?.type ||  new BN(ETypes.TYPE_DATA);                   // holding a transaction proof of export with finalization referencing finalization of root notarization
     this.md = data?.md;
     this.vdxfd = data?.vdxfd;
-    this.dataVec = data?.dataVec || Buffer.alloc(0);
+    this.data_vec = data?.data_vec || Buffer.alloc(0);
   }
 
   getByteLength() {
@@ -99,8 +99,8 @@ export class EvidenceData implements SerializableEntity {
     } else {
       byteLength += 20;
     }
-    byteLength += varuint.encodingLength(this.dataVec.length);
-    byteLength += this.dataVec.length;
+    byteLength += varuint.encodingLength(this.data_vec.length);
+    byteLength += this.data_vec.length;
 
     return byteLength;
   }
@@ -118,7 +118,7 @@ export class EvidenceData implements SerializableEntity {
       bufferWriter.writeSlice(fromBase58Check(this.vdxfd).hash);
     }
 
-    bufferWriter.writeVarSlice(this.dataVec);
+    bufferWriter.writeVarSlice(this.data_vec);
 
     return bufferWriter.buffer
   }
@@ -136,7 +136,7 @@ export class EvidenceData implements SerializableEntity {
     } else {
       this.vdxfd = toBase58Check(reader.readSlice(20), I_ADDR_VERSION);
     }
-    this.dataVec = reader.readVarSlice();
+    this.data_vec = reader.readVarSlice();
 
     return reader.offset;
   }

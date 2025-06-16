@@ -141,17 +141,17 @@ export class VdxfUniValue implements SerializableEntity {
         length += totalStreamLength(transferDest.getByteLength());
       }
       else if (key == VDXF_Data.ContentMultiMapRemoveKey.vdxfid) {
-        const transferDest = new ContentMultiMapRemove(value as ContentMultiMapRemove);
+        const multiRemove = new ContentMultiMapRemove(value as ContentMultiMapRemove);
 
-        length += varint.encodingLength(transferDest.version);
-        length += totalStreamLength(transferDest.getByteLength());
+        length += varint.encodingLength(multiRemove.version);
+        length += totalStreamLength(multiRemove.getByteLength());
       }
       else if (key == VDXF_Data.CrossChainDataRefKey.vdxfid) {
 
-        const transferDest = (value as CrossChainDataRef);
+        const crossCh = (value as CrossChainDataRef);
 
         length += varint.encodingLength(VDXF_OBJECT_DEFAULT_VERSION);
-        length += totalStreamLength(transferDest.getByteLength());
+        length += totalStreamLength(crossCh.getByteLength());
       }
       else if (key == VDXF_Data.DataDescriptorKey.vdxfid) {
         const descr = new DataDescriptor(value as DataDescriptor);
@@ -656,8 +656,13 @@ export class VdxfUniValue implements SerializableEntity {
           arrayItem.push({ [objTypeKey]: sigData });
 
         }
+        else if (objTypeKey == VDXF_Data.CredentialKey.vdxfid) {
+
+          const oneCredential = Credential.fromJson(oneValValues[k] as CredentialJson);
+          arrayItem.push({ [objTypeKey]: oneCredential });
+
+        }  
         else {
-          throw new Error("Unknown vdxfkey: " + oneValValues[k]);
           throw new Error("Unknown vdxfkey: " + oneValValues[k]);
         }
       }

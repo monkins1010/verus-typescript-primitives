@@ -111,7 +111,7 @@ export class URLRef implements SerializableEntity {
     return {
       version: this.version.toNumber(),
       flags: this.flags ? this.flags.toNumber() : 0,
-      data_hash: this.data_hash ? this.data_hash.toString('hex') : "",
+      datahash: this.data_hash ? this.data_hash.toString('hex') : "",
       url: this.url
     }
   }

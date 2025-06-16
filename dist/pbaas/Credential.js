@@ -12,7 +12,7 @@ class Credential {
         if (data) {
             this.version = data.version || Credential.CURRENT_VERSION;
             this.flags = data.flags || new bn_js_1.BN(0);
-            this.credentialKey = data.credentialKey || '';
+            this.credential_key = data.credential_key || '';
             this.credential = data.credential || {};
             this.scopes = data.scopes || {};
             this.label = data.label || '';
@@ -53,7 +53,7 @@ class Credential {
         const bufferWriter = new BufferWriter(Buffer.alloc(this.getByteLength()));
         bufferWriter.writeUInt32(this.version.toNumber());
         bufferWriter.writeUInt32(this.flags.toNumber());
-        bufferWriter.writeSlice((0, address_1.fromBase58Check)(this.credentialKey).hash);
+        bufferWriter.writeSlice((0, address_1.fromBase58Check)(this.credential_key).hash);
         bufferWriter.writeVarSlice(Buffer.from(JSON.stringify(this.credential), 'utf8'));
         bufferWriter.writeVarSlice(Buffer.from(JSON.stringify(this.scopes), 'utf8'));
         if (this.flags.and(Credential.FLAG_LABEL_PRESENT).gt(new bn_js_1.BN(0))) {
@@ -66,7 +66,7 @@ class Credential {
         this.version = new bn_js_1.BN(reader.readUInt32());
         this.flags = new bn_js_1.BN(reader.readUInt32());
         ;
-        this.credentialKey = (0, address_1.toBase58Check)(reader.readSlice(20), vdxf_1.I_ADDR_VERSION);
+        this.credential_key = (0, address_1.toBase58Check)(reader.readSlice(20), vdxf_1.I_ADDR_VERSION);
         const credentialJson = reader.readVarSlice();
         this.credential = credentialJson.length > 0 ? JSON.parse(credentialJson.toString('utf8')) : {};
         const scopesJson = reader.readVarSlice();
@@ -77,13 +77,13 @@ class Credential {
     isValid() {
         return this.version.gte(Credential.FIRST_VERSION) &&
             this.version.lte(Credential.LAST_VERSION) &&
-            this.credentialKey.length == 20;
+            (0, address_1.fromBase58Check)(this.credential_key).hash.length == 20;
     }
     toJson() {
         let retval = {
             version: this.version.toNumber(),
             flags: this.flags.toNumber(),
-            credentialKey: this.credentialKey,
+            credentialKey: this.credential_key,
             credential: this.credential,
             scopes: this.scopes,
             label: this.label
@@ -94,7 +94,7 @@ class Credential {
         return new Credential({
             version: new bn_js_1.BN(data.version),
             flags: new bn_js_1.BN(data.flags),
-            credentialKey: data.credentialKey,
+            credential_key: data.credentialKey,
             credential: data.credential,
             scopes: data.scopes,
             label: data.label

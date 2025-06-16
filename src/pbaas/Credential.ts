@@ -21,7 +21,7 @@ export interface CredentialJson {
 export class Credential implements SerializableEntity {
   version: BigNumber;
   flags: BigNumber;
-  credentialKey: string;
+  credential_key: string;
   credential: object;
   scopes: object;
   label: string;
@@ -39,7 +39,7 @@ export class Credential implements SerializableEntity {
     if (data) {
       this.version = data.version || Credential.CURRENT_VERSION;
       this.flags = data.flags || new BN(0);
-      this.credentialKey = data.credentialKey || '';
+      this.credential_key = data.credential_key || '';
       this.credential = data.credential || {};
       this.scopes = data.scopes || {};
       this.label = data.label || '';      
@@ -92,7 +92,7 @@ export class Credential implements SerializableEntity {
 
     bufferWriter.writeUInt32(this.version.toNumber());
     bufferWriter.writeUInt32(this.flags.toNumber());
-    bufferWriter.writeSlice(fromBase58Check(this.credentialKey).hash);
+    bufferWriter.writeSlice(fromBase58Check(this.credential_key).hash);
     bufferWriter.writeVarSlice(Buffer.from(JSON.stringify(this.credential), 'utf8'));
     bufferWriter.writeVarSlice(Buffer.from(JSON.stringify(this.scopes), 'utf8'));
     if (this.flags.and(Credential.FLAG_LABEL_PRESENT).gt(new BN(0))) {
@@ -107,7 +107,7 @@ export class Credential implements SerializableEntity {
 
     this.version = new BN(reader.readUInt32());
     this.flags = new BN(reader.readUInt32());;
-    this.credentialKey = toBase58Check(reader.readSlice(20), I_ADDR_VERSION);
+    this.credential_key = toBase58Check(reader.readSlice(20), I_ADDR_VERSION);
     const credentialJson = reader.readVarSlice();
     this.credential = credentialJson.length > 0 ? JSON.parse(credentialJson.toString('utf8')) : {};
     const scopesJson = reader.readVarSlice();
@@ -120,7 +120,7 @@ export class Credential implements SerializableEntity {
   isValid(): boolean {
     return this.version.gte(Credential.FIRST_VERSION) &&
       this.version.lte(Credential.LAST_VERSION) &&
-      this.credentialKey.length == 20;
+      fromBase58Check(this.credential_key).hash.length == 20;
   }
 
   toJson() {
@@ -129,7 +129,7 @@ export class Credential implements SerializableEntity {
 
       version: this.version.toNumber(),
       flags: this.flags.toNumber(),
-      credentialKey: this.credentialKey,
+      credentialKey: this.credential_key,
       credential: this.credential,
       scopes: this.scopes,
       label: this.label
@@ -142,7 +142,7 @@ export class Credential implements SerializableEntity {
     return new Credential({
       version: new BN(data.version),
       flags: new BN(data.flags),
-      credentialKey: data.credentialKey,
+      credential_key: data.credentialKey,
       credential: data.credential,
       scopes: data.scopes,
       label: data.label

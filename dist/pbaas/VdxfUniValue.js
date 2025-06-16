@@ -106,14 +106,14 @@ class VdxfUniValue {
                 length += totalStreamLength(transferDest.getByteLength());
             }
             else if (key == VDXF_Data.ContentMultiMapRemoveKey.vdxfid) {
-                const transferDest = new ContentMultiMapRemove_1.ContentMultiMapRemove(value);
-                length += varint_1.default.encodingLength(transferDest.version);
-                length += totalStreamLength(transferDest.getByteLength());
+                const multiRemove = new ContentMultiMapRemove_1.ContentMultiMapRemove(value);
+                length += varint_1.default.encodingLength(multiRemove.version);
+                length += totalStreamLength(multiRemove.getByteLength());
             }
             else if (key == VDXF_Data.CrossChainDataRefKey.vdxfid) {
-                const transferDest = value;
+                const crossCh = value;
                 length += varint_1.default.encodingLength(vdxf_1.VDXF_OBJECT_DEFAULT_VERSION);
-                length += totalStreamLength(transferDest.getByteLength());
+                length += totalStreamLength(crossCh.getByteLength());
             }
             else if (key == VDXF_Data.DataDescriptorKey.vdxfid) {
                 const descr = new DataDescriptor_1.DataDescriptor(value);
@@ -192,7 +192,6 @@ class VdxfUniValue {
                 const valBuf = Buffer.from(value, "utf-8");
                 writer.writeSlice((0, address_1.fromBase58Check)(key).hash);
                 writer.writeVarInt(new bn_js_1.BN(1));
-                writer.writeCompactSize(valBuf.length + varuint_1.default.encodingLength(valBuf.length));
                 writer.writeCompactSize(valBuf.length + varuint_1.default.encodingLength(valBuf.length));
                 writer.writeVarSlice(valBuf);
             }
@@ -552,8 +551,11 @@ class VdxfUniValue {
                     const sigData = SignatureData_1.SignatureData.fromJson(oneValValues[k]);
                     arrayItem.push({ [objTypeKey]: sigData });
                 }
+                else if (objTypeKey == VDXF_Data.CredentialKey.vdxfid) {
+                    const oneCredential = Credential_1.Credential.fromJson(oneValValues[k]);
+                    arrayItem.push({ [objTypeKey]: oneCredential });
+                }
                 else {
-                    throw new Error("Unknown vdxfkey: " + oneValValues[k]);
                     throw new Error("Unknown vdxfkey: " + oneValValues[k]);
                 }
             }

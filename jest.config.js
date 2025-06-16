@@ -4,4 +4,7 @@ module.exports = {
   },
   testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(t|j)s$',
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
+  testPathIgnorePatterns: [
+    'fixtures.ts',
+  ],
 };

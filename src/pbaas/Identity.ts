@@ -2,7 +2,7 @@ import varuint from '../utils/varuint'
 import bufferutils from '../utils/bufferutils'
 import { BigNumber } from '../utils/types/BigNumber';
 import { Principal } from './Principal';
-import { fromBase58Check, nameAndParentAddrToIAddr, toBase58Check, toIAddress } from '../utils/address';
+import { fromBase58Check, nameAndParentAddrToIAddr, toBase58Check } from '../utils/address';
 import { I_ADDR_VERSION, R_ADDR_VERSION } from '../constants/vdxf';
 import { BN } from 'bn.js';
 import { IdentityID } from './IdentityID';

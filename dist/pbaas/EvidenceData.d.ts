@@ -22,11 +22,11 @@ export declare enum ETypes {
 }
 export declare class MultiPartDescriptor implements SerializableEntity {
     index: BigNumber;
-    totalLength: BigNumber;
+    total_length: BigNumber;
     start: BigNumber;
     constructor(data?: {
         index: any;
-        totalLength: any;
+        total_length: any;
         start: any;
     });
     getByteLength(): number;
@@ -38,7 +38,7 @@ export declare class EvidenceData implements SerializableEntity {
     type: BigNumber;
     md: MultiPartDescriptor;
     vdxfd: string;
-    dataVec: Buffer;
+    data_vec: Buffer;
     static VERSION_INVALID: import("bn.js");
     static VERSION_FIRST: import("bn.js");
     static VERSION_CURRENT: import("bn.js");
@@ -48,7 +48,7 @@ export declare class EvidenceData implements SerializableEntity {
         type: any;
         md: any;
         vdxfd: any;
-        dataVec: any;
+        data_vec: any;
     });
     getByteLength(): number;
     toBuffer(): Buffer;

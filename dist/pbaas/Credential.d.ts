@@ -13,7 +13,7 @@ export interface CredentialJson {
 export declare class Credential implements SerializableEntity {
     version: BigNumber;
     flags: BigNumber;
-    credentialKey: string;
+    credential_key: string;
     credential: object;
     scopes: object;
     label: string;

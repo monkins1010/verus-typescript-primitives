@@ -33,16 +33,16 @@ export enum CHAIN_OBJECT_TYPES
 
 export class CrossChainProof implements SerializableEntity {
   version: BigNumber;
-  chainObjects: Array<EvidenceData>;
+  chain_objects: Array<EvidenceData>;
 
   static VERSION_INVALID = new BN(0);
   static VERSION_FIRST = new BN(1);
   static VERSION_CURRENT = new BN(1);
   static VERSION_LAST = new BN(1);
 
-  constructor(data?: {version, chainObjects}) {
+  constructor(data?: {version, chain_objects}) {
     this.version = data?.version || new BN(1, 10);
-    this.chainObjects = data?.chainObjects || [];    
+    this.chain_objects = data?.chain_objects || [];    
   }
 
   static KnownVDXFKeys(): Map<string, CHAIN_OBJECT_TYPES> {
@@ -54,11 +54,11 @@ export class CrossChainProof implements SerializableEntity {
   getByteLength() {
     let byteLength = 0;
     byteLength += 4; // version uint32
-    byteLength += varint.encodingLength(new BN(this.chainObjects.length));
+    byteLength += varint.encodingLength(new BN(this.chain_objects.length));
     
-    for (let i = 0; i < this.chainObjects.length; i++) {
+    for (let i = 0; i < this.chain_objects.length; i++) {
       byteLength += 2; // objtype uint16
-      byteLength += this.chainObjects[i].getByteLength();
+      byteLength += this.chain_objects[i].getByteLength();
     }
 
     return byteLength
@@ -68,11 +68,11 @@ export class CrossChainProof implements SerializableEntity {
     const bufferWriter = new BufferWriter(Buffer.alloc(this.getByteLength()))
 
     bufferWriter.writeUInt32(this.version.toNumber());
-    bufferWriter.writeVarInt(new BN(this.chainObjects.length));
+    bufferWriter.writeVarInt(new BN(this.chain_objects.length));
 
-    for (let i = 0; i < this.chainObjects.length; i++) {
-      bufferWriter.writeUInt16(this.chainObjects[i].type.toNumber());
-      bufferWriter.writeSlice(this.chainObjects[i].toBuffer());
+    for (let i = 0; i < this.chain_objects.length; i++) {
+      bufferWriter.writeUInt16(this.chain_objects[i].type.toNumber());
+      bufferWriter.writeSlice(this.chain_objects[i].toBuffer());
     }
 
     return bufferWriter.buffer
@@ -82,17 +82,17 @@ export class CrossChainProof implements SerializableEntity {
     const reader = new BufferReader(buffer, offset);
 
     this.version = new BN(reader.readUInt32());
-    this.chainObjects = [];
+    this.chain_objects = [];
 
-    const chainObjectsLength = reader.readVarInt().toNumber();
+    const chain_objectsLength = reader.readVarInt().toNumber();
 
-    for (let i = 0; i < chainObjectsLength; i++) {
+    for (let i = 0; i < chain_objectsLength; i++) {
       const objType = reader.readUInt16();
       //TODO: Implement all proof types
       if (objType != CHAIN_OBJECT_TYPES.CHAINOBJ_EVIDENCEDATA) throw new Error("Invalid chain object type");
       const obj = new EvidenceData();
       obj.fromBuffer(reader.buffer, reader.offset);
-      this.chainObjects.push(obj);
+      this.chain_objects.push(obj);
     }
 
     return reader.offset;
@@ -100,11 +100,11 @@ export class CrossChainProof implements SerializableEntity {
 
   isValid(): boolean {
 
-    for (let i = 0; i < this.chainObjects.length; i++) {
-      if (!this.chainObjects[i].isValid()) return false;
+    for (let i = 0; i < this.chain_objects.length; i++) {
+      if (!this.chain_objects[i].isValid()) return false;
     }
 
-    return this.chainObjects.length > 0;
+    return this.chain_objects.length > 0;
 
   }
 
@@ -112,9 +112,9 @@ export class CrossChainProof implements SerializableEntity {
 
     const outputChainObjects = [];
   //TODO: Implement all proof types
-    for (let i = 0; i < this.chainObjects.length; i++) {
-      if (!(this.chainObjects[i] instanceof EvidenceData)) throw new Error("Invalid chain object type");
-      outputChainObjects.push({vdxftype: VDXF_Data.EvidenceDataKey.vdxfid, value: this.chainObjects[i].toJson()});
+    for (let i = 0; i < this.chain_objects.length; i++) {
+      if (!(this.chain_objects[i] instanceof EvidenceData)) throw new Error("Invalid chain object type");
+      outputChainObjects.push({vdxftype: VDXF_Data.EvidenceDataKey.vdxfid, value: this.chain_objects[i].toJson()});
     }
 
     return {
@@ -141,7 +141,7 @@ export class CrossChainProof implements SerializableEntity {
 
     return new CrossChainProof({
       version: new BN(data.version, 10),
-      chainObjects: chainObjects
+      chain_objects: chainObjects
     });
   }
 

@@ -20,27 +20,27 @@ var ETypes;
 class MultiPartDescriptor {
     constructor(data) {
         this.index = (data === null || data === void 0 ? void 0 : data.index) || new bn_js_1.BN(0, 10);
-        this.totalLength = (data === null || data === void 0 ? void 0 : data.totalLength) || new bn_js_1.BN(0, 10);
+        this.total_length = (data === null || data === void 0 ? void 0 : data.total_length) || new bn_js_1.BN(0, 10);
         this.start = (data === null || data === void 0 ? void 0 : data.start) || new bn_js_1.BN(0, 10);
     }
     getByteLength() {
         let byteLength = 0;
         byteLength += varint_1.default.encodingLength(this.index);
-        byteLength += varint_1.default.encodingLength(this.totalLength);
+        byteLength += varint_1.default.encodingLength(this.total_length);
         byteLength += varint_1.default.encodingLength(this.start);
         return byteLength;
     }
     toBuffer() {
         const bufferWriter = new BufferWriter(Buffer.alloc(this.getByteLength()));
         bufferWriter.writeVarInt(this.index);
-        bufferWriter.writeVarInt(this.totalLength);
+        bufferWriter.writeVarInt(this.total_length);
         bufferWriter.writeVarInt(this.start);
         return bufferWriter.buffer;
     }
     fromBuffer(buffer, offset = 0) {
         const reader = new BufferReader(buffer, offset);
         this.index = reader.readVarInt();
-        this.totalLength = reader.readVarInt();
+        this.total_length = reader.readVarInt();
         this.start = reader.readVarInt();
         return reader.offset;
     }
@@ -52,10 +52,11 @@ class EvidenceData {
         this.type = (data === null || data === void 0 ? void 0 : data.type) || new bn_js_1.BN(ETypes.TYPE_DATA); // holding a transaction proof of export with finalization referencing finalization of root notarization
         this.md = data === null || data === void 0 ? void 0 : data.md;
         this.vdxfd = data === null || data === void 0 ? void 0 : data.vdxfd;
-        this.dataVec = (data === null || data === void 0 ? void 0 : data.dataVec) || Buffer.alloc(0);
+        this.data_vec = (data === null || data === void 0 ? void 0 : data.data_vec) || Buffer.alloc(0);
     }
     getByteLength() {
         let byteLength = 0;
+        //yes read twice
         byteLength += varint_1.default.encodingLength(new bn_js_1.BN(this.version));
         byteLength += varint_1.default.encodingLength(new bn_js_1.BN(this.version));
         byteLength += varint_1.default.encodingLength(new bn_js_1.BN(this.type));
@@ -65,12 +66,13 @@ class EvidenceData {
         else {
             byteLength += 20;
         }
-        byteLength += varuint_1.default.encodingLength(this.dataVec.length);
-        byteLength += this.dataVec.length;
+        byteLength += varuint_1.default.encodingLength(this.data_vec.length);
+        byteLength += this.data_vec.length;
         return byteLength;
     }
     toBuffer() {
         const bufferWriter = new BufferWriter(Buffer.alloc(this.getByteLength()));
+        //yes read twice
         bufferWriter.writeVarInt(this.version);
         bufferWriter.writeVarInt(this.version);
         bufferWriter.writeVarInt(this.type);
@@ -80,11 +82,12 @@ class EvidenceData {
         else {
             bufferWriter.writeSlice((0, address_1.fromBase58Check)(this.vdxfd).hash);
         }
-        bufferWriter.writeVarSlice(this.dataVec);
+        bufferWriter.writeVarSlice(this.data_vec);
         return bufferWriter.buffer;
     }
     fromBuffer(buffer, offset = 0) {
         const reader = new BufferReader(buffer, offset);
+        //yes read twice
         this.version = reader.readVarInt();
         this.version = reader.readVarInt();
         this.type = reader.readVarInt();
@@ -95,7 +98,7 @@ class EvidenceData {
         else {
             this.vdxfd = (0, address_1.toBase58Check)(reader.readSlice(20), vdxf_1.I_ADDR_VERSION);
         }
-        this.dataVec = reader.readVarSlice();
+        this.data_vec = reader.readVarSlice();
         return reader.offset;
     }
     isValid() {

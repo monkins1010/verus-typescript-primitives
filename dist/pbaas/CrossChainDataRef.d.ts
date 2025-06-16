@@ -43,7 +43,7 @@ export declare class CrossChainDataRef implements SerializableEntity {
         type: number;
         version: number;
         flags: number;
-        data_hash: string;
+        datahash: string;
         url: string;
     };
     static fromJson(data: CrossChainDataRefJson): CrossChainDataRef;

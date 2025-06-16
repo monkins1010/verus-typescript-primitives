@@ -31,7 +31,7 @@ export declare class URLRef implements SerializableEntity {
     toJson(): {
         version: number;
         flags: number;
-        data_hash: string;
+        datahash: string;
         url: string;
     };
     static fromJson(data: URLRefJson): URLRef;

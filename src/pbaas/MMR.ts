@@ -85,8 +85,6 @@ export class MMRNode {
   }
 };
 
-
-
 //template <typename NODE_TYPE=CDefaultMMRNode, typename LAYER_TYPE=CChunkedLayer<NODE_TYPE>, typename LAYER0_TYPE=LAYER_TYPE>
 export class MerkleMountainRange {
   layer0: MMRLayer<MMRNode>;
@@ -575,7 +573,7 @@ export class MerkleMountainView {
   // of the proof by the size of the vector, and the expected bit in each position for the given
   // position in a Merkle Mountain View of the specified size
   getProofBits(pos: number, mmvSize: number) {
-    //NOTE: Not implmented.
+    throw new Error("getProofBits not implemented for MMR");
   };
 }
 
