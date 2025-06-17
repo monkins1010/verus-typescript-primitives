@@ -63,7 +63,7 @@ class CrossChainProof {
             if (objType != CHAIN_OBJECT_TYPES.CHAINOBJ_EVIDENCEDATA)
                 throw new Error("Invalid chain object type");
             const obj = new EvidenceData_1.EvidenceData();
-            obj.fromBuffer(reader.buffer, reader.offset);
+            reader.offset = obj.fromBuffer(reader.buffer, reader.offset);
             this.chain_objects.push(obj);
         }
         return reader.offset;
