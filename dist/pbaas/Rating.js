@@ -30,10 +30,25 @@ class Rating {
         bufferWriter.writeUInt32(this.version.toNumber());
         bufferWriter.writeUInt8(this.trust_level.toNumber());
         bufferWriter.writeCompactSize(this.ratings.size);
+        const entries = [];
         for (const [key, value] of this.ratings) {
             const { hash } = (0, address_1.fromBase58Check)(key);
-            bufferWriter.writeSlice(hash);
-            bufferWriter.writeVarSlice(value);
+            entries.push({ [hash.toString('hex')]: value });
+        }
+        // Sort by Buffer (vkey) value, smallest first
+        entries.sort((a, b) => {
+            const aKey = Object.keys(a)[0];
+            const bKey = Object.keys(b)[0];
+            const aBuf = Buffer.from(aKey, 'hex');
+            const bBuf = Buffer.from(bKey, 'hex');
+            return aBuf.compare(bBuf);
+        });
+        // Write sorted entries
+        for (const value of entries) {
+            const key = Object.keys(value)[0];
+            const innervalue = value[key];
+            bufferWriter.writeSlice(Buffer.from(key, 'hex'));
+            bufferWriter.writeVarSlice(innervalue);
         }
         return bufferWriter.buffer;
     }
@@ -60,9 +75,9 @@ class Rating {
             ratings[key] = value.toString('hex');
         });
         return {
-            version: this.version.toString(),
-            trust_level: this.trust_level.toString(),
-            ratings: ratings
+            version: this.version.toNumber(),
+            trustlevel: this.trust_level.toNumber(),
+            ratingsmap: ratings
         };
     }
     static fromJson(json) {

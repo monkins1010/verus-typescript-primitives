@@ -67,3 +67,7 @@ export declare const ZMemoSignatureKeyName = "vrsc::system.zmemo.signature";
 export declare const ZMemoSignatureKey: VDXFKeyInterface;
 export declare const CurrencyStartNotarizationKeyName = "vrsc::system.currency.startnotarization";
 export declare const CurrencyStartNotarizationKey: VDXFKeyInterface;
+export declare const EvidenceDataKeyName = "vrsc::system.crosschain.evidencedata";
+export declare const EvidenceDataKey: VDXFKeyInterface;
+export declare const CredentialKeyName = "vrsc::data.type.object.credential";
+export declare const CredentialKey: VDXFKeyInterface;

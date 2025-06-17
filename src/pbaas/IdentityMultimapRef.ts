@@ -13,10 +13,11 @@ export interface IdentityMultimapRefJson {
   version: number;
   flags: number;
   vdxfkey: string;
+  identityid?: string; 
   startheight: number;
   endheight: number;
-  datahash: string;
-  systemid: string;
+  datahash?: string;
+  systemid?: string;
 }
 export class IdentityMultimapRef implements SerializableEntity {
   version: BigNumber;
@@ -69,7 +70,7 @@ export class IdentityMultimapRef implements SerializableEntity {
     byteLength += 20; // key uint160
     byteLength += varint.encodingLength(this.height_start); // height_start uint32
     byteLength += varint.encodingLength(this.height_end); // height_end uint32
-    byteLength += 32; // data_hash uint25
+
 
     if (this.flags.and(IdentityMultimapRef.FLAG_HAS_DATAHASH).gt(new BN(0))) {
       byteLength += 32;
@@ -124,7 +125,7 @@ export class IdentityMultimapRef implements SerializableEntity {
   isValid(): boolean {
     return this.version.gte(IdentityMultimapRef.FIRST_VERSION) &&
       this.version.lte(IdentityMultimapRef.LAST_VERSION) &&
-      (this.flags.and(IdentityMultimapRef.FLAG_HAS_DATAHASH.add(IdentityMultimapRef.FLAG_HAS_SYSTEM).notn(16))).eq(new BN(0)) &&
+      this.flags.and(IdentityMultimapRef.FLAG_HAS_DATAHASH.add(IdentityMultimapRef.FLAG_HAS_SYSTEM)).eq(IdentityMultimapRef.FLAG_HAS_DATAHASH.add(IdentityMultimapRef.FLAG_HAS_SYSTEM)) &&
       !(!this.id_ID || this.id_ID.length === 0) && !(!this.key || this.key.length === 0);
   }
 
@@ -138,20 +139,24 @@ export class IdentityMultimapRef implements SerializableEntity {
 
   toJson() {
 
-    let retval;
+    let retval: IdentityMultimapRefJson = {
 
-    retval.version = this.version.toString(10);
-    retval.flags = this.flags.toString(10);
-    retval.vdxfkey = this.key;
+      version: this.version.toNumber(),
+      flags: this.flags.toNumber(),
+      vdxfkey: this.key,
+      startheight: this.height_start.toNumber(),
+      endheight: this.height_end.toNumber(),
+      identityid: this.id_ID
+    };
+
     if (this.hasDataHash()) {
-      retval.datahash = this.data_hash.toString('hex');
+      retval.datahash = Buffer.from(this.data_hash).reverse().toString('hex');
     }
 
     if (this.hasSystemID()) {
       retval.systemid = this.system_id;
     }
-    retval.startheight = this.height_start.toString(10);
-    retval.endheight = this.height_end.toString(10);
+    return retval;
   }
 
   static fromJson(data: IdentityMultimapRefJson): IdentityMultimapRef {
@@ -159,9 +164,10 @@ export class IdentityMultimapRef implements SerializableEntity {
       version: new BN(data.version),
       flags: new BN(data.flags),
       key: data.vdxfkey,
+      id_ID: data.identityid,
       height_start: new BN(data.startheight),
       height_end: new BN(data.endheight),
-      data_hash: Buffer.from(data.datahash, 'hex'),
+      data_hash: Buffer.from(data.datahash, 'hex').reverse(),
       system_id: data.systemid
     })
   }

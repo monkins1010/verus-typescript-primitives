@@ -35,7 +35,7 @@ class SignatureData {
             signatureData.hash_type = new bn_js_1.BN(data.hashtype);
             signatureData.identity_ID = data.identityid;
             signatureData.sig_type = new bn_js_1.BN(data.signaturetype);
-            if (signatureData.hash_type == new bn_js_1.BN(DataDescriptor_1.EHashTypes.HASH_SHA256)) {
+            if (signatureData.hash_type.eq(new bn_js_1.BN(Number(DataDescriptor_1.EHashTypes.HASH_SHA256)))) {
                 signatureData.signature_hash = Buffer.from(data.signaturehash, 'hex');
             }
             else {
@@ -44,7 +44,7 @@ class SignatureData {
             signatureData.signature_as_vch = Buffer.from(data.signature, 'base64');
             signatureData.vdxf_keys = data.vdxfkeys || [];
             signatureData.vdxf_key_names = data.vdxfkeynames || [];
-            signatureData.bound_hashes = ((_a = data.boundhashes) === null || _a === void 0 ? void 0 : _a.map((hash) => Buffer.from(hash, 'hex'))) || [];
+            signatureData.bound_hashes = ((_a = data.boundhashes) === null || _a === void 0 ? void 0 : _a.map((hash) => Buffer.from(hash, 'hex').reverse())) || [];
         }
         return signatureData;
     }
@@ -134,18 +134,18 @@ class SignatureData {
     }
     toJson() {
         const returnObj = {
-            version: this.version.toString(),
+            version: this.version.toNumber(),
             systemid: this.system_ID,
-            hashtype: this.hash_type.toString()
+            hashtype: this.hash_type.toNumber()
         };
-        if (this.hash_type == new bn_js_1.BN(DataDescriptor_1.EHashTypes.HASH_SHA256)) {
-            returnObj['signaturehash'] = this.signature_hash.reverse().toString('hex');
+        if (this.hash_type.eq(new bn_js_1.BN(Number(DataDescriptor_1.EHashTypes.HASH_SHA256)))) {
+            returnObj['signaturehash'] = Buffer.from(this.signature_hash).toString('hex');
         }
         else {
-            returnObj['signaturehash'] = this.signature_hash.toString('hex');
+            returnObj['signaturehash'] = Buffer.from(this.signature_hash).reverse().toString('hex');
         }
         returnObj['identityid'] = this.identity_ID;
-        returnObj['signaturetype'] = this.sig_type.toString();
+        returnObj['signaturetype'] = this.sig_type.toNumber();
         returnObj['signature'] = this.signature_as_vch.toString('base64');
         if (this.vdxf_keys) {
             returnObj['vdxfkeys'] = this.vdxf_keys;
@@ -154,7 +154,7 @@ class SignatureData {
             returnObj['vdxfkeynames'] = this.vdxf_key_names;
         }
         if (this.bound_hashes) {
-            returnObj['boundhashes'] = this.bound_hashes.map((hash) => hash.toString('hex'));
+            returnObj['boundhashes'] = this.bound_hashes.map((hash) => Buffer.from(hash).reverse().toString('hex'));
         }
         return returnObj;
     }

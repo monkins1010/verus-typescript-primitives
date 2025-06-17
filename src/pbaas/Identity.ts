@@ -278,7 +278,7 @@ export class Identity extends Principal implements SerializableEntity {
       if (this.version.gte(IDENTITY_VERSION_PBAAS)) {
         const multimap = new ContentMultiMap();
 
-        reader.offset = multimap.fromBuffer(reader.buffer, reader.offset, parseVdxfObjects);
+      reader.offset = multimap.fromBuffer(reader.buffer, reader.offset, parseVdxfObjects);
 
         this.content_multimap = multimap;
       }

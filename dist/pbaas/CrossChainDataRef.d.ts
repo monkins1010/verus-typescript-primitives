@@ -23,6 +23,14 @@ export declare class CrossChainDataRef implements SerializableEntity {
     isValid(): boolean;
     toJson(): {
         type: number;
+        version: number;
+        flags: number;
+        vdxfkey: string;
+        identityid?: string;
+        startheight: number;
+        endheight: number;
+        datahash?: string;
+        systemid?: string;
     } | {
         type: number;
         version: number;
@@ -33,7 +41,9 @@ export declare class CrossChainDataRef implements SerializableEntity {
         systemid: string;
     } | {
         type: number;
-        version: string;
+        version: number;
+        flags: number;
+        datahash: string;
         url: string;
     };
     static fromJson(data: CrossChainDataRefJson): CrossChainDataRef;

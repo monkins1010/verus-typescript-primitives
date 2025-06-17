@@ -59,11 +59,30 @@ export class Rating implements SerializableEntity {
     bufferWriter.writeUInt8(this.trust_level.toNumber());
     bufferWriter.writeCompactSize(this.ratings.size);
 
+    const entries: Array<{ [key: string]: Buffer }> = [];
+
     for (const [key, value] of this.ratings) {
       const { hash } = fromBase58Check(key);
+      entries.push({ [hash.toString('hex')]: value });
+    }
 
-      bufferWriter.writeSlice(hash);
-      bufferWriter.writeVarSlice(value);
+    // Sort by Buffer (vkey) value, smallest first
+
+    entries.sort((a, b) => {
+      const aKey = Object.keys(a)[0];
+      const bKey = Object.keys(b)[0];
+      const aBuf = Buffer.from(aKey, 'hex');
+      const bBuf = Buffer.from(bKey, 'hex');
+      return aBuf.compare(bBuf);
+    });
+
+    // Write sorted entries
+    for (const value of entries) {
+      const key = Object.keys(value)[0];
+      const innervalue = value[key];
+
+      bufferWriter.writeSlice(Buffer.from(key, 'hex'));
+      bufferWriter.writeVarSlice(innervalue);
     }
 
     return bufferWriter.buffer
@@ -102,9 +121,9 @@ export class Rating implements SerializableEntity {
     });
 
     return {
-      version: this.version.toString(),
-      trust_level: this.trust_level.toString(),
-      ratings: ratings
+      version: this.version.toNumber(),
+      trustlevel: this.trust_level.toNumber(),
+      ratingsmap: ratings
     }
   }
 

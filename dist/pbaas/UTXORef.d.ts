@@ -13,11 +13,11 @@ export declare class UTXORef implements SerializableEntity {
     fromBuffer(buffer: Buffer, offset?: number): number;
     isValid(): boolean;
     toJson(): {
-        hash: string;
-        n: number;
+        txid: string;
+        voutnum: number;
     };
     static fromJson(data: {
-        hash: string;
-        n: string;
+        txid: string;
+        voutnum: string;
     }): UTXORef;
 }

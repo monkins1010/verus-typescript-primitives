@@ -27,6 +27,8 @@ const keys_1 = require("./keys");
 const bn_js_1 = require("bn.js");
 __exportStar(require("./keys"), exports);
 __exportStar(require("./scopes"), exports);
+__exportStar(require("./keymap"), exports);
+__exportStar(require("./identitydatakeys"), exports);
 __exportStar(require("./vdxfdatakeys"), exports);
 class VDXFObject {
     constructor(key = "", serializekey = true) {

@@ -92,7 +92,7 @@ export class PBaaSEvidenceRef implements SerializableEntity {
     this.version = reader.readVarInt();
     this.flags = reader.readVarInt();
     this.output = new UTXORef();
-    offset = this.output.fromBuffer(reader.buffer, reader.offset);
+    reader.offset = this.output.fromBuffer(reader.buffer, reader.offset);
     this.object_num = reader.readVarInt();
     this.sub_object = reader.readVarInt();
 

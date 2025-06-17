@@ -71,7 +71,7 @@ export class SignatureData implements SerializableEntity {
       signatureData.identity_ID = data.identityid;
       signatureData.sig_type = new BN(data.signaturetype);
 
-      if (signatureData.hash_type == new BN(EHashTypes.HASH_SHA256)) {
+      if (signatureData.hash_type.eq(new BN(Number(EHashTypes.HASH_SHA256)))) {
         signatureData.signature_hash = Buffer.from(data.signaturehash, 'hex');
       } else {
         signatureData.signature_hash = Buffer.from(data.signaturehash, 'hex').reverse();
@@ -80,7 +80,7 @@ export class SignatureData implements SerializableEntity {
       signatureData.signature_as_vch = Buffer.from(data.signature, 'base64');
       signatureData.vdxf_keys = data.vdxfkeys || [];
       signatureData.vdxf_key_names = data.vdxfkeynames || [];
-      signatureData.bound_hashes = data.boundhashes?.map((hash) => Buffer.from(hash, 'hex')) || [];
+      signatureData.bound_hashes = data.boundhashes?.map((hash) => Buffer.from(hash, 'hex').reverse()) || [];
 
     }
 
@@ -196,19 +196,19 @@ export class SignatureData implements SerializableEntity {
   toJson() {
 
     const returnObj = {
-      version: this.version.toString(),
+      version: this.version.toNumber(),
       systemid: this.system_ID,
-      hashtype: this.hash_type.toString()
+      hashtype: this.hash_type.toNumber()
     }
 
-    if (this.hash_type == new BN(EHashTypes.HASH_SHA256)) {
-      returnObj['signaturehash'] = this.signature_hash.reverse().toString('hex');
+    if (this.hash_type.eq(new BN(Number(EHashTypes.HASH_SHA256)))) {
+      returnObj['signaturehash'] = Buffer.from(this.signature_hash).toString('hex');
     } else {
-      returnObj['signaturehash'] = this.signature_hash.toString('hex');
+      returnObj['signaturehash'] = Buffer.from(this.signature_hash).reverse().toString('hex');
     }
 
     returnObj['identityid'] = this.identity_ID;
-    returnObj['signaturetype'] = this.sig_type.toString();
+    returnObj['signaturetype'] = this.sig_type.toNumber();
     returnObj['signature'] = this.signature_as_vch.toString('base64');
 
     if (this.vdxf_keys) {
@@ -220,7 +220,7 @@ export class SignatureData implements SerializableEntity {
     }
 
     if (this.bound_hashes) {
-      returnObj['boundhashes'] = this.bound_hashes.map((hash) => hash.toString('hex'));
+      returnObj['boundhashes'] = this.bound_hashes.map((hash) => Buffer.from(hash).reverse().toString('hex'));
     }
 
     return returnObj

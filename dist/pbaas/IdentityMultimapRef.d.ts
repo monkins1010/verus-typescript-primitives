@@ -6,10 +6,11 @@ export interface IdentityMultimapRefJson {
     version: number;
     flags: number;
     vdxfkey: string;
+    identityid?: string;
     startheight: number;
     endheight: number;
-    datahash: string;
-    systemid: string;
+    datahash?: string;
+    systemid?: string;
 }
 export declare class IdentityMultimapRef implements SerializableEntity {
     version: BigNumber;
@@ -34,6 +35,6 @@ export declare class IdentityMultimapRef implements SerializableEntity {
     isValid(): boolean;
     hasDataHash(): boolean;
     hasSystemID(): boolean;
-    toJson(): void;
+    toJson(): IdentityMultimapRefJson;
     static fromJson(data: IdentityMultimapRefJson): IdentityMultimapRef;
 }
