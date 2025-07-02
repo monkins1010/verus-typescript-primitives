@@ -45,3 +45,4 @@ __exportStar(require("./SignatureData"), exports);
 __exportStar(require("./URLRef"), exports);
 __exportStar(require("./UTXORef"), exports);
 __exportStar(require("./DefinedKey"), exports);
+__exportStar(require("./MMR"), exports);
