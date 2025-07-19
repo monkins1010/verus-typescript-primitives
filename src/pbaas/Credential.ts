@@ -106,8 +106,8 @@ export class Credential implements SerializableEntity {
   fromBuffer(buffer: Buffer, offset: number = 0) {
     const reader = new BufferReader(buffer, offset);
 
-    this.version = new BN(reader.readVarInt());
-    this.flags = new BN(reader.readVarInt());
+    this.version = reader.readVarInt();
+    this.flags = reader.readVarInt();
     this.credential_key = toBase58Check(reader.readSlice(20), I_ADDR_VERSION);
     const credentialJson = reader.readVarSlice();
     this.credential = credentialJson.length > 0 ? JSON.parse(credentialJson.toString('utf8')) : {};

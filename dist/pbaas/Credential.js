@@ -64,8 +64,8 @@ class Credential {
     }
     fromBuffer(buffer, offset = 0) {
         const reader = new BufferReader(buffer, offset);
-        this.version = new bn_js_1.BN(reader.readVarInt());
-        this.flags = new bn_js_1.BN(reader.readVarInt());
+        this.version = reader.readVarInt();
+        this.flags = reader.readVarInt();
         this.credential_key = (0, address_1.toBase58Check)(reader.readSlice(20), vdxf_1.I_ADDR_VERSION);
         const credentialJson = reader.readVarSlice();
         this.credential = credentialJson.length > 0 ? JSON.parse(credentialJson.toString('utf8')) : {};
