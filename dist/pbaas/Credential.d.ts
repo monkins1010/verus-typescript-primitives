@@ -5,7 +5,7 @@ import { SerializableEntity } from '../utils/types/SerializableEntity';
 export interface CredentialJson {
     version: number;
     flags: number;
-    credentialKey: string;
+    credentialkey: string;
     credential?: object;
     scopes: object;
     label: string;
