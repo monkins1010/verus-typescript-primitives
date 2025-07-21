@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Credential = void 0;
+const varint_1 = require("../utils/varint");
 const varuint_1 = require("../utils/varuint");
 const address_1 = require("../utils/address");
 const bufferutils_1 = require("../utils/bufferutils");
@@ -27,8 +28,8 @@ class Credential {
     getByteLength() {
         let byteLength = 0;
         this.setFlags();
-        byteLength += 4; // version uint32
-        byteLength += 4; // flags uint32
+        byteLength += varint_1.default.encodingLength(this.version);
+        byteLength += varint_1.default.encodingLength(this.flags);
         byteLength += 20; // credentialskey
         if (JSON.stringify(this.credential).length > Credential.MAX_JSON_STRING_LENGTH) {
             throw new Error(`Credential JSON exceeds maximum length of ${Credential.MAX_JSON_STRING_LENGTH} characters`);
@@ -51,8 +52,8 @@ class Credential {
     }
     toBuffer() {
         const bufferWriter = new BufferWriter(Buffer.alloc(this.getByteLength()));
-        bufferWriter.writeUInt32(this.version.toNumber());
-        bufferWriter.writeUInt32(this.flags.toNumber());
+        bufferWriter.writeVarInt(this.version);
+        bufferWriter.writeVarInt(this.flags);
         bufferWriter.writeSlice((0, address_1.fromBase58Check)(this.credential_key).hash);
         bufferWriter.writeVarSlice(Buffer.from(JSON.stringify(this.credential), 'utf8'));
         bufferWriter.writeVarSlice(Buffer.from(JSON.stringify(this.scopes), 'utf8'));
@@ -63,9 +64,8 @@ class Credential {
     }
     fromBuffer(buffer, offset = 0) {
         const reader = new BufferReader(buffer, offset);
-        this.version = new bn_js_1.BN(reader.readUInt32());
-        this.flags = new bn_js_1.BN(reader.readUInt32());
-        ;
+        this.version = reader.readVarInt();
+        this.flags = reader.readVarInt();
         this.credential_key = (0, address_1.toBase58Check)(reader.readSlice(20), vdxf_1.I_ADDR_VERSION);
         const credentialJson = reader.readVarSlice();
         this.credential = credentialJson.length > 0 ? JSON.parse(credentialJson.toString('utf8')) : {};
@@ -83,7 +83,7 @@ class Credential {
         let retval = {
             version: this.version.toNumber(),
             flags: this.flags.toNumber(),
-            credentialKey: this.credential_key,
+            credentialkey: this.credential_key,
             credential: this.credential,
             scopes: this.scopes,
             label: this.label
@@ -94,7 +94,7 @@ class Credential {
         return new Credential({
             version: new bn_js_1.BN(data.version),
             flags: new bn_js_1.BN(data.flags),
-            credential_key: data.credentialKey,
+            credential_key: data.credentialkey,
             credential: data.credential,
             scopes: data.scopes,
             label: data.label

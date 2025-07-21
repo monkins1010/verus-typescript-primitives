@@ -12,7 +12,7 @@ const { BufferReader, BufferWriter } = bufferutils
 export interface CredentialJson { 
   version: number;
   flags: number;
-  credentialKey: string;
+  credentialkey: string;
   credential?: object; 
   scopes: object;
   label: string;
@@ -60,8 +60,9 @@ export class Credential implements SerializableEntity {
     let byteLength = 0;
     this.setFlags();
 
-    byteLength += 4; // version uint32
-    byteLength += 4; // flags uint32
+    byteLength += varint.encodingLength(this.version);
+    byteLength += varint.encodingLength(this.flags);
+
     byteLength += 20; // credentialskey
 
     if (JSON.stringify(this.credential).length > Credential.MAX_JSON_STRING_LENGTH) {
@@ -90,8 +91,8 @@ export class Credential implements SerializableEntity {
   toBuffer() {
     const bufferWriter = new BufferWriter(Buffer.alloc(this.getByteLength()))
 
-    bufferWriter.writeUInt32(this.version.toNumber());
-    bufferWriter.writeUInt32(this.flags.toNumber());
+    bufferWriter.writeVarInt(this.version);
+    bufferWriter.writeVarInt(this.flags);
     bufferWriter.writeSlice(fromBase58Check(this.credential_key).hash);
     bufferWriter.writeVarSlice(Buffer.from(JSON.stringify(this.credential), 'utf8'));
     bufferWriter.writeVarSlice(Buffer.from(JSON.stringify(this.scopes), 'utf8'));
@@ -105,8 +106,8 @@ export class Credential implements SerializableEntity {
   fromBuffer(buffer: Buffer, offset: number = 0) {
     const reader = new BufferReader(buffer, offset);
 
-    this.version = new BN(reader.readUInt32());
-    this.flags = new BN(reader.readUInt32());;
+    this.version = reader.readVarInt();
+    this.flags = reader.readVarInt();
     this.credential_key = toBase58Check(reader.readSlice(20), I_ADDR_VERSION);
     const credentialJson = reader.readVarSlice();
     this.credential = credentialJson.length > 0 ? JSON.parse(credentialJson.toString('utf8')) : {};
@@ -129,7 +130,7 @@ export class Credential implements SerializableEntity {
 
       version: this.version.toNumber(),
       flags: this.flags.toNumber(),
-      credentialKey: this.credential_key,
+      credentialkey: this.credential_key,
       credential: this.credential,
       scopes: this.scopes,
       label: this.label
@@ -142,7 +143,7 @@ export class Credential implements SerializableEntity {
     return new Credential({
       version: new BN(data.version),
       flags: new BN(data.flags),
-      credential_key: data.credentialKey,
+      credential_key: data.credentialkey,
       credential: data.credential,
       scopes: data.scopes,
       label: data.label
