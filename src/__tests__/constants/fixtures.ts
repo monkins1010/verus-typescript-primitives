@@ -149,7 +149,7 @@ export const manyContentMultimapData = {
       "iDTG49YLqmkHMYRyuQBYgEyTByQwAzqGd6": {
         "version": 1,
         "flags": 1,
-        "credentialKey": "i3esdByX2PKx5vJiuNrRb61KAKqsBEMxac",
+        "credentialkey": "i3esdByX2PKx5vJiuNrRb61KAKqsBEMxac",
         "credential": { name: "Test Account" },
         "scopes": { address: "Test Address" },
         "label": "Label 1"

@@ -251,7 +251,7 @@ describe('Encodes and decodes VdxfUniValue', () => {
     expect(urldata).toBe(VdxfUniValue.fromJson(jsonData[11]).toBuffer().toString('hex'));
 
     //Credential
-    const credentialdata = '6d7401412e7ee923567eb8ac2d9f0c7102c2fb090157010000000100000001f503c4f232c4599167a02357c25b75d5ad3ff0177b226e616d65223a2254657374204163636f756e74227d1a7b2261646472657373223a22546573742041646472657373227d074c6162656c2031'
+    const credentialdata = '6d7401412e7ee923567eb8ac2d9f0c7102c2fb090151010101f503c4f232c4599167a02357c25b75d5ad3ff0177b226e616d65223a2254657374204163636f756e74227d1a7b2261646472657373223a22546573742041646472657373227d074c6162656c2031'
     const credentialObject = new VdxfUniValue();
     credentialObject.fromBuffer(Buffer.from(credentialdata, 'hex'));
     expect(credentialObject.toJson()).toStrictEqual(jsonData[12]);
