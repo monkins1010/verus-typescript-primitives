@@ -66,7 +66,7 @@ type SignDataKeys = {
   messagebase64?: string;
   datahash?: string;
   vdxfdata?: VdxfUniValueJson;
-  mmrdata?: Array<SingleKeyMMRData | string>;
+  mmrdata?: Array<SingleKeyMMRData | string | { vdxfdata: VdxfUniValueJson }>;
 };
 
 // Base fields (always optional)

@@ -60,7 +60,7 @@ export type SingleKeyMMRData = {
 }[CLIMMRDataStringKey];
 
 export type PartialMMRDataCLIJson = {
-  mmrdata: Array<SingleKeyMMRData | string | { ['vdfxdata']: VdxfUniValueJson }>;
+  mmrdata: Array<SingleKeyMMRData | string | { ['vdxfdata']: VdxfUniValueJson }>;
   mmrsalt?: Array<string>;
   mmrhashtype?: AllowedHashes;
   priormmr?: Array<string>;
