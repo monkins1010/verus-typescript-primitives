@@ -48,7 +48,7 @@ declare type SignDataKeys = {
     datahash?: string;
     vdxfdata?: VdxfUniValueJson;
     mmrdata?: Array<SingleKeyMMRData | string | {
-        ['vdfxdata']: VdxfUniValueJson;
+        vdxfdata: VdxfUniValueJson;
     }>;
 };
 declare type BaseFields = {

@@ -5,7 +5,7 @@ import { LOGIN_CONSENT_PROVISIONING_RESULT_VDXF_KEY } from "../../keys";
 import { Hash160 } from "../Hash160";
 
 export interface ProvisioningResultInterface {
-  // Vdfxkey representing the result state
+  // Vdxfkey representing the result state
   state: string;
 
   // VDXF key of error type
