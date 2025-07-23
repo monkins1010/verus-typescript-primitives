@@ -34,7 +34,7 @@ export declare type SingleKeyMMRData = {
 }[CLIMMRDataStringKey];
 export declare type PartialMMRDataCLIJson = {
     mmrdata: Array<SingleKeyMMRData | string | {
-        ['vdfxdata']: VdxfUniValueJson;
+        ['vdxfdata']: VdxfUniValueJson;
     }>;
     mmrsalt?: Array<string>;
     mmrhashtype?: AllowedHashes;

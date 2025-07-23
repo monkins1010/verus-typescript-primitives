@@ -22,3 +22,4 @@ export declare const GET_CURRENCY_CONVERTERS = "getcurrencyconverters";
 export declare const LIST_CURRENCIES = "listcurrencies";
 export declare const ESTIMATE_CONVERSION = "estimateconversion";
 export declare const Z_GET_OPERATION_STATUS = "z_getoperationstatus";
+export declare const SIGN_RAW_TRANSACTION = "signrawtransaction";

@@ -16,8 +16,8 @@ export interface CredentialJson {
   credential?: object; 
   scopes: object;
   label: string;
-
 }
+
 export class Credential implements SerializableEntity {
   version: BigNumber;
   flags: BigNumber;

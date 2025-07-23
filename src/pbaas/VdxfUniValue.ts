@@ -32,7 +32,7 @@ export type VdxfUniType = string | Buffer | BigNumber | CurrencyValueMap | Ratin
 
 export interface VdxfUniValueJson {
   [key: string]: string | number | RatingJson | TransferDestinationJson |
-  ContentMultiMapRemoveJson | CrossChainDataRefJson | SignatureJsonDataInterface | DataDescriptorJson | MMRDescriptorJson;
+  ContentMultiMapRemoveJson | CrossChainDataRefJson | SignatureJsonDataInterface | DataDescriptorJson | MMRDescriptorJson | VdxfUniValueJson;
   serializedhex?: string;
   serializedbase64?: string;
   message?: string;
