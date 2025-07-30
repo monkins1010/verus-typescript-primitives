@@ -146,15 +146,34 @@ class AttestationDetails {
     }
     setLabel(label) {
         this.label = label;
-        this.flags = this.flags.or(new bn_js_1.BN(AttestationDetails.FLAG_LABEL));
     }
     setId(id) {
         this.id = id;
-        this.flags = this.flags.or(new bn_js_1.BN(AttestationDetails.FLAG_ID));
     }
     setTimestamp(timestamp) {
         this.timestamp = timestamp;
-        this.flags = this.flags.or(new bn_js_1.BN(AttestationDetails.FLAG_TIMESTAMP));
+    }
+    /**
+     * Calculate flags based on the presence of optional fields
+     */
+    calcFlags() {
+        let flags = new bn_js_1.BN(0);
+        if (this.label && this.label.length > 0) {
+            flags = flags.or(new bn_js_1.BN(AttestationDetails.FLAG_LABEL));
+        }
+        if (this.id && this.id.length > 0) {
+            flags = flags.or(new bn_js_1.BN(AttestationDetails.FLAG_ID));
+        }
+        if (this.timestamp) {
+            flags = flags.or(new bn_js_1.BN(AttestationDetails.FLAG_TIMESTAMP));
+        }
+        return flags;
+    }
+    /**
+     * Set the flags based on calculated values from present fields
+     */
+    setFlags() {
+        this.flags = this.calcFlags();
     }
     /**
      * Add a new attestation from a Verus node response
@@ -192,6 +211,7 @@ class AttestationDetails {
         return this.attestations.length;
     }
     getByteLength() {
+        this.setFlags();
         let length = 0;
         length += varint_1.default.encodingLength(this.version);
         length += varint_1.default.encodingLength(this.flags);

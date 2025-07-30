@@ -85,6 +85,14 @@ export declare class AttestationDetails implements SerializableEntity {
     setId(id: string): void;
     setTimestamp(timestamp: BigNumber): void;
     /**
+     * Calculate flags based on the presence of optional fields
+     */
+    calcFlags(): BigNumber;
+    /**
+     * Set the flags based on calculated values from present fields
+     */
+    setFlags(): void;
+    /**
      * Add a new attestation from a Verus node response
      * @param nodeResponse - The JSON object from Verus node: {"signaturedata": ..., "mmrdescriptor": ...}
      */

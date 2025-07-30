@@ -170,6 +170,9 @@ export class AttestationDetails implements SerializableEntity {
       attestationDetails.setTimestamp(new BN(options.timestamp));
     }
 
+    // Update flags based on set metadata
+    attestationDetails.setFlags();
+
     return attestationDetails;
   }
 
@@ -208,6 +211,9 @@ export class AttestationDetails implements SerializableEntity {
       attestationDetails.setTimestamp(new BN(options.timestamp));
     }
 
+    // Update flags based on set metadata
+    attestationDetails.setFlags();
+
     return attestationDetails;
   }
 
@@ -225,17 +231,42 @@ export class AttestationDetails implements SerializableEntity {
 
   setLabel(label: string): void {
     this.label = label;
-    this.flags = this.flags.or(new BN(AttestationDetails.FLAG_LABEL));
   }
 
   setId(id: string): void {
     this.id = id;
-    this.flags = this.flags.or(new BN(AttestationDetails.FLAG_ID));
   }
 
   setTimestamp(timestamp: BigNumber): void {
     this.timestamp = timestamp;
-    this.flags = this.flags.or(new BN(AttestationDetails.FLAG_TIMESTAMP));
+  }
+
+  /**
+   * Calculate flags based on the presence of optional fields
+   */
+  calcFlags(): BigNumber {
+    let flags = new BN(0);
+    
+    if (this.label && this.label.length > 0) {
+      flags = flags.or(new BN(AttestationDetails.FLAG_LABEL));
+    }
+    
+    if (this.id && this.id.length > 0) {
+      flags = flags.or(new BN(AttestationDetails.FLAG_ID));
+    }
+    
+    if (this.timestamp) {
+      flags = flags.or(new BN(AttestationDetails.FLAG_TIMESTAMP));
+    }
+    
+    return flags;
+  }
+
+  /**
+   * Set the flags based on calculated values from present fields
+   */
+  setFlags(): void {
+    this.flags = this.calcFlags();
   }
 
   /**
@@ -282,6 +313,7 @@ export class AttestationDetails implements SerializableEntity {
   }
 
   getByteLength(): number {
+    this.setFlags();
     let length = 0;
 
     length += varint.encodingLength(this.version);
