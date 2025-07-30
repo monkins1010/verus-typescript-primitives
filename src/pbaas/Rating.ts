@@ -142,5 +142,5 @@ export class Rating implements SerializableEntity {
     })
   }
 
-  //TODO: implment ratings values
+  //TODO: implement ratings values
 }
