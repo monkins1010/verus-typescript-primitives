@@ -164,7 +164,7 @@ class TransferDestination {
         if (type.and(exports.FLAG_DEST_AUX).gt(new bn_js_1.BN(0)) && data.auxdests.length > 0) {
             auxDests = data.auxdests.map(x => TransferDestination.fromJson(x));
         }
-        if (type.and(exports.FLAG_DEST_GATEWAY).gt(new bn_js_1.BN(0)) && data.auxdests.length > 0) {
+        if (type.and(exports.FLAG_DEST_GATEWAY).gt(new bn_js_1.BN(0)) && data.fees) {
             fees = (0, numberConversion_1.decimalToBn)(data.fees);
         }
         return new TransferDestination({

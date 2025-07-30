@@ -203,7 +203,7 @@ export class TransferDestination implements SerializableEntity {
       auxDests = data.auxdests.map(x => TransferDestination.fromJson(x));
     }
 
-    if (type.and(FLAG_DEST_GATEWAY).gt(new BN(0)) && data.auxdests.length > 0) {
+    if (type.and(FLAG_DEST_GATEWAY).gt(new BN(0)) && data.fees) {
       fees = decimalToBn(data.fees);
     }
 
