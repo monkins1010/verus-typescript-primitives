@@ -22,6 +22,8 @@ export const getFriendlyNameForVdxfKey = (vdxfkey: string, locale = 'EN') => {
 export const IdentityVdxfidMap = {
     [identitykeys.IDENTITY_FIRSTNAME.vdxfid]: { EN: "First Name"},
     [identitykeys.IDENTITY_LASTNAME.vdxfid]: { EN: "Last Name"},
+    [identitykeys.IDENTITY_MIDDLENAME.vdxfid]: { EN: "Middle Name" },
+    [identitykeys.IDENTITY_GENDER.vdxfid]: { EN: "Gender" },
     [identitykeys.IDENTITY_NATIONALITY.vdxfid]: { EN: "Nationality"},
     [identitykeys.IDENTITY_ATTESTOR.vdxfid]: { EN: "Attestor ID"},
     [identitykeys.IDENTITY_ATTESTATION_RECIPIENT.vdxfid]: { EN: "Attestation Recipient"},

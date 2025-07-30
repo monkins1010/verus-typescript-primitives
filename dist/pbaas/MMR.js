@@ -323,7 +323,7 @@ class MerkleMountainView {
                         this.peakMerkle[this.peakMerkle.length - 1].push(this.peakMerkle[layerIndex][this.peakMerkle[layerIndex].length - 1]);
                     }
                     else {
-                        this.peakMerkle[this.peakMerkle.length].push(this.peaks[this.peaks.length - 1]);
+                        this.peakMerkle[this.peakMerkle.length - 1].push(this.peaks[this.peaks.length - 1]);
                     }
                 }
                 // each entry in the next layer should be either combined two of the prior layer, or a duplicate of the prior layer's end
