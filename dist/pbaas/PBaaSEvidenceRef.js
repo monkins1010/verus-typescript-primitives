@@ -7,7 +7,6 @@ const bufferutils_1 = require("../utils/bufferutils");
 const bn_js_1 = require("bn.js");
 const vdxf_1 = require("../constants/vdxf");
 const UTXORef_1 = require("./UTXORef");
-const IdentityMultimapRef_1 = require("./IdentityMultimapRef");
 const { BufferReader, BufferWriter } = bufferutils_1.default;
 class PBaaSEvidenceRef {
     constructor(data) {
@@ -59,7 +58,7 @@ class PBaaSEvidenceRef {
         reader.offset = this.output.fromBuffer(reader.buffer, reader.offset);
         this.object_num = reader.readVarInt();
         this.sub_object = reader.readVarInt();
-        if (this.flags.and(IdentityMultimapRef_1.IdentityMultimapRef.FLAG_HAS_DATAHASH).gt(new bn_js_1.BN(0))) {
+        if (this.flags.and(PBaaSEvidenceRef.FLAG_HAS_SYSTEM).gt(new bn_js_1.BN(0))) {
             this.system_id = (0, address_1.toBase58Check)(reader.readSlice(20), vdxf_1.I_ADDR_VERSION);
         }
         return reader.offset;
