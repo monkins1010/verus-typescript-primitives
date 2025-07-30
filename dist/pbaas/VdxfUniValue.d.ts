@@ -21,7 +21,7 @@ export interface VdxfUniValueJson {
     serializedhex?: string;
     serializedbase64?: string;
     message?: string;
-}
+};
 export declare type VdxfUniValueJsonArray = Array<VdxfUniValueJson>;
 export declare type JsonSerializableObject = CurrencyValueMap | Rating | TransferDestination | ContentMultiMapRemove | CrossChainDataRef | SignatureData | DataDescriptor | MMRDescriptor | Credential;
 export declare class VdxfUniValue implements SerializableEntity {
