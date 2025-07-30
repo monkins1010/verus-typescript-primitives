@@ -12,6 +12,18 @@ This library is essential for any JavaScript or TypeScript project that needs to
 - **Serialization & Deserialization**: Robust methods (`toBuffer`, `fromBuffer`) to convert complex objects into byte-level representations for network transport or storage.
 - **Utility Functions**: A suite of helper functions for address conversion (`toIAddress`), hashing, and Verus script compilation/decompilation.
 
+## ⚠️ Features in Progress ⚠️
+
+Certain features in this library are not yet implemented on the wallet side and may be subject to breaking changes. These include the following and all related subclasses to the following (e.g. the details classes for IdentityUpdateRequest and IdentityUpdateResponse):
+
+- `IdentityUpdateRequest`
+- `IdentityUpdateResponse`
+- `IdentityUpdateEnvelope`
+- `IDENTITY_UPDATE_REQUEST_VDXF_KEY`
+- `IDENTITY_UPDATE_RESPONSE_VDXF_KEY`
+- `DATA_TYPE_DEFINEDKEY`
+- `DefinedKey`
+
 ## Installation
 
 Install the package using npm:
