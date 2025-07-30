@@ -16,12 +16,13 @@ import { IdentityMultimapRef } from './IdentityMultimapRef';
 export declare const VDXF_UNI_VALUE_VERSION_INVALID: import("bn.js");
 export declare const VDXF_UNI_VALUE_VERSION_CURRENT: import("bn.js");
 export declare type VdxfUniType = string | Buffer | BigNumber | CurrencyValueMap | Rating | TransferDestination | ContentMultiMapRemove | CrossChainDataRef | SignatureData | DataDescriptor | MMRDescriptor | URLRef | IdentityMultimapRef | Credential;
-export interface VdxfUniValueJson {
-    [key: string]: string | number | RatingJson | TransferDestinationJson | ContentMultiMapRemoveJson | CrossChainDataRefJson | SignatureJsonDataInterface | DataDescriptorJson | MMRDescriptorJson | VdxfUniValueJson;
+export interface VdxfUniValueInterface {
+    [key: string]: string | number | RatingJson | TransferDestinationJson | ContentMultiMapRemoveJson | CrossChainDataRefJson | SignatureJsonDataInterface | DataDescriptorJson | MMRDescriptorJson | VdxfUniValueInterface;
     serializedhex?: string;
     serializedbase64?: string;
     message?: string;
-};
+}
+export declare type VdxfUniValueJson = string | VdxfUniValueInterface;
 export declare type VdxfUniValueJsonArray = Array<VdxfUniValueJson>;
 export declare type JsonSerializableObject = CurrencyValueMap | Rating | TransferDestination | ContentMultiMapRemove | CrossChainDataRef | SignatureData | DataDescriptor | MMRDescriptor | Credential;
 export declare class VdxfUniValue implements SerializableEntity {

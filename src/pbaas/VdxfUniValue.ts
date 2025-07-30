@@ -30,13 +30,15 @@ export type VdxfUniType = string | Buffer | BigNumber | CurrencyValueMap | Ratin
   TransferDestination | ContentMultiMapRemove | CrossChainDataRef | SignatureData |
   DataDescriptor | MMRDescriptor | URLRef | IdentityMultimapRef | Credential;
 
-export type VdxfUniValueJson = string | {
+export interface VdxfUniValueInterface {
   [key: string]: string | number | RatingJson | TransferDestinationJson |
-  ContentMultiMapRemoveJson | CrossChainDataRefJson | SignatureJsonDataInterface | DataDescriptorJson | MMRDescriptorJson | VdxfUniValueJson;
+  ContentMultiMapRemoveJson | CrossChainDataRefJson | SignatureJsonDataInterface | DataDescriptorJson | MMRDescriptorJson | VdxfUniValueInterface;
   serializedhex?: string;
   serializedbase64?: string;
   message?: string;
 };
+
+export type VdxfUniValueJson = string | VdxfUniValueInterface;
 
 export type VdxfUniValueJsonArray = Array<VdxfUniValueJson>;
 

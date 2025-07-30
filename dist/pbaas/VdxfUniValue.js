@@ -21,6 +21,7 @@ const VDXF_Data = require("../vdxf/vdxfdatakeys");
 exports.VDXF_UNI_VALUE_VERSION_INVALID = new bn_js_1.BN(0, 10);
 exports.VDXF_UNI_VALUE_VERSION_CURRENT = new bn_js_1.BN(1, 10);
 const { BufferWriter, BufferReader } = bufferutils_1.default;
+;
 // This UniValue class was adapted from C++ code for encoding JSON objects into bytes. It is not serialization and
 // therefore doesn't have a fromBuffer function, as you can't reliably decode it, only encode.
 class VdxfUniValue {
