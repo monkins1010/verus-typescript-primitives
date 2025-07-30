@@ -12,10 +12,11 @@ const PartialSignData_1 = require("../../../pbaas/PartialSignData");
 const bn_js_1 = require("bn.js");
 const pbaas_1 = require("../../../pbaas");
 const ResponseUri_1 = require("../ResponseUri");
+const pbaas_2 = require("../../../constants/pbaas");
 const { BufferReader, BufferWriter } = bufferutils_1.default;
 class IdentityUpdateRequestDetails {
     constructor(data) {
-        this.flags = data && data.flags ? data.flags : new bn_js_1.BN("1", 10);
+        this.flags = data && data.flags ? data.flags : new bn_js_1.BN("0", 10);
         if (data === null || data === void 0 ? void 0 : data.requestid) {
             this.requestid = data.requestid;
         }
@@ -24,6 +25,8 @@ class IdentityUpdateRequestDetails {
         if (data === null || data === void 0 ? void 0 : data.createdat) {
             this.createdat = data.createdat;
         }
+        else
+            this.createdat = new bn_js_1.BN("0", 10);
         if (data === null || data === void 0 ? void 0 : data.identity) {
             this.identity = data.identity;
         }
@@ -36,6 +39,11 @@ class IdentityUpdateRequestDetails {
             if (!this.containsSystem())
                 this.toggleContainsSystem();
             this.systemid = data.systemid;
+        }
+        if (data === null || data === void 0 ? void 0 : data.txid) {
+            if (!this.containsTxid())
+                this.toggleContainsTxid();
+            this.txid = data.txid;
         }
         if (data === null || data === void 0 ? void 0 : data.responseuris) {
             if (!this.containsResponseUris())
@@ -53,9 +61,6 @@ class IdentityUpdateRequestDetails {
             this.salt = data.salt;
         }
     }
-    isValid() {
-        return !!(this.flags.and(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_VALID).toNumber());
-    }
     expires() {
         return !!(this.flags.and(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_EXPIRES).toNumber());
     }
@@ -64,6 +69,9 @@ class IdentityUpdateRequestDetails {
     }
     containsSystem() {
         return !!(this.flags.and(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_SYSTEM).toNumber());
+    }
+    containsTxid() {
+        return !!(this.flags.and(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_TXID).toNumber());
     }
     containsResponseUris() {
         return !!(this.flags.and(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_RESPONSE_URIS).toNumber());
@@ -74,9 +82,6 @@ class IdentityUpdateRequestDetails {
     isTestnet() {
         return !!(this.flags.and(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_IS_TESTNET).toNumber());
     }
-    toggleIsValid() {
-        this.flags = this.flags.xor(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_VALID);
-    }
     toggleExpires() {
         this.flags = this.flags.xor(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_EXPIRES);
     }
@@ -85,6 +90,9 @@ class IdentityUpdateRequestDetails {
     }
     toggleContainsSystem() {
         this.flags = this.flags.xor(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_SYSTEM);
+    }
+    toggleContainsTxid() {
+        this.flags = this.flags.xor(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_TXID);
     }
     toggleContainsResponseUris() {
         this.flags = this.flags.xor(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_RESPONSE_URIS);
@@ -98,6 +106,20 @@ class IdentityUpdateRequestDetails {
     toSha256() {
         return createHash("sha256").update(this.toBuffer()).digest();
     }
+    getIdentityAddress() {
+        if (this.identity.name === "VRSC" || this.identity.name === "VRSCTEST") {
+            return (0, address_1.nameAndParentAddrToIAddr)(this.identity.name);
+        }
+        else if (this.identity.parent) {
+            return this.identity.getIdentityAddress();
+        }
+        else if (this.isTestnet()) {
+            return (0, address_1.nameAndParentAddrToIAddr)(this.identity.name, (0, address_1.nameAndParentAddrToIAddr)("VRSCTEST"));
+        }
+        else {
+            return (0, address_1.nameAndParentAddrToIAddr)(this.identity.name, (0, address_1.nameAndParentAddrToIAddr)("VRSC"));
+        }
+    }
     getByteLength() {
         let length = 0;
         length += varint_1.default.encodingLength(this.flags);
@@ -108,6 +130,9 @@ class IdentityUpdateRequestDetails {
             length += varint_1.default.encodingLength(this.expiryheight);
         if (this.containsSystem())
             length += this.systemid.getByteLength();
+        if (this.containsTxid()) {
+            length += pbaas_2.UINT_256_LENGTH;
+        }
         if (this.containsResponseUris()) {
             length += varuint_1.default.encodingLength(this.responseuris.length);
             length += this.responseuris.reduce((sum, current) => sum + current.getByteLength(), 0);
@@ -135,6 +160,11 @@ class IdentityUpdateRequestDetails {
             writer.writeVarInt(this.expiryheight);
         if (this.containsSystem())
             writer.writeSlice(this.systemid.toBuffer());
+        if (this.containsTxid()) {
+            if (this.txid.length !== pbaas_2.UINT_256_LENGTH)
+                throw new Error("invalid txid length");
+            writer.writeSlice(this.txid);
+        }
         if (this.containsResponseUris()) {
             writer.writeArray(this.responseuris.map((x) => x.toBuffer()));
         }
@@ -150,7 +180,7 @@ class IdentityUpdateRequestDetails {
         }
         return writer.buffer;
     }
-    fromBuffer(buffer, offset = 0, parseVdxfObjects = false) {
+    fromBuffer(buffer, offset = 0, parseVdxfObjects = true) {
         const reader = new BufferReader(buffer, offset);
         this.flags = reader.readVarInt();
         this.requestid = reader.readVarInt();
@@ -163,6 +193,9 @@ class IdentityUpdateRequestDetails {
         if (this.containsSystem()) {
             this.systemid = new pbaas_1.IdentityID();
             reader.offset = this.systemid.fromBuffer(reader.buffer, reader.offset);
+        }
+        if (this.containsTxid()) {
+            this.txid = reader.readSlice(pbaas_2.UINT_256_LENGTH);
         }
         if (this.containsResponseUris()) {
             this.responseuris = [];
@@ -203,6 +236,7 @@ class IdentityUpdateRequestDetails {
             identity: this.identity ? this.identity.toJson() : undefined,
             expiryheight: this.expiryheight ? this.expiryheight.toString(10) : undefined,
             systemid: this.systemid ? this.systemid.toAddress() : undefined,
+            txid: this.txid ? (Buffer.from(this.txid.toString('hex'), 'hex').reverse()).toString('hex') : undefined,
             responseuris: this.responseuris ? this.responseuris.map(x => x.toJson()) : undefined,
             signdatamap: signDataJson,
             salt: this.salt ? this.salt.toString('hex') : undefined
@@ -225,16 +259,60 @@ class IdentityUpdateRequestDetails {
             systemid: json.systemid ? pbaas_1.IdentityID.fromAddress(json.systemid) : undefined,
             responseuris: json.responseuris ? json.responseuris.map(x => ResponseUri_1.ResponseUri.fromJson(x)) : undefined,
             signdatamap,
-            salt: json.salt ? Buffer.from(json.salt, 'hex') : undefined
+            salt: json.salt ? Buffer.from(json.salt, 'hex') : undefined,
+            txid: json.txid ? Buffer.from(json.txid, 'hex').reverse() : undefined,
+        });
+    }
+    toCLIJson() {
+        if (!this.identity)
+            throw new Error("No identity details to update");
+        const idJson = this.identity.toJson();
+        if (this.containsSignData()) {
+            for (const [key, psd] of this.signdatamap.entries()) {
+                idJson.contentmultimap[key] = {
+                    "data": psd.toCLIJson()
+                };
+            }
+        }
+        return idJson;
+    }
+    static fromCLIJson(json, details) {
+        let identity;
+        let signdatamap;
+        if (json.contentmultimap) {
+            const cmm = Object.assign({}, json.contentmultimap);
+            for (const key in cmm) {
+                if (cmm[key]['data']) {
+                    if (!signdatamap)
+                        signdatamap = new Map();
+                    const psd = PartialSignData_1.PartialSignData.fromCLIJson(cmm[key]['data']);
+                    signdatamap.set(key, psd);
+                    delete cmm[key];
+                }
+            }
+            json = Object.assign(Object.assign({}, json), { contentmultimap: cmm });
+        }
+        identity = PartialIdentity_1.PartialIdentity.fromJson(json);
+        return new IdentityUpdateRequestDetails({
+            identity,
+            signdatamap,
+            systemid: (details === null || details === void 0 ? void 0 : details.systemid) ? pbaas_1.IdentityID.fromAddress(details.systemid) : undefined,
+            requestid: (details === null || details === void 0 ? void 0 : details.requestid) ? new bn_js_1.BN(details.requestid, 10) : undefined,
+            createdat: (details === null || details === void 0 ? void 0 : details.createdat) ? new bn_js_1.BN(details.createdat, 10) : undefined,
+            expiryheight: (details === null || details === void 0 ? void 0 : details.expiryheight) ? new bn_js_1.BN(details.expiryheight, 10) : undefined,
+            responseuris: (details === null || details === void 0 ? void 0 : details.responseuris) ? details.responseuris.map(x => ResponseUri_1.ResponseUri.fromJson(x)) : undefined,
+            salt: (details === null || details === void 0 ? void 0 : details.salt) ? Buffer.from(details.salt, 'hex') : undefined,
+            txid: (details === null || details === void 0 ? void 0 : details.txid) ? Buffer.from(details.txid, 'hex').reverse() : undefined,
         });
     }
 }
 exports.IdentityUpdateRequestDetails = IdentityUpdateRequestDetails;
-IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_INVALID = new bn_js_1.BN(0, 10);
-IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_VALID = new bn_js_1.BN(1, 10);
-IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_SIGNDATA = new bn_js_1.BN(2, 10);
-IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_EXPIRES = new bn_js_1.BN(4, 10);
-IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_RESPONSE_URIS = new bn_js_1.BN(8, 10);
-IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_SYSTEM = new bn_js_1.BN(16, 10);
+// stored in natural order, if displayed as text make sure to reverse!
+IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_VALID = new bn_js_1.BN(0, 10);
+IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_SIGNDATA = new bn_js_1.BN(1, 10);
+IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_EXPIRES = new bn_js_1.BN(2, 10);
+IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_RESPONSE_URIS = new bn_js_1.BN(4, 10);
+IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_SYSTEM = new bn_js_1.BN(8, 10);
+IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_TXID = new bn_js_1.BN(16, 10);
 IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_SALT = new bn_js_1.BN(32, 10);
 IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_IS_TESTNET = new bn_js_1.BN(64, 10);

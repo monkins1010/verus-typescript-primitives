@@ -11,7 +11,7 @@ import { DATA_TYPE_MMRDATA } from "../../constants/pbaas";
 
 describe("IdentityUpdateEnvelope Serialization", () => {
   const systemID = IdentityID.fromAddress("iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq");
-  const signingID = IdentityID.fromAddress("RP4Qct9197i5vrS11qHVtdyRRoAHVNJS47");
+  const signingID = IdentityID.fromAddress("iPsFBfFoCcxtuZNzE8yxPQhXVn4dmytf8j");
   const requestID = new BN("123456", 10);
   const createdAt = new BN("1700000000", 10);
   const expiryHeight = new BN("123456");
@@ -21,6 +21,44 @@ describe("IdentityUpdateEnvelope Serialization", () => {
   const contentmap = new Map();
   contentmap.set("iPsFBfFoCcxtuZNzE8yxPQhXVn4dmytf8j", Buffer.alloc(32));
   contentmap.set("iK7a5JNJnbeuYWVHCDRpJosj3irGJ5Qa8c", Buffer.alloc(32));
+
+  const cliIdUpdateRequestJson = {
+    "name": "data",
+    "contentmultimap": {
+        "i5CXAPoCLothTntExgvc5kK38u2wyHtFCg": {
+            "data": {"createmmr":true, "mmrdata":[{"message": "{\"rail_transport\": 43326.71, \"public_bus_transport\": 83452.4, \"air_transport\": 1306.83, \"urban_public_transport\": -1, \"time\": 993945600}", "mimetype": "application/json", "label": "quarter_3_2001_transport_passenger_data_cz"}]}
+        }
+    }
+  }
+
+  const cliIdUpdateRequestJsonHex = {
+    "name":"[32][32]",
+    "parent":"iF6hHpRXpmhLq77eksQzqQrWuminKtzmxT",
+    "contentmultimap": {
+      "i4d7U1aZhmoxZbWx8AVezh6z1YewAnuw3V": [
+        {
+          "i4GC1YGEVD21afWudGoFJVdnfjJ5XWnCQv": {
+            "version": 1,
+            "flags": 32,
+            "label": "i3bgiLuaxTr6smF8q6xLG4jvvhF1mmrkM2",
+            "objectdata": {
+              "serializedhex": "08a2ebb2c55f83a8e2a426a53320ed4d42124f4d010c012001010776657273696f6e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d011d01600a656d706c6f796d656e7404747970650a746578742f706c61696e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d011d016009446576656c6f706572057469746c650a746578742f706c61696e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d0157016044426f6479206f6620636c61696d20676f657320686572652c207768617420796f75206861766520646f6e652c207768617420796f7520686176652061636869657665642e04626f64790a746578742f706c61696e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d011d016009323031392d323032300564617465730a746578742f706c61696e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d011f01600a323032352d30312d3330066973737565640a746578742f706c61696e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d012f012020cc2b8109fb5566cf98297aaf5c80e2fb0a5051c3252a7957b13ba5433767e23a0b7265666572656e63654944"
+            }
+          }
+        },
+        {
+          "i4GC1YGEVD21afWudGoFJVdnfjJ5XWnCQv": {
+            "version": 1,
+            "flags": 32,
+            "label": "i3bgiLuaxTr6smF8q6xLG4jvvhF1mmrkM2",
+            "objectdata": {
+              "serializedhex": "08a2ebb2c55f83a8e2a426a53320ed4d42124f4d010c012001010776657273696f6e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d011d01600a656d706c6f796d656e7404747970650a746578742f706c61696e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d012301600f436869656620446576656c6f706572057469746c650a746578742f706c61696e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d0157016044426f6479206f6620636c61696d20676f657320686572652c207768617420796f75206861766520646f6e652c207768617420796f7520686176652061636869657665642e04626f64790a746578742f706c61696e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d011d016009323032312d323032340564617465730a746578742f706c61696e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d011f01600a323032352d30312d3239066973737565640a746578742f706c61696e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d015a016040373962343830376333303465383035333831666438653165376234383865353062363032613033333366663266663633636264313564363362366163383835650b7265666572656e636549440a746578742f706c61696e"
+            }
+          }
+        }
+      ]
+    }
+  }
 
   const partialIdentity = new PartialIdentity({
     flags: new BN("0"),
@@ -103,6 +141,14 @@ describe("IdentityUpdateEnvelope Serialization", () => {
     expect(newJson).toEqual(json);
   }
 
+  function testCLIJsonSerialization(instance: IdentityUpdateRequestDetails) {
+    const cliJson = instance.toCLIJson();
+
+    const fromCLIJsonInstance = IdentityUpdateRequestDetails.fromCLIJson(cliJson);
+    
+    expect(fromCLIJsonInstance.toCLIJson()).toEqual(cliJson);
+  }
+
   test("Serialize/Deserialize unsigned IdentityUpdateRequest", () => {
     const requestDetails = new IdentityUpdateRequestDetails({ 
       requestid: requestID, 
@@ -111,10 +157,11 @@ describe("IdentityUpdateEnvelope Serialization", () => {
       identity: partialIdentity, 
       expiryheight: expiryHeight, 
       salt: salt, 
-      signdatamap 
+      signdatamap
     });
     const request = new IdentityUpdateRequest({ details: requestDetails });
     testSerialization(request);
+    testCLIJsonSerialization(request.details as IdentityUpdateRequestDetails);
   });
 
   test("Serialize/Deserialize signed IdentityUpdateRequest", () => {
@@ -135,6 +182,7 @@ describe("IdentityUpdateEnvelope Serialization", () => {
     });
 
     testSerialization(request);
+    testCLIJsonSerialization(request.details as IdentityUpdateRequestDetails);
   });
 
   test("Serialize/Deserialize unsigned IdentityUpdateResponse", () => {
@@ -173,6 +221,7 @@ describe("IdentityUpdateEnvelope Serialization", () => {
       const request = new IdentityUpdateRequest({ details: newRequestDetails });
 
       testSerialization(request);
+      testCLIJsonSerialization(request.details as IdentityUpdateRequestDetails);
 
       if (i < toRemove.length) {
         delete baseRequestDetailsConfig[toRemove[i]]
@@ -211,6 +260,7 @@ describe("IdentityUpdateEnvelope Serialization", () => {
 
     const request = new IdentityUpdateRequest({ details: requestDetails });
     testJsonSerialization(request);
+    testCLIJsonSerialization(request.details as IdentityUpdateRequestDetails);
   });
 
   test("Serialize/Deserialize signed IdentityUpdateRequest to/from JSON", () => {
@@ -232,6 +282,7 @@ describe("IdentityUpdateEnvelope Serialization", () => {
     });
 
     testJsonSerialization(request);
+    testCLIJsonSerialization(request.details as IdentityUpdateRequestDetails);
   });
 
   test("Serialize/Deserialize IdentityUpdateResponse to/from JSON", () => {
@@ -271,6 +322,7 @@ describe("IdentityUpdateEnvelope Serialization", () => {
     });
 
     testJsonSerialization(requestDetails);
+    testCLIJsonSerialization(requestDetails);
   });
 
   test("Serialize/Deserialize IdentityUpdateResponseDetails to/from JSON", () => {
@@ -311,4 +363,79 @@ describe("IdentityUpdateEnvelope Serialization", () => {
 
     testJsonSerialization(contentMultiMap);
   });
+
+  test("Deserialize cli identity update details", () => {
+    const req = IdentityUpdateRequestDetails.fromCLIJson(cliIdUpdateRequestJson);
+
+    testCLIJsonSerialization(req);
+  })
+
+  test("Deserialize cli identity update details", () => {
+    const req = IdentityUpdateRequestDetails.fromCLIJson(
+      cliIdUpdateRequestJsonHex, 
+      {
+        systemid: systemID.toAddress() as string, 
+        requestid: requestID.toString(), 
+        createdat: createdAt.toString(), 
+        expiryheight: expiryHeight.toString(), 
+        responseuris: [
+          ResponseUri.fromUriString("http:/127.0.0.1:8000", ResponseUri.TYPE_REDIRECT).toJson(), 
+          ResponseUri.fromUriString("http:/127.0.0.1:8000", ResponseUri.TYPE_POST).toJson()
+        ],
+        salt: salt.toString('hex'),
+        txid
+      }
+    );
+
+    const env = new IdentityUpdateRequest({ 
+      details: req, 
+      signingid: signingID, 
+      systemid: systemID,
+      signature: "AeNjMwABQSAPBEuajDkRyy+OBJsWmDP3EUoqN9UjCJK9nmoSQiNoZWBK19OgGCYdEqr1CiFfBf8SFHVoUv4r2tb5Q3qsMTrp"
+    });
+
+    const envBuf = env.toBuffer();
+
+    const envFromBuf = new IdentityUpdateRequest();
+    envFromBuf.fromBuffer(envBuf);
+
+    expect(JSON.stringify(env.toJson())).toEqual(JSON.stringify(IdentityUpdateRequest.fromWalletDeeplinkUri(env.toWalletDeeplinkUri()).toJson()));
+    testCLIJsonSerialization(req);
+    testJsonSerialization(env);
+    testSerialization(env);
+  })
+
+  test("Deserialize cli identity update details", () => {
+    const detailsProps = {
+      requestid: requestID.toString(), 
+      createdat: createdAt.toString(), 
+      expiryheight: expiryHeight.toString(), 
+      responseuris: [
+        ResponseUri.fromUriString("http:/127.0.0.1:8000", ResponseUri.TYPE_REDIRECT).toJson(), 
+        ResponseUri.fromUriString("http:/127.0.0.1:8000", ResponseUri.TYPE_POST).toJson()
+      ],
+      salt: salt.toString('hex'),
+      txid
+    };
+
+    expect(IdentityUpdateRequestDetails.fromCLIJson(
+      { name: "data" }, 
+      detailsProps
+    ).getIdentityAddress()).toEqual("iHhi8aSwJcA5SzP2jE2M3wcsuVcnMdh6Fr");
+
+    expect(IdentityUpdateRequestDetails.fromCLIJson(
+      { name: "Mozek86", parent: "iQ2TqQot9W7mLrcCRJKnAZmaPTTY6sx4S4" }, 
+      detailsProps
+    ).getIdentityAddress()).toEqual("i6joVUtMohssU9pFAwojYrZfF9EmyAB95K");
+
+    expect(IdentityUpdateRequestDetails.fromCLIJson(
+      { name: "VRSC" }, 
+      detailsProps
+    ).getIdentityAddress()).toEqual("i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV");
+    
+    expect(IdentityUpdateRequestDetails.fromCLIJson(
+      { name: "VRSCTEST" }, 
+      detailsProps
+    ).getIdentityAddress()).toEqual("iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq");
+  })
 });

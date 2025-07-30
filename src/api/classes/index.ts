@@ -33,8 +33,12 @@ import { GetAddressMempoolResponse } from './GetAddressMempool/GetAddressMempool
 import { GetAddressMempoolRequest } from './GetAddressMempool/GetAddressMempoolRequest'
 import { SendCurrencyRequest } from './SendCurrency/SendCurrencyRequest'
 import { SendCurrencyResponse } from './SendCurrency/SendCurrencyResponse'
+import { UpdateIdentityRequest } from './UpdateIdentity/UpdateIdentityRequest'
+import { UpdateIdentityResponse } from './UpdateIdentity/UpdateIdentityResponse'
 import { FundRawTransactionRequest } from './FundRawTransaction/FundRawTransactionRequest'
 import { FundRawTransactionResponse } from './FundRawTransaction/FundRawTransactionResponse'
+import { SignRawTransactionRequest } from './SignRawTransaction/SignRawTransactionRequest'
+import { SignRawTransactionResponse } from './SignRawTransaction/SignRawTransactionResponse'
 import { GetCurrencyConvertersRequest } from './GetCurrencyConverters/GetCurrencyConvertersRequest'
 import { GetCurrencyConvertersResponse } from './GetCurrencyConverters/GetCurrencyConvertersResponse'
 import { ListCurrenciesRequest } from './ListCurrencies/ListCurrenciesRequest'
@@ -80,6 +84,8 @@ export {
   SignDataResponse,
   SendCurrencyRequest,
   SendCurrencyResponse,
+  UpdateIdentityRequest,
+  UpdateIdentityResponse,
   FundRawTransactionRequest,
   FundRawTransactionResponse,
   GetCurrencyConvertersRequest,
@@ -89,7 +95,9 @@ export {
   EstimateConversionRequest,
   EstimateConversionResponse,
   ZGetOperationStatusRequest,
-  ZGetOperationStatusResponse
+  ZGetOperationStatusResponse,
+  SignRawTransactionRequest,
+  SignRawTransactionResponse
 }
 
 export type RpcRequest =
@@ -111,11 +119,13 @@ export type RpcRequest =
   | typeof SignMessageRequest
   | typeof SignDataRequest
   | typeof SendCurrencyRequest
+  | typeof UpdateIdentityRequest
   | typeof FundRawTransactionRequest
   | typeof GetCurrencyConvertersRequest
   | typeof ListCurrenciesRequest
   | typeof EstimateConversionRequest
-  | typeof ZGetOperationStatusRequest;
+  | typeof ZGetOperationStatusRequest
+  | typeof SignRawTransactionRequest;
 
 export type RpcResponse =
   | typeof MakeOfferResponse
@@ -135,8 +145,10 @@ export type RpcResponse =
   | typeof SignMessageResponse
   | typeof SignDataResponse
   | typeof SendCurrencyResponse
+  | typeof UpdateIdentityResponse
   | typeof FundRawTransactionResponse
   | typeof GetCurrencyConvertersResponse
   | typeof ListCurrenciesResponse
   | typeof EstimateConversionResponse
-  | typeof ZGetOperationStatusResponse;
+  | typeof ZGetOperationStatusResponse
+  | typeof SignRawTransactionResponse;

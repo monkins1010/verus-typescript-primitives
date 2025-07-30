@@ -6,8 +6,8 @@ const bn_js_1 = require("bn.js");
 const { BufferReader, BufferWriter } = bufferutils_1.default;
 class UTXORef {
     constructor(data) {
-        this.hash = data.hash || Buffer.alloc(0);
-        this.n = data.n || new bn_js_1.BN(0);
+        this.hash = (data === null || data === void 0 ? void 0 : data.hash) || Buffer.alloc(0);
+        this.n = (data === null || data === void 0 ? void 0 : data.n) || new bn_js_1.BN(0);
     }
     getByteLength() {
         let byteLength = 0;
@@ -32,14 +32,14 @@ class UTXORef {
     }
     toJson() {
         return {
-            hash: this.hash.toString('hex'),
-            n: this.n.toNumber()
+            txid: Buffer.from(this.hash).reverse().toString('hex'),
+            voutnum: this.n.toNumber()
         };
     }
     static fromJson(data) {
         return new UTXORef({
-            hash: Buffer.from(data.hash, 'hex'),
-            n: new bn_js_1.BN(data.n, 10)
+            hash: Buffer.from(data.txid, 'hex').reverse(),
+            n: new bn_js_1.BN(data.voutnum, 10)
         });
     }
 }

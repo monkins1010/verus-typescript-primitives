@@ -14,8 +14,8 @@ export class UTXORef implements SerializableEntity {
   n: BigNumber;
 
   constructor(data?: { hash?: Buffer, n?: BigNumber }) {
-    this.hash = data.hash || Buffer.alloc(0);
-    this.n = data.n || new BN(0);
+    this.hash = data?.hash || Buffer.alloc(0);
+    this.n = data?.n || new BN(0);
   }
 
   getByteLength() {
@@ -51,15 +51,15 @@ export class UTXORef implements SerializableEntity {
 
   toJson() {
     return {
-      hash: this.hash.toString('hex'),
-      n: this.n.toNumber()
+      txid: Buffer.from(this.hash).reverse().toString('hex'),
+      voutnum: this.n.toNumber()
     }
   }
 
-  static fromJson(data: { hash: string, n: string }): UTXORef {
+  static fromJson(data: { txid: string, voutnum: string }): UTXORef {
     return new UTXORef({
-      hash: Buffer.from(data.hash, 'hex'),
-      n: new BN(data.n, 10)
+      hash: Buffer.from(data.txid, 'hex').reverse(),
+      n: new BN(data.voutnum, 10)
     });
   }
 }

@@ -38,7 +38,6 @@ class IdentityMultimapRef {
         byteLength += 20; // key uint160
         byteLength += varint_1.default.encodingLength(this.height_start); // height_start uint32
         byteLength += varint_1.default.encodingLength(this.height_end); // height_end uint32
-        byteLength += 32; // data_hash uint25
         if (this.flags.and(IdentityMultimapRef.FLAG_HAS_DATAHASH).gt(new bn_js_1.BN(0))) {
             byteLength += 32;
         }
@@ -82,7 +81,7 @@ class IdentityMultimapRef {
     isValid() {
         return this.version.gte(IdentityMultimapRef.FIRST_VERSION) &&
             this.version.lte(IdentityMultimapRef.LAST_VERSION) &&
-            (this.flags.and(IdentityMultimapRef.FLAG_HAS_DATAHASH.add(IdentityMultimapRef.FLAG_HAS_SYSTEM).notn(16))).eq(new bn_js_1.BN(0)) &&
+            this.flags.and(IdentityMultimapRef.FLAG_HAS_DATAHASH.add(IdentityMultimapRef.FLAG_HAS_SYSTEM)).eq(IdentityMultimapRef.FLAG_HAS_DATAHASH.add(IdentityMultimapRef.FLAG_HAS_SYSTEM)) &&
             !(!this.id_ID || this.id_ID.length === 0) && !(!this.key || this.key.length === 0);
     }
     hasDataHash() {
@@ -92,27 +91,31 @@ class IdentityMultimapRef {
         return this.flags.and(IdentityMultimapRef.FLAG_HAS_SYSTEM).gt(new bn_js_1.BN(0));
     }
     toJson() {
-        let retval;
-        retval.version = this.version.toString(10);
-        retval.flags = this.flags.toString(10);
-        retval.vdxfkey = this.key;
+        let retval = {
+            version: this.version.toNumber(),
+            flags: this.flags.toNumber(),
+            vdxfkey: this.key,
+            startheight: this.height_start.toNumber(),
+            endheight: this.height_end.toNumber(),
+            identityid: this.id_ID
+        };
         if (this.hasDataHash()) {
-            retval.datahash = this.data_hash.toString('hex');
+            retval.datahash = Buffer.from(this.data_hash).reverse().toString('hex');
         }
         if (this.hasSystemID()) {
             retval.systemid = this.system_id;
         }
-        retval.startheight = this.height_start.toString(10);
-        retval.endheight = this.height_end.toString(10);
+        return retval;
     }
     static fromJson(data) {
         return new IdentityMultimapRef({
             version: new bn_js_1.BN(data.version),
             flags: new bn_js_1.BN(data.flags),
             key: data.vdxfkey,
+            id_ID: data.identityid,
             height_start: new bn_js_1.BN(data.startheight),
             height_end: new bn_js_1.BN(data.endheight),
-            data_hash: Buffer.from(data.datahash, 'hex'),
+            data_hash: Buffer.from(data.datahash, 'hex').reverse(),
             system_id: data.systemid
         });
     }

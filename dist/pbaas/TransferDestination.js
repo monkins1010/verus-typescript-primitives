@@ -6,6 +6,7 @@ const bn_js_1 = require("bn.js");
 const varuint_1 = require("../utils/varuint");
 const address_1 = require("../utils/address");
 const vdxf_1 = require("../constants/vdxf");
+const numberConversion_1 = require("../utils/numberConversion");
 const { BufferReader, BufferWriter } = bufferutils_1.default;
 exports.DEST_INVALID = new bn_js_1.BN(0, 10);
 exports.DEST_PK = new bn_js_1.BN(1, 10);
@@ -143,24 +144,60 @@ class TransferDestination {
         return reader.offset;
     }
     static fromJson(data) {
+        const type = new bn_js_1.BN(data.type);
+        let destination = null;
+        switch (type.and(exports.FLAG_MASK.notn(exports.FLAG_MASK.bitLength())).toString()) {
+            case exports.DEST_PKH.toString():
+            case exports.DEST_SH.toString():
+            case exports.DEST_ID.toString():
+            case exports.DEST_QUANTUM.toString():
+                destination = (0, address_1.decodeDestination)(data.address);
+                break;
+            case exports.DEST_ETH.toString():
+                destination = (0, address_1.decodeEthDestination)(data.address);
+                break;
+            default:
+                throw new Error("Unknown destination type: " + type + "\nNote: Only DEST_PKH, DEST_SH, DEST_ID, DEST_QUANTUM and DEST_ETH are supported for now.");
+        }
+        let auxDests = [];
+        let fees = null;
+        if (type.and(exports.FLAG_DEST_AUX).gt(new bn_js_1.BN(0)) && data.auxdests.length > 0) {
+            auxDests = data.auxdests.map(x => TransferDestination.fromJson(x));
+        }
+        if (type.and(exports.FLAG_DEST_GATEWAY).gt(new bn_js_1.BN(0)) && data.fees) {
+            fees = (0, numberConversion_1.decimalToBn)(data.fees);
+        }
         return new TransferDestination({
-            type: new bn_js_1.BN(data.type),
-            destination_bytes: Buffer.from(data.destination_bytes, 'hex'),
-            gateway_id: data.gateway_id,
-            gateway_code: data.gateway_code,
-            fees: new bn_js_1.BN(data.fees),
-            aux_dests: data.aux_dests.map(x => TransferDestination.fromJson(x))
+            type: type,
+            destination_bytes: destination,
+            gateway_code: data.gatewaycode,
+            fees: fees,
+            aux_dests: auxDests
         });
     }
     toJson() {
-        return {
-            type: this.type.toString(),
-            destination_bytes: this.destination_bytes.toString('hex'),
-            gateway_id: this.gateway_id,
-            gateway_code: this.gateway_code,
-            fees: this.fees.toString(),
-            aux_dests: this.aux_dests.map(x => x.toJson())
+        let destVal = {
+            type: this.type.toNumber(),
+            address: ''
         };
+        switch (this.typeNoFlags().toString()) {
+            case exports.DEST_PKH.toString():
+            case exports.DEST_SH.toString():
+            case exports.DEST_ID.toString():
+            case exports.DEST_QUANTUM.toString():
+            case exports.DEST_ETH.toString():
+                destVal.address = this.getAddressString();
+                break;
+            default:
+                throw new Error("Unknown destination type: " + this.typeNoFlags() + "\nNote: Only DEST_PKH, DEST_SH, DEST_ID, DEST_QUANTUM and DEST_ETH are supported for now.");
+        }
+        if (this.hasAuxDests()) {
+            destVal.auxdests = this.aux_dests.map(auxDest => auxDest.toJson());
+        }
+        if (this.isGateway()) {
+            destVal.gateway = this.gateway_id;
+        }
+        return destVal;
     }
     isValid() {
         // verify aux dests
@@ -185,12 +222,12 @@ class TransferDestination {
                 retVal.type = exports.DEST_INVALID;
             }
             // no gateways or flags, only simple destinations work
-            switch (retVal.type) {
-                case exports.DEST_ID:
-                case exports.DEST_PK:
-                case exports.DEST_PKH:
-                case exports.DEST_ETH:
-                case exports.DEST_SH:
+            switch (retVal.type.toString()) {
+                case exports.DEST_ID.toString():
+                case exports.DEST_PK.toString():
+                case exports.DEST_PKH.toString():
+                case exports.DEST_ETH.toString():
+                case exports.DEST_SH.toString():
                     break;
                 default:
                     retVal.type = exports.DEST_INVALID;

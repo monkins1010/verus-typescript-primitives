@@ -14,6 +14,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+__exportStar(require("./Credential"), exports);
 __exportStar(require("./CurrencyValueMap"), exports);
 __exportStar(require("./Identity"), exports);
 __exportStar(require("./ReserveTransfer"), exports);
@@ -44,3 +45,5 @@ __exportStar(require("./SaltedData"), exports);
 __exportStar(require("./SignatureData"), exports);
 __exportStar(require("./URLRef"), exports);
 __exportStar(require("./UTXORef"), exports);
+__exportStar(require("./DefinedKey"), exports);
+__exportStar(require("./MMR"), exports);

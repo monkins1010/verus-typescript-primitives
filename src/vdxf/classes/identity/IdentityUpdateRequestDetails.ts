@@ -1,19 +1,23 @@
 import varint from '../../../utils/varint'
 import varuint from '../../../utils/varuint'
 import bufferutils from '../../../utils/bufferutils'
-import { fromBase58Check, toBase58Check } from '../../../utils/address';
+import { fromBase58Check, nameAndParentAddrToIAddr, toBase58Check } from '../../../utils/address';
 import { HASH160_BYTE_LENGTH, I_ADDR_VERSION } from '../../../constants/vdxf';
 import createHash = require('create-hash');
 import { PartialIdentity } from '../../../pbaas/PartialIdentity';
-import { PartialSignData, PartialSignDataJson } from '../../../pbaas/PartialSignData';
+import { PartialSignData, PartialSignDataCLIJson, PartialSignDataJson } from '../../../pbaas/PartialSignData';
 import { BigNumber } from '../../../utils/types/BigNumber';
 import { BN } from 'bn.js';
-import { IdentityID, VerusCLIVerusIDJson } from '../../../pbaas';
+import { ContentMultiMapJsonValue, IdentityID, VerusCLIVerusIDJson, VerusCLIVerusIDJsonBase } from '../../../pbaas';
 import { ResponseUri, ResponseUriJson } from '../ResponseUri';
-import { IdentityUpdateRequest } from './IdentityUpdateEnvelope';
+import { SerializableEntity } from '../../../utils/types/SerializableEntity';
+import { UINT_256_LENGTH } from '../../../constants/pbaas';
+
 const { BufferReader, BufferWriter } = bufferutils;
 
 export type SignDataMap = Map<string, PartialSignData>;
+
+export type VerusCLIVerusIDJsonWithData = VerusCLIVerusIDJsonBase<{ [key: string]: ContentMultiMapJsonValue | { data: PartialSignDataCLIJson } }>
 
 export type IdentityUpdateRequestDetailsJson = {
   flags?: string;
@@ -25,9 +29,10 @@ export type IdentityUpdateRequestDetailsJson = {
   responseuris?: Array<ResponseUriJson>;
   signdatamap?: { [key: string]: PartialSignDataJson };
   salt?: string;
+  txid?: string;
 }
 
-export class IdentityUpdateRequestDetails {
+export class IdentityUpdateRequestDetails implements SerializableEntity {
   flags?: BigNumber;
   requestid?: BigNumber;              // ID of request, to be referenced in response
   createdat?: BigNumber;              // Unix timestamp of request creation
@@ -37,13 +42,15 @@ export class IdentityUpdateRequestDetails {
   responseuris?: Array<ResponseUri>;  // Array of uris + type to send response to (type can be post, redirect, etc. depending on how response is expected to be received)
   signdatamap?: SignDataMap;          // Map of data to pass to signdata
   salt?: Buffer;                      // Optional salt
+  txid?: Buffer;                      // 32 byte transaction ID of transaction that must be spent to update identity, on same system asked for in request
+                                      // stored in natural order, if displayed as text make sure to reverse!
 
-  static IDENTITY_UPDATE_REQUEST_INVALID = new BN(0, 10);
-  static IDENTITY_UPDATE_REQUEST_VALID = new BN(1, 10);
-  static IDENTITY_UPDATE_REQUEST_CONTAINS_SIGNDATA = new BN(2, 10);
-  static IDENTITY_UPDATE_REQUEST_EXPIRES = new BN(4, 10);
-  static IDENTITY_UPDATE_REQUEST_CONTAINS_RESPONSE_URIS = new BN(8, 10);
-  static IDENTITY_UPDATE_REQUEST_CONTAINS_SYSTEM = new BN(16, 10);
+  static IDENTITY_UPDATE_REQUEST_VALID = new BN(0, 10);
+  static IDENTITY_UPDATE_REQUEST_CONTAINS_SIGNDATA = new BN(1, 10);
+  static IDENTITY_UPDATE_REQUEST_EXPIRES = new BN(2, 10);
+  static IDENTITY_UPDATE_REQUEST_CONTAINS_RESPONSE_URIS = new BN(4, 10);
+  static IDENTITY_UPDATE_REQUEST_CONTAINS_SYSTEM = new BN(8, 10);
+  static IDENTITY_UPDATE_REQUEST_CONTAINS_TXID = new BN(16, 10);
   static IDENTITY_UPDATE_REQUEST_CONTAINS_SALT = new BN(32, 10);
   static IDENTITY_UPDATE_REQUEST_IS_TESTNET = new BN(64, 10);
 
@@ -54,11 +61,12 @@ export class IdentityUpdateRequestDetails {
     identity?: PartialIdentity,
     expiryheight?: BigNumber,
     systemid?: IdentityID,
+    txid?: Buffer,
     responseuris?: Array<ResponseUri>,
     signdatamap?: SignDataMap,
     salt?: Buffer
   }) {
-    this.flags = data && data.flags ? data.flags : new BN("1", 10);
+    this.flags = data && data.flags ? data.flags : new BN("0", 10);
 
     if (data?.requestid) {
       this.requestid = data.requestid;
@@ -66,7 +74,7 @@ export class IdentityUpdateRequestDetails {
 
     if (data?.createdat) {
       this.createdat = data.createdat;
-    }
+    } else this.createdat = new BN("0", 10);
 
     if (data?.identity) {
       this.identity = data.identity;
@@ -80,6 +88,11 @@ export class IdentityUpdateRequestDetails {
     if (data?.systemid) {
       if (!this.containsSystem()) this.toggleContainsSystem();
       this.systemid = data.systemid;
+    }
+
+    if (data?.txid) {
+      if (!this.containsTxid()) this.toggleContainsTxid();
+      this.txid = data.txid;
     }
 
     if (data?.responseuris) {
@@ -98,10 +111,6 @@ export class IdentityUpdateRequestDetails {
     }
   }
 
-  isValid() {
-    return !!(this.flags.and(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_VALID).toNumber());
-  }
-
   expires() {
     return !!(this.flags.and(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_EXPIRES).toNumber());
   }
@@ -112,6 +121,10 @@ export class IdentityUpdateRequestDetails {
 
   containsSystem() {
     return !!(this.flags.and(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_SYSTEM).toNumber());
+  }
+
+  containsTxid() {
+    return !!(this.flags.and(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_TXID).toNumber());
   }
 
   containsResponseUris() {
@@ -126,10 +139,6 @@ export class IdentityUpdateRequestDetails {
     return !!(this.flags.and(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_IS_TESTNET).toNumber());
   }
 
-  toggleIsValid() {
-    this.flags = this.flags.xor(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_VALID);
-  }
-
   toggleExpires() {
     this.flags = this.flags.xor(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_EXPIRES);
   }
@@ -140,6 +149,10 @@ export class IdentityUpdateRequestDetails {
 
   toggleContainsSystem() {
     this.flags = this.flags.xor(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_SYSTEM);
+  }
+
+  toggleContainsTxid() {
+    this.flags = this.flags.xor(IdentityUpdateRequestDetails.IDENTITY_UPDATE_REQUEST_CONTAINS_TXID);
   }
 
   toggleContainsResponseUris() {
@@ -158,6 +171,18 @@ export class IdentityUpdateRequestDetails {
     return createHash("sha256").update(this.toBuffer()).digest();
   }
 
+  getIdentityAddress() {
+    if (this.identity.name === "VRSC" || this.identity.name === "VRSCTEST") {
+      return nameAndParentAddrToIAddr(this.identity.name);
+    } else if (this.identity.parent) {
+      return this.identity.getIdentityAddress();
+    } else if (this.isTestnet()) {
+      return nameAndParentAddrToIAddr(this.identity.name, nameAndParentAddrToIAddr("VRSCTEST"));
+    } else {
+      return nameAndParentAddrToIAddr(this.identity.name, nameAndParentAddrToIAddr("VRSC"));
+    }
+  }
+
   getByteLength(): number {
     let length = 0;
 
@@ -172,6 +197,10 @@ export class IdentityUpdateRequestDetails {
     if (this.expires()) length += varint.encodingLength(this.expiryheight);
 
     if (this.containsSystem()) length += this.systemid.getByteLength();
+
+    if (this.containsTxid()) {
+      length += UINT_256_LENGTH;
+    }
 
     if (this.containsResponseUris()) {
       length += varuint.encodingLength(this.responseuris.length);
@@ -212,6 +241,12 @@ export class IdentityUpdateRequestDetails {
 
     if (this.containsSystem()) writer.writeSlice(this.systemid.toBuffer());
 
+    if (this.containsTxid()) {
+      if (this.txid.length !== UINT_256_LENGTH) throw new Error("invalid txid length");
+
+      writer.writeSlice(this.txid);
+    }
+
     if (this.containsResponseUris()) {
       writer.writeArray(this.responseuris.map((x) => x.toBuffer()));
     }
@@ -231,7 +266,7 @@ export class IdentityUpdateRequestDetails {
     return writer.buffer;
   }
 
-  fromBuffer(buffer: Buffer, offset: number = 0, parseVdxfObjects: boolean = false) {
+  fromBuffer(buffer: Buffer, offset: number = 0, parseVdxfObjects: boolean = true) {
     const reader = new BufferReader(buffer, offset);
 
     this.flags = reader.readVarInt();
@@ -250,6 +285,10 @@ export class IdentityUpdateRequestDetails {
     if (this.containsSystem()) {
       this.systemid = new IdentityID();
       reader.offset = this.systemid.fromBuffer(reader.buffer, reader.offset);
+    }
+
+    if (this.containsTxid()) {
+      this.txid = reader.readSlice(UINT_256_LENGTH);
     }
 
     if (this.containsResponseUris()) {
@@ -306,6 +345,7 @@ export class IdentityUpdateRequestDetails {
       identity: this.identity ? this.identity.toJson() : undefined,
       expiryheight: this.expiryheight ? this.expiryheight.toString(10) : undefined,
       systemid: this.systemid ? this.systemid.toAddress() : undefined,
+      txid: this.txid ? (Buffer.from(this.txid.toString('hex'), 'hex').reverse()).toString('hex') : undefined,
       responseuris: this.responseuris ? this.responseuris.map(x => x.toJson()) : undefined,
       signdatamap: signDataJson,
       salt: this.salt ? this.salt.toString('hex') : undefined
@@ -332,7 +372,63 @@ export class IdentityUpdateRequestDetails {
       systemid: json.systemid ? IdentityID.fromAddress(json.systemid) : undefined,
       responseuris: json.responseuris ? json.responseuris.map(x => ResponseUri.fromJson(x)) : undefined,
       signdatamap,
-      salt: json.salt ? Buffer.from(json.salt, 'hex') : undefined
+      salt: json.salt ? Buffer.from(json.salt, 'hex') : undefined,
+      txid: json.txid ? Buffer.from(json.txid, 'hex').reverse() : undefined,
+    })
+  }
+
+  toCLIJson(): VerusCLIVerusIDJsonWithData {
+    if (!this.identity) throw new Error("No identity details to update");
+
+    const idJson = (this.identity.toJson() as VerusCLIVerusIDJsonWithData);
+
+    if (this.containsSignData()) {
+      for (const [key, psd] of this.signdatamap.entries()) {
+        idJson.contentmultimap[key] = {
+          "data": psd.toCLIJson()
+        }
+      }
+    }
+
+    return idJson;
+  }
+
+  static fromCLIJson(
+    json: VerusCLIVerusIDJsonWithData, 
+    details?: IdentityUpdateRequestDetailsJson
+  ): IdentityUpdateRequestDetails {
+    let identity: PartialIdentity;
+    let signdatamap: SignDataMap;
+
+    if (json.contentmultimap) {
+      const cmm = { ...json.contentmultimap };
+
+      for (const key in cmm) {
+        if (cmm[key]['data']) {
+          if (!signdatamap) signdatamap = new Map();
+
+          const psd = PartialSignData.fromCLIJson(cmm[key]['data']);
+          signdatamap.set(key, psd);
+
+          delete cmm[key];
+        }
+      }
+
+      json = { ...json, contentmultimap: cmm }
+    }
+
+    identity = PartialIdentity.fromJson(json as VerusCLIVerusIDJson);
+
+    return new IdentityUpdateRequestDetails({
+      identity,
+      signdatamap,
+      systemid: details?.systemid ? IdentityID.fromAddress(details.systemid) : undefined,
+      requestid: details?.requestid ? new BN(details.requestid, 10) : undefined,
+      createdat: details?.createdat ? new BN(details.createdat, 10) : undefined,
+      expiryheight: details?.expiryheight ? new BN(details.expiryheight, 10) : undefined,
+      responseuris: details?.responseuris ? details.responseuris.map(x => ResponseUri.fromJson(x)) : undefined,
+      salt: details?.salt ? Buffer.from(details.salt, 'hex') : undefined,
+      txid: details?.txid ? Buffer.from(details.txid, 'hex').reverse() : undefined,
     })
   }
 }

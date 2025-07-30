@@ -32,9 +32,9 @@ export declare class Rating implements SerializableEntity {
     fromBuffer(buffer: Buffer, offset?: number): number;
     isValid(): boolean;
     toJson(): {
-        version: string;
-        trust_level: string;
-        ratings: {
+        version: number;
+        trustlevel: number;
+        ratingsmap: {
             [key: string]: string;
         };
     };

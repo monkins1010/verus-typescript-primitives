@@ -1,11 +1,12 @@
-import { ContentMultiMap, KvContent } from "../../pbaas/ContentMultiMap";
+import { ContentMultiMap, ContentMultiMapJson, ContentMultiMapJsonValue, KvContent } from "../../pbaas/ContentMultiMap";
 import { DATA_TYPE_STRING } from "../../vdxf";
 import { VDXF_UNI_VALUE_VERSION_CURRENT, VdxfUniValue } from "../../pbaas/VdxfUniValue";
 import { VdxfUniType } from "../../pbaas/VdxfUniValue";
+import { manyContentMultimapData } from "../constants/fixtures";
 
 describe('Serializes and deserializes ContentMultiMap', () => {
-  const vdxfunivaluedata = new Array<{[key: string]: VdxfUniType}>;
-  vdxfunivaluedata.push({[DATA_TYPE_STRING.vdxfid]: "Test String 123454321"});
+  const vdxfunivaluedata = new Array<{ [key: string]: VdxfUniType }>;
+  vdxfunivaluedata.push({ [DATA_TYPE_STRING.vdxfid]: "Test String 123454321" });
 
   const vdxfunivalue = new VdxfUniValue({
     values: vdxfunivaluedata,
@@ -20,7 +21,7 @@ describe('Serializes and deserializes ContentMultiMap', () => {
     const cFromBuf = new ContentMultiMap();
 
     cFromBuf.fromBuffer(c.toBuffer());
-    
+
     expect(cFromBuf.toBuffer().toString('hex')).toBe(c.toBuffer().toString('hex'));
     expect(ContentMultiMap.fromJson(c.toJson()).toBuffer().toString("hex")).toBe(cFromBuf.toBuffer().toString('hex'));
   }
@@ -38,5 +39,11 @@ describe('Serializes and deserializes ContentMultiMap', () => {
     kvcontent.set("i5v3h9FWVdRFbNHU7DfcpGykQjRaHtMqu7", [Buffer.alloc(20).fill("h"), Buffer.alloc(20).fill("h"), Buffer.alloc(20).fill("h")]);
     kvcontent.set("i81XL8ZpuCo9jmWLv5L5ikdxrGuHrrpQLz", [vdxfunivalue]);
     testContentMultimapWithKvContent(kvcontent);
+  });
+
+  test('test CMM from json', () => {
+    const cmm = ContentMultiMap.fromJson(manyContentMultimapData as unknown as { [key: string]: ContentMultiMapJsonValue });
+
+    expect(cmm.toJson()).toEqual(manyContentMultimapData);
   });
 });

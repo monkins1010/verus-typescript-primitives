@@ -13,16 +13,16 @@ import { BN } from 'bn.js';
 import { BigNumber } from "../../../utils/types/BigNumber";
 import { IdentityUpdateRequestDetails, IdentityUpdateRequestDetailsJson } from "./IdentityUpdateRequestDetails";
 import { IdentityID } from "../../../pbaas";
-import { IdentityUpdateResponseDetails, IdentityUpdateReponseDetailsJson } from "./IdentityUpdateResponseDetails";
+import { IdentityUpdateResponseDetails, IdentityUpdateResponseDetailsJson } from "./IdentityUpdateResponseDetails";
 
-export const IDENTITY_UPDATE_VERSION_CURRENT = new BN(3, 10)
-export const IDENTITY_UPDATE_VERSION_FIRSTVALID = new BN(3, 10)
-export const IDENTITY_UPDATE_VERSION_LASTVALID = new BN(3, 10)
+export const IDENTITY_UPDATE_VERSION_CURRENT = new BN(1, 10)
+export const IDENTITY_UPDATE_VERSION_FIRSTVALID = new BN(1, 10)
+export const IDENTITY_UPDATE_VERSION_LASTVALID = new BN(1, 10)
 export const IDENTITY_UPDATE_VERSION_SIGNED = new BN('80000000', 16)
 export const IDENTITY_UPDATE_VERSION_MASK = IDENTITY_UPDATE_VERSION_SIGNED;
 
 export type IdentityUpdateDetails = IdentityUpdateRequestDetails | IdentityUpdateResponseDetails;
-export type IdentityUpdateDetailsJson = IdentityUpdateRequestDetailsJson | IdentityUpdateReponseDetailsJson;
+export type IdentityUpdateDetailsJson = IdentityUpdateRequestDetailsJson | IdentityUpdateResponseDetailsJson;
 
 export interface IdentityUpdateEnvelopeInterface {
   details: IdentityUpdateDetails;
@@ -265,7 +265,7 @@ export class IdentityUpdateEnvelope extends VDXFObject {
 }
 
 export class IdentityUpdateRequest extends IdentityUpdateEnvelope {
-  constructor(request: IdentityUpdateEnvelopeInterface) {
+  constructor(request?: IdentityUpdateEnvelopeInterface) {
     super(IDENTITY_UPDATE_REQUEST_VDXF_KEY.vdxfid, request);
   }
 
@@ -283,7 +283,7 @@ export class IdentityUpdateRequest extends IdentityUpdateEnvelope {
 }
 
 export class IdentityUpdateResponse extends IdentityUpdateEnvelope {
-  constructor(response: IdentityUpdateEnvelopeInterface) {
+  constructor(response?: IdentityUpdateEnvelopeInterface) {
     super(IDENTITY_UPDATE_RESPONSE_VDXF_KEY.vdxfid, response);
   }
 

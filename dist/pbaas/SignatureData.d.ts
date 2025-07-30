@@ -9,9 +9,9 @@ export interface SignatureJsonDataInterface {
     signaturehash: string;
     identityid: string;
     signaturetype: number;
-    vdxfkeys: Array<string>;
-    vdxfkeynames: Array<string>;
-    boundhashes: Array<string>;
+    vdxfkeys?: Array<string>;
+    vdxfkeynames?: Array<string>;
+    boundhashes?: Array<string>;
     signature: string;
 }
 export declare class SignatureData implements SerializableEntity {
@@ -48,11 +48,7 @@ export declare class SignatureData implements SerializableEntity {
     toBuffer(): Buffer;
     fromBuffer(buffer: Buffer, offset?: number): number;
     isValid(): boolean;
-    toJson(): {
-        version: string;
-        systemid: string;
-        hashtype: string;
-    };
+    toJson(): SignatureJsonDataInterface;
     getIdentityHash(sigObject: {
         version: number;
         hash_type: number;

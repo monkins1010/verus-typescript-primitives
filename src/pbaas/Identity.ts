@@ -10,6 +10,7 @@ import { SaplingPaymentAddress } from './SaplingPaymentAddress';
 import { ContentMultiMap, ContentMultiMapJson } from './ContentMultiMap';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
 import { KeyID } from './KeyID';
+import { PartialSignDataCLIJson } from './PartialSignData';
 
 export const IDENTITY_VERSION_VAULT = new BN(2, 10);
 export const IDENTITY_VERSION_PBAAS = new BN(3, 10);
@@ -26,22 +27,24 @@ const { BufferReader, BufferWriter } = bufferutils;
 
 export type Hashes = Map<string, Buffer>;
 
-export type VerusCLIVerusIDJson = {
-  contentmap?: { [key: string]: string },
-  contentmultimap?: ContentMultiMapJson,
-  flags?: number,
-  identityaddress?: string,
-  minimumsignatures?: number,
-  name?: string,
-  parent?: string,
-  primaryaddresses?: Array<string>,
-  privateaddress?: string,
-  recoveryauthority?: string,
-  revocationauthority?: string,
-  systemid?: string,
-  timelock?: number,
-  version?: number
-}
+export type VerusCLIVerusIDJsonBase<T = ContentMultiMapJson> = {
+  contentmap?: { [key: string]: string };
+  contentmultimap?: T;
+  flags?: number;
+  identityaddress?: string;
+  minimumsignatures?: number;
+  name?: string;
+  parent?: string;
+  primaryaddresses?: Array<string>;
+  privateaddress?: string;
+  recoveryauthority?: string;
+  revocationauthority?: string;
+  systemid?: string;
+  timelock?: number;
+  version?: number;
+};
+
+export type VerusCLIVerusIDJson = VerusCLIVerusIDJsonBase<ContentMultiMapJson>;
 
 export type VerusIDInitData = {
   version?: BigNumber;
@@ -80,6 +83,9 @@ export class Identity extends Principal implements SerializableEntity {
 
   constructor(data?: VerusIDInitData) {
     super(data)
+
+    if (data?.version) this.version = data.version;
+    else this.version = Identity.VERSION_CURRENT;
 
     if (data?.parent) this.parent = data.parent;
     if (data?.system_id) this.system_id = data.system_id;
@@ -272,7 +278,7 @@ export class Identity extends Principal implements SerializableEntity {
       if (this.version.gte(IDENTITY_VERSION_PBAAS)) {
         const multimap = new ContentMultiMap();
 
-        reader.offset = multimap.fromBuffer(reader.buffer, reader.offset, parseVdxfObjects);
+      reader.offset = multimap.fromBuffer(reader.buffer, reader.offset, parseVdxfObjects);
 
         this.content_multimap = multimap;
       }
@@ -366,7 +372,7 @@ export class Identity extends Principal implements SerializableEntity {
     const ret: VerusCLIVerusIDJson = {
       contentmap: this.containsContentMap() ? contentmap : undefined,
       contentmultimap: this.containsContentMultiMap() ? this.content_multimap.toJson() : undefined,
-      flags: this.flags.toNumber(),
+      flags: this.containsFlags() ? this.flags.toNumber() : undefined,
       minimumsignatures: this.containsMinSigs() ? this.min_sigs.toNumber() : undefined,
       name: this.name,
       parent: this.containsParent() ? this.parent.toAddress() : undefined,
@@ -375,12 +381,16 @@ export class Identity extends Principal implements SerializableEntity {
       revocationauthority: this.containsRevocation() ? this.revocation_authority.toAddress() : undefined,
       systemid: this.containsSystemId() ? this.system_id.toAddress() : undefined,
       timelock: this.containsUnlockAfter() ? this.unlock_after.toNumber() : undefined,
-      version: this.version.toNumber(),
+      version: this.containsVersion() ? this.version.toNumber() : undefined,
       identityaddress: this.containsParent() ? this.getIdentityAddress() : undefined
     };
 
     if (this.private_addresses != null && this.private_addresses.length > 0) {
       ret.privateaddress = this.private_addresses[0].toAddressString();
+    }
+
+    for (const key in ret) {
+      if (ret[key] === undefined) delete ret[key]
     }
 
     return ret;
@@ -503,19 +513,19 @@ export class Identity extends Principal implements SerializableEntity {
     }
   
     return new ctor({
-      version: json.version ? new BN(json.version, 10) : null,
-      flags: json.flags ? new BN(json.flags, 10) : null,
-      min_sigs: json.minimumsignatures ? new BN(json.minimumsignatures, 10) : null,
-      primary_addresses: json.primaryaddresses ? json.primaryaddresses.map(x => KeyID.fromAddress(x)) : null,
-      parent: json.parent ? IdentityID.fromAddress(json.parent) : null,
+      version: json.version != null ? new BN(json.version, 10) : undefined,
+      flags: json.flags != null ? new BN(json.flags, 10) : undefined,
+      min_sigs: json.minimumsignatures ? new BN(json.minimumsignatures, 10) : undefined,
+      primary_addresses: json.primaryaddresses ? json.primaryaddresses.map(x => KeyID.fromAddress(x)) : undefined,
+      parent: json.parent ? IdentityID.fromAddress(json.parent) : undefined,
       system_id: json.systemid ? IdentityID.fromAddress(json.systemid) : undefined,
       name: json.name,
-      content_map: contentmap,
-      content_multimap: json.contentmultimap ? ContentMultiMap.fromJson(json.contentmultimap) : null,
-      revocation_authority: json.revocationauthority ? IdentityID.fromAddress(json.revocationauthority) : null,
-      recovery_authority: json.recoveryauthority ? IdentityID.fromAddress(json.recoveryauthority) : null,
+      content_map: json.contentmap ? contentmap : undefined,
+      content_multimap: json.contentmultimap ? ContentMultiMap.fromJson(json.contentmultimap as  ContentMultiMapJson) : undefined,
+      revocation_authority: json.revocationauthority ? IdentityID.fromAddress(json.revocationauthority) : undefined,
+      recovery_authority: json.recoveryauthority ? IdentityID.fromAddress(json.recoveryauthority) : undefined,
       private_addresses: json.privateaddress == null ? [] : [SaplingPaymentAddress.fromAddressString(json.privateaddress)],
-      unlock_after: json.timelock != null ? new BN(json.timelock, 10) : null
+      unlock_after: json.timelock != null ? new BN(json.timelock, 10) : undefined
     });
   }
 

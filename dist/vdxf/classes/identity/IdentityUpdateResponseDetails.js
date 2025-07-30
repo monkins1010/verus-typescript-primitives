@@ -10,7 +10,7 @@ const varuint_1 = require("../../../utils/varuint");
 const { BufferReader, BufferWriter } = bufferutils_1.default;
 class IdentityUpdateResponseDetails {
     constructor(data) {
-        this.flags = data && data.flags ? data.flags : new bn_js_1.BN("1", 10);
+        this.flags = data && data.flags ? data.flags : new bn_js_1.BN("0", 10);
         if (data === null || data === void 0 ? void 0 : data.requestid) {
             this.requestid = data.requestid;
         }
@@ -30,17 +30,11 @@ class IdentityUpdateResponseDetails {
             this.salt = data.salt;
         }
     }
-    isValid() {
-        return !!(this.flags.and(IdentityUpdateResponseDetails.IDENTITY_UPDATE_RESPONSE_VALID).toNumber());
-    }
     containsTxid() {
         return !!(this.flags.and(IdentityUpdateResponseDetails.IDENTITY_UPDATE_RESPONSE_CONTAINS_TXID).toNumber());
     }
     containsSalt() {
         return !!(this.flags.and(IdentityUpdateResponseDetails.IDENTITY_UPDATE_RESPONSE_CONTAINS_SALT).toNumber());
-    }
-    toggleIsValid() {
-        this.flags = this.flags.xor(IdentityUpdateResponseDetails.IDENTITY_UPDATE_RESPONSE_VALID);
     }
     toggleContainsTxid() {
         this.flags = this.flags.xor(IdentityUpdateResponseDetails.IDENTITY_UPDATE_RESPONSE_CONTAINS_TXID);
@@ -114,7 +108,6 @@ class IdentityUpdateResponseDetails {
     }
 }
 exports.IdentityUpdateResponseDetails = IdentityUpdateResponseDetails;
-IdentityUpdateResponseDetails.IDENTITY_UPDATE_RESPONSE_INVALID = new bn_js_1.BN(0, 10);
-IdentityUpdateResponseDetails.IDENTITY_UPDATE_RESPONSE_VALID = new bn_js_1.BN(1, 10);
-IdentityUpdateResponseDetails.IDENTITY_UPDATE_RESPONSE_CONTAINS_TXID = new bn_js_1.BN(2, 10);
-IdentityUpdateResponseDetails.IDENTITY_UPDATE_RESPONSE_CONTAINS_SALT = new bn_js_1.BN(4, 10);
+IdentityUpdateResponseDetails.IDENTITY_UPDATE_RESPONSE_VALID = new bn_js_1.BN(0, 10);
+IdentityUpdateResponseDetails.IDENTITY_UPDATE_RESPONSE_CONTAINS_TXID = new bn_js_1.BN(1, 10);
+IdentityUpdateResponseDetails.IDENTITY_UPDATE_RESPONSE_CONTAINS_SALT = new bn_js_1.BN(2, 10);

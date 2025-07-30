@@ -13,6 +13,7 @@ const vdxf_1 = require("../constants/vdxf");
 const PartialMMRData_1 = require("./PartialMMRData");
 const pbaas_1 = require("../constants/pbaas");
 const address_1 = require("../utils/address");
+const VdxfUniValue_1 = require("./VdxfUniValue");
 const { BufferReader, BufferWriter } = bufferutils_1.default;
 class PartialSignData {
     constructor(data) {
@@ -38,12 +39,12 @@ class PartialSignData {
                 this.toggleContainsVdxfKeyNames();
             this.vdxfkeynames = data.vdxfkeynames;
         }
+        if (data === null || data === void 0 ? void 0 : data.hashtype) {
+            this.hashtype = data.hashtype;
+        }
+        else
+            this.hashtype = pbaas_1.DEFAULT_HASH_TYPE;
         if (data === null || data === void 0 ? void 0 : data.boundhashes) {
-            if (data === null || data === void 0 ? void 0 : data.hashtype) {
-                this.hashtype = data.hashtype;
-            }
-            else
-                this.hashtype = pbaas_1.DEFAULT_HASH_TYPE;
             if (!this.containsBoundhashes())
                 this.toggleContainsBoundHashes();
             this.boundhashes = data.boundhashes;
@@ -116,6 +117,9 @@ class PartialSignData {
     isMMRData() {
         return this.datatype && this.datatype.eq(pbaas_1.DATA_TYPE_MMRDATA);
     }
+    isVdxfData() {
+        return this.datatype && this.datatype.eq(pbaas_1.DATA_TYPE_VDXFDATA);
+    }
     getPartialSignDataByteLength() {
         function calculateVectorLength(items, getItemLength, varlength = true) {
             let totalLength = 0;
@@ -143,8 +147,8 @@ class PartialSignData {
         if (this.containsVdxfKeyNames()) {
             length += calculateVectorLength(this.vdxfkeynames, (vdxfname) => vdxfname.length);
         }
+        length += varint_1.default.encodingLength(this.hashtype);
         if (this.containsBoundhashes()) {
-            length += varint_1.default.encodingLength(this.hashtype);
             length += calculateVectorLength(this.boundhashes, (hash) => hash.length);
         }
         if (this.containsEncrypttoAddress()) {
@@ -155,6 +159,11 @@ class PartialSignData {
             length += varint_1.default.encodingLength(this.datatype);
             if (this.isMMRData()) {
                 length += this.data.getByteLength();
+            }
+            else if (this.isVdxfData()) {
+                const vdxfDataLen = this.data.getByteLength();
+                length += varuint_1.default.encodingLength(vdxfDataLen);
+                length += vdxfDataLen;
             }
             else {
                 const datalen = this.data.length;
@@ -198,8 +207,8 @@ class PartialSignData {
         if (this.containsVdxfKeyNames()) {
             this.vdxfkeynames = reader.readVector();
         }
+        this.hashtype = reader.readVarInt();
         if (this.containsBoundhashes()) {
-            this.hashtype = reader.readVarInt();
             this.boundhashes = reader.readVector();
         }
         if (this.containsEncrypttoAddress()) {
@@ -214,6 +223,12 @@ class PartialSignData {
                 const partialMMRData = new PartialMMRData_1.PartialMMRData();
                 reader.offset = partialMMRData.fromBuffer(reader.buffer, reader.offset);
                 this.data = partialMMRData;
+            }
+            else if (this.isVdxfData()) {
+                const vdxfData = new VdxfUniValue_1.VdxfUniValue();
+                const vdxfDataBuf = reader.readVarSlice();
+                vdxfData.fromBuffer(vdxfDataBuf);
+                this.data = vdxfData;
             }
             else {
                 this.data = reader.readVarSlice();
@@ -258,12 +273,12 @@ class PartialSignData {
             }
             writer.writeVector(this.vdxfkeynames);
         }
+        writer.writeVarInt(this.hashtype);
         // Bound hashes
         if (this.containsBoundhashes()) {
-            if (!this.boundhashes || !this.hashtype) {
+            if (!this.boundhashes) {
                 throw new Error("Bound hashes are required but not provided");
             }
-            writer.writeVarInt(this.hashtype);
             writer.writeVector(this.boundhashes);
         }
         // Encrypt-to address (Sapling)
@@ -285,6 +300,10 @@ class PartialSignData {
                 const mmrData = this.data;
                 writer.writeSlice(mmrData.toBuffer());
             }
+            else if (this.isVdxfData()) {
+                const vdxfData = this.data;
+                writer.writeVarSlice(vdxfData.toBuffer());
+            }
             else {
                 writer.writeVarSlice(this.data);
             }
@@ -297,7 +316,7 @@ class PartialSignData {
             address: this.address ? this.address.toAddress() : undefined,
             prefixstring: this.prefixstring ? this.prefixstring.toString('utf-8') : undefined,
             vdxfkeys: this.vdxfkeys ? this.vdxfkeys.map(x => x.toAddress()) : undefined,
-            vdxfkeynames: this.vdxfkeys ? this.vdxfkeynames.map(x => x.toString('utf-8')) : undefined,
+            vdxfkeynames: this.vdxfkeynames ? this.vdxfkeynames.map(x => x.toString('utf-8')) : undefined,
             boundhashes: this.boundhashes ? this.boundhashes.map(x => x.toString('hex')) : undefined,
             hashtype: this.hashtype ? this.hashtype.toString(10) : undefined,
             encrypttoaddress: this.encrypttoaddress ? this.encrypttoaddress.toAddressString() : undefined,
@@ -320,6 +339,7 @@ class PartialSignData {
             else
                 throw new Error("Unrecognized address version");
         }
+        const datatype = json.datatype ? new bn_js_1.BN(json.datatype, 10) : undefined;
         return new PartialSignData({
             flags: json.flags ? new bn_js_1.BN(json.flags, 10) : undefined,
             address: addr,
@@ -332,8 +352,160 @@ class PartialSignData {
             createmmr: json.createmmr,
             signature: json.signature ? Buffer.from(json.signature, 'base64') : undefined,
             datatype: json.datatype ? new bn_js_1.BN(json.datatype, 10) : undefined,
-            data: json.data ? typeof json.data === 'string' ? Buffer.from(json.data, 'hex') : PartialMMRData_1.PartialMMRData.fromJson(json.data) : undefined
+            data: json.data ?
+                typeof json.data === 'string' ?
+                    Buffer.from(json.data, 'hex')
+                    :
+                        datatype && datatype.eq(pbaas_1.DATA_TYPE_MMRDATA) ?
+                            PartialMMRData_1.PartialMMRData.fromJson(json.data)
+                            :
+                                VdxfUniValue_1.VdxfUniValue.fromJson(json.data)
+                :
+                    undefined
         });
+    }
+    toCLIJson() {
+        const ret = {
+            address: this.address ? this.address.toAddress() : undefined,
+            prefixstring: this.prefixstring ? this.prefixstring.toString('utf-8') : undefined,
+            vdxfkeys: this.vdxfkeys ? this.vdxfkeys.map(x => x.toAddress()) : undefined,
+            vdxfkeynames: this.vdxfkeynames ? this.vdxfkeynames.map(x => x.toString('utf-8')) : undefined,
+            boundhashes: this.boundhashes ? this.boundhashes.map(x => x.toString('hex')) : undefined,
+            encrypttoaddress: this.encrypttoaddress ? this.encrypttoaddress.toAddressString() : undefined,
+            createmmr: this.createmmr,
+            signature: this.signature ? this.signature.toString('base64') : undefined
+        };
+        if (this.containsData() && this.data && this.datatype) {
+            if (this.datatype.eq(pbaas_1.DATA_TYPE_MMRDATA)) {
+                const mmrCLIJson = this.data.toCLIJson();
+                ret['mmrdata'] = mmrCLIJson.mmrdata;
+                ret['mmrsalt'] = mmrCLIJson.mmrsalt;
+                ret['mmrhashtype'] = mmrCLIJson.mmrhashtype;
+                ret['priormmr'] = mmrCLIJson.priormmr;
+            }
+            else if (this.datatype.eq(pbaas_1.DATA_TYPE_VDXFDATA)) {
+                const uniJson = this.data.toJson();
+                if (Array.isArray(uniJson))
+                    throw new Error("VDXF univalue arrays not supported as sign data param");
+                ret['vdxfdata'] = this.data.toJson();
+            }
+            else {
+                const dataBuf = this.data;
+                if (this.datatype.eq(pbaas_1.DATA_TYPE_FILENAME)) {
+                    ret['filename'] = dataBuf.toString('utf-8');
+                }
+                else if (this.datatype.eq(pbaas_1.DATA_TYPE_MESSAGE)) {
+                    ret['message'] = dataBuf.toString('utf-8');
+                }
+                else if (this.datatype.eq(pbaas_1.DATA_TYPE_HEX)) {
+                    ret['messagehex'] = dataBuf.toString('hex');
+                }
+                else if (this.datatype.eq(pbaas_1.DATA_TYPE_BASE64)) {
+                    ret['messagebase64'] = dataBuf.toString('base64');
+                }
+                else if (this.datatype.eq(pbaas_1.DATA_TYPE_DATAHASH)) {
+                    ret['datahash'] = dataBuf.toString('hex');
+                }
+                else
+                    throw new Error("Unrecognized datatype");
+            }
+        }
+        if (this.hashtype.eq(pbaas_1.HASH_TYPE_SHA256)) {
+            ret['hashtype'] = pbaas_1.HASH_TYPE_SHA256_NAME;
+        }
+        else if (this.hashtype.eq(pbaas_1.HASH_TYPE_SHA256D)) {
+            ret['hashtype'] = pbaas_1.HASH_TYPE_SHA256D_NAME;
+        }
+        else if (this.hashtype.eq(pbaas_1.HASH_TYPE_BLAKE2B)) {
+            ret['hashtype'] = pbaas_1.HASH_TYPE_BLAKE2B_NAME;
+        }
+        else if (this.hashtype.eq(pbaas_1.HASH_TYPE_KECCAK256)) {
+            ret['hashtype'] = pbaas_1.HASH_TYPE_KECCAK256_NAME;
+        }
+        else
+            throw new Error("Unrecognized hash type");
+        for (const key in ret) {
+            if (ret[key] === undefined)
+                delete ret[key];
+        }
+        return ret;
+    }
+    static fromCLIJson(json) {
+        let addr;
+        if (json.address) {
+            const { version, hash } = (0, address_1.fromBase58Check)(json.address);
+            if (version === vdxf_1.I_ADDR_VERSION) {
+                addr = new IdentityID_1.IdentityID(hash);
+            }
+            else if (version === vdxf_1.R_ADDR_VERSION) {
+                addr = new KeyID_1.KeyID(hash);
+            }
+            else
+                throw new Error("Unrecognized address version");
+        }
+        const config = {
+            address: addr,
+            prefixstring: json.prefixstring ? Buffer.from(json.prefixstring, 'utf-8') : undefined,
+            vdxfkeys: json.vdxfkeys ? json.vdxfkeys.map(x => IdentityID_1.IdentityID.fromAddress(x)) : undefined,
+            vdxfkeynames: json.vdxfkeynames ? json.vdxfkeynames.map(x => Buffer.from(x, 'utf-8')) : undefined,
+            boundhashes: json.boundhashes ? json.boundhashes.map(x => Buffer.from(x, 'hex')) : undefined,
+            encrypttoaddress: json.encrypttoaddress ? SaplingPaymentAddress_1.SaplingPaymentAddress.fromAddressString(json.encrypttoaddress) : undefined,
+            createmmr: json.createmmr,
+            signature: json.signature ? Buffer.from(json.signature, 'base64') : undefined
+        };
+        if ('mmrdata' in json) {
+            const pmd = PartialMMRData_1.PartialMMRData.fromCLIJson({
+                mmrdata: json.mmrdata,
+                mmrsalt: json.mmrsalt,
+                mmrhashtype: json.mmrhashtype,
+                priormmr: json.priormmr
+            });
+            config.data = pmd;
+            config.datatype = pbaas_1.DATA_TYPE_MMRDATA;
+        }
+        else if (json.filename) {
+            config.data = Buffer.from(json.filename, 'utf-8');
+            config.datatype = pbaas_1.DATA_TYPE_FILENAME;
+        }
+        else if (json.message) {
+            config.data = Buffer.from(json.message, 'utf-8');
+            config.datatype = pbaas_1.DATA_TYPE_MESSAGE;
+        }
+        else if (json.vdxfdata) {
+            config.data = VdxfUniValue_1.VdxfUniValue.fromJson(json.vdxfdata);
+            config.datatype = pbaas_1.DATA_TYPE_VDXFDATA;
+        }
+        else if (json.messagehex) {
+            config.data = Buffer.from(json.messagehex, 'hex');
+            config.datatype = pbaas_1.DATA_TYPE_HEX;
+        }
+        else if (json.messagebase64) {
+            config.data = Buffer.from(json.messagebase64, 'base64');
+            config.datatype = pbaas_1.DATA_TYPE_BASE64;
+        }
+        else if (json.datahash) {
+            config.data = Buffer.from(json.datahash, 'hex');
+            config.datatype = pbaas_1.DATA_TYPE_DATAHASH;
+        }
+        if (json.hashtype) {
+            switch (json.hashtype) {
+                case pbaas_1.HASH_TYPE_SHA256_NAME:
+                    config.hashtype = pbaas_1.HASH_TYPE_SHA256;
+                    break;
+                case pbaas_1.HASH_TYPE_SHA256D_NAME:
+                    config.hashtype = pbaas_1.HASH_TYPE_SHA256D;
+                    break;
+                case pbaas_1.HASH_TYPE_BLAKE2B_NAME:
+                    config.hashtype = pbaas_1.HASH_TYPE_BLAKE2B;
+                    break;
+                case pbaas_1.HASH_TYPE_KECCAK256_NAME:
+                    config.hashtype = pbaas_1.HASH_TYPE_KECCAK256;
+                    break;
+                default:
+                    throw new Error("Unrecognized hash type");
+            }
+        }
+        return new PartialSignData(config);
     }
 }
 exports.PartialSignData = PartialSignData;

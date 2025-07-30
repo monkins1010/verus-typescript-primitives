@@ -1,11 +1,17 @@
 /// <reference types="node" />
 /// <reference types="bn.js" />
 import { PartialIdentity } from '../../../pbaas/PartialIdentity';
-import { PartialSignData, PartialSignDataJson } from '../../../pbaas/PartialSignData';
+import { PartialSignData, PartialSignDataCLIJson, PartialSignDataJson } from '../../../pbaas/PartialSignData';
 import { BigNumber } from '../../../utils/types/BigNumber';
-import { IdentityID, VerusCLIVerusIDJson } from '../../../pbaas';
+import { ContentMultiMapJsonValue, IdentityID, VerusCLIVerusIDJson, VerusCLIVerusIDJsonBase } from '../../../pbaas';
 import { ResponseUri, ResponseUriJson } from '../ResponseUri';
+import { SerializableEntity } from '../../../utils/types/SerializableEntity';
 export declare type SignDataMap = Map<string, PartialSignData>;
+export declare type VerusCLIVerusIDJsonWithData = VerusCLIVerusIDJsonBase<{
+    [key: string]: ContentMultiMapJsonValue | {
+        data: PartialSignDataCLIJson;
+    };
+}>;
 export declare type IdentityUpdateRequestDetailsJson = {
     flags?: string;
     requestid?: string;
@@ -18,8 +24,9 @@ export declare type IdentityUpdateRequestDetailsJson = {
         [key: string]: PartialSignDataJson;
     };
     salt?: string;
+    txid?: string;
 };
-export declare class IdentityUpdateRequestDetails {
+export declare class IdentityUpdateRequestDetails implements SerializableEntity {
     flags?: BigNumber;
     requestid?: BigNumber;
     createdat?: BigNumber;
@@ -29,12 +36,13 @@ export declare class IdentityUpdateRequestDetails {
     responseuris?: Array<ResponseUri>;
     signdatamap?: SignDataMap;
     salt?: Buffer;
-    static IDENTITY_UPDATE_REQUEST_INVALID: import("bn.js");
+    txid?: Buffer;
     static IDENTITY_UPDATE_REQUEST_VALID: import("bn.js");
     static IDENTITY_UPDATE_REQUEST_CONTAINS_SIGNDATA: import("bn.js");
     static IDENTITY_UPDATE_REQUEST_EXPIRES: import("bn.js");
     static IDENTITY_UPDATE_REQUEST_CONTAINS_RESPONSE_URIS: import("bn.js");
     static IDENTITY_UPDATE_REQUEST_CONTAINS_SYSTEM: import("bn.js");
+    static IDENTITY_UPDATE_REQUEST_CONTAINS_TXID: import("bn.js");
     static IDENTITY_UPDATE_REQUEST_CONTAINS_SALT: import("bn.js");
     static IDENTITY_UPDATE_REQUEST_IS_TESTNET: import("bn.js");
     constructor(data?: {
@@ -44,28 +52,32 @@ export declare class IdentityUpdateRequestDetails {
         identity?: PartialIdentity;
         expiryheight?: BigNumber;
         systemid?: IdentityID;
+        txid?: Buffer;
         responseuris?: Array<ResponseUri>;
         signdatamap?: SignDataMap;
         salt?: Buffer;
     });
-    isValid(): boolean;
     expires(): boolean;
     containsSignData(): boolean;
     containsSystem(): boolean;
+    containsTxid(): boolean;
     containsResponseUris(): boolean;
     containsSalt(): boolean;
     isTestnet(): boolean;
-    toggleIsValid(): void;
     toggleExpires(): void;
     toggleContainsSignData(): void;
     toggleContainsSystem(): void;
+    toggleContainsTxid(): void;
     toggleContainsResponseUris(): void;
     toggleContainsSalt(): void;
     toggleIsTestnet(): void;
     toSha256(): Buffer;
+    getIdentityAddress(): string;
     getByteLength(): number;
     toBuffer(): Buffer;
     fromBuffer(buffer: Buffer, offset?: number, parseVdxfObjects?: boolean): number;
     toJson(): IdentityUpdateRequestDetailsJson;
     static fromJson(json: IdentityUpdateRequestDetailsJson): IdentityUpdateRequestDetails;
+    toCLIJson(): VerusCLIVerusIDJsonWithData;
+    static fromCLIJson(json: VerusCLIVerusIDJsonWithData, details?: IdentityUpdateRequestDetailsJson): IdentityUpdateRequestDetails;
 }

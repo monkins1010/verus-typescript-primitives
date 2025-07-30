@@ -1,4 +1,5 @@
-import { nameAndParentAddrToIAddr, toIAddress } from "../../utils/address";
+import { getDataKey, nameAndParentAddrToIAddr, toIAddress } from "../../utils/address";
+import { DATA_TYPE_DEFINEDKEY, IDENTITY_UPDATE_REQUEST_VDXF_KEY, VERUSPAY_INVOICE_VDXF_KEY, WALLET_VDXF_KEY } from "../../vdxf";
 
 describe('Address tests', () => {
   test('toIAddress tests', async () => {
@@ -18,5 +19,21 @@ describe('Address tests', () => {
     expect(nameAndParentAddrToIAddr("Andromeda", "iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq")).toBe("iNC9NG5Jqk2tqVtqfjfiSpaqxrXaFU6RDu");
     expect(nameAndParentAddrToIAddr("VRSC")).toBe("i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV");
     expect(nameAndParentAddrToIAddr("The Verus Coin Foundation", "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV")).toBe("iDV1KZA6vBXi9k6K3imiSLe5CsYG6MdH4V");
+  });
+
+  test('getDataKey tests', () => {
+    const keys = [
+      VERUSPAY_INVOICE_VDXF_KEY, 
+      IDENTITY_UPDATE_REQUEST_VDXF_KEY, 
+      WALLET_VDXF_KEY,
+      DATA_TYPE_DEFINEDKEY
+    ]
+
+    for (const key of keys) {
+      const dataKey = getDataKey(key.qualifiedname.name);
+
+      expect(dataKey.id).toBe(key.vdxfid);
+      expect(dataKey.namespace).toBe(key.qualifiedname.namespace);
+    }
   });
 });

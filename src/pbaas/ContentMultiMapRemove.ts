@@ -40,10 +40,10 @@ export class ContentMultiMapRemove implements SerializableEntity {
   }
 
   getByteLength() {
-    let byteLength = 0;
+    let byteLength = 0; 
 
-    byteLength += 4; // version uint32
-    byteLength += 4; // action uint32
+    byteLength += varint.encodingLength(this.version);
+    byteLength += varint.encodingLength(this.action);
     if (this.action != ContentMultiMapRemove.ACTION_CLEAR_MAP) {
       byteLength += 20
       if (this.action != ContentMultiMapRemove.ACTION_REMOVE_ALL_KEY) {
@@ -56,13 +56,13 @@ export class ContentMultiMapRemove implements SerializableEntity {
   toBuffer() {
     const bufferWriter = new BufferWriter(Buffer.alloc(this.getByteLength()))
 
-    bufferWriter.writeUInt32(this.version.toNumber());
-    bufferWriter.writeUInt32(this.action.toNumber());
+    bufferWriter.writeVarInt(this.version);
+    bufferWriter.writeVarInt(this.action);
 
     if (this.action != ContentMultiMapRemove.ACTION_CLEAR_MAP) {
       bufferWriter.writeSlice(fromBase58Check(this.entry_key).hash);
       if (this.action != ContentMultiMapRemove.ACTION_REMOVE_ALL_KEY) {
-        bufferWriter.writeSlice(this.value_hash);
+        bufferWriter.writeSlice(this.value_hash); 
       }
     }
 
@@ -72,13 +72,13 @@ export class ContentMultiMapRemove implements SerializableEntity {
   fromBuffer(buffer: Buffer, offset: number = 0) {
     const reader = new BufferReader(buffer, offset);
 
-    this.version = new BN(reader.readUInt32());
-    this.action = new BN(reader.readUInt32());
+    this.version = new BN(reader.readVarInt());
+    this.action = new BN(reader.readVarInt());
 
-    if (this.action != ContentMultiMapRemove.ACTION_CLEAR_MAP) {
+    if (!this.action.eq(ContentMultiMapRemove.ACTION_CLEAR_MAP)) {
       this.entry_key = toBase58Check(reader.readSlice(20), I_ADDR_VERSION)
-      if (this.action != ContentMultiMapRemove.ACTION_REMOVE_ALL_KEY) {
-        this.value_hash = reader.readSlice(32)
+      if (!this.action.eq(ContentMultiMapRemove.ACTION_REMOVE_ALL_KEY)) {
+        this.value_hash = reader.readSlice(32); 
       }
     }
     return reader.offset;
@@ -89,7 +89,7 @@ export class ContentMultiMapRemove implements SerializableEntity {
       version: new BN(data.version),
       action: new BN(data.action),
       entry_key: data.entrykey,
-      value_hash: Buffer.from(data.valuehash, 'hex')
+      value_hash: Buffer.from(data.valuehash, 'hex').reverse() // Unit256 Reverse to match the original hash order
     })
   }
 
@@ -98,7 +98,7 @@ export class ContentMultiMapRemove implements SerializableEntity {
       version: this.version.toNumber(),
       action: this.action.toNumber(),
       entrykey: this.entry_key,
-      valuehash: this.value_hash.toString('hex')
+      valuehash: Buffer.from(this.value_hash).reverse().toString('hex')
     }
   }
 

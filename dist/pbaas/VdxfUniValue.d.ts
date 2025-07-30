@@ -10,19 +10,20 @@ import { CrossChainDataRef, CrossChainDataRefJson } from './CrossChainDataRef';
 import { SignatureData, SignatureJsonDataInterface } from './SignatureData';
 import { DataDescriptor, DataDescriptorJson } from './DataDescriptor';
 import { MMRDescriptor, MMRDescriptorJson } from './MMRDescriptor';
+import { Credential } from './Credential';
 import { URLRef } from './URLRef';
 import { IdentityMultimapRef } from './IdentityMultimapRef';
 export declare const VDXF_UNI_VALUE_VERSION_INVALID: import("bn.js");
 export declare const VDXF_UNI_VALUE_VERSION_CURRENT: import("bn.js");
-export declare type VdxfUniType = string | Buffer | BigNumber | CurrencyValueMap | Rating | TransferDestination | ContentMultiMapRemove | CrossChainDataRef | SignatureData | DataDescriptor | MMRDescriptor | URLRef | IdentityMultimapRef;
-export declare type VdxfUniValueJson = string | {
-    [key: string]: string | number | RatingJson | TransferDestinationJson | ContentMultiMapRemoveJson | CrossChainDataRefJson | SignatureJsonDataInterface | DataDescriptorJson | MMRDescriptorJson;
+export declare type VdxfUniType = string | Buffer | BigNumber | CurrencyValueMap | Rating | TransferDestination | ContentMultiMapRemove | CrossChainDataRef | SignatureData | DataDescriptor | MMRDescriptor | URLRef | IdentityMultimapRef | Credential;
+export interface VdxfUniValueJson {
+    [key: string]: string | number | RatingJson | TransferDestinationJson | ContentMultiMapRemoveJson | CrossChainDataRefJson | SignatureJsonDataInterface | DataDescriptorJson | MMRDescriptorJson | VdxfUniValueJson;
     serializedhex?: string;
     serializedbase64?: string;
     message?: string;
 };
 export declare type VdxfUniValueJsonArray = Array<VdxfUniValueJson>;
-export declare type JsonSerializableObject = CurrencyValueMap | Rating | TransferDestination | ContentMultiMapRemove | CrossChainDataRef | SignatureData | DataDescriptor | MMRDescriptor;
+export declare type JsonSerializableObject = CurrencyValueMap | Rating | TransferDestination | ContentMultiMapRemove | CrossChainDataRef | SignatureData | DataDescriptor | MMRDescriptor | Credential;
 export declare class VdxfUniValue implements SerializableEntity {
     values: Array<{
         [key: string]: VdxfUniType;
@@ -37,6 +38,6 @@ export declare class VdxfUniValue implements SerializableEntity {
     getByteLength(): number;
     toBuffer(): Buffer;
     fromBuffer(buffer: Buffer, offset?: number): number;
-    static fromJson(obj: VdxfUniValueJson | VdxfUniValueJsonArray): VdxfUniValue;
+    static fromJson(obj: any): VdxfUniValue;
     toJson(): VdxfUniValueJsonArray | VdxfUniValueJson;
 }

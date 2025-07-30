@@ -50,7 +50,7 @@ export class Decision extends VDXFObject {
 
     this.decision_id = decision.decision_id;
     this.request = new Request(decision.request);
-    this.context = decision.context;
+    this.context = decision.context ? new Context(decision.context.kv) : new Context();
     this.created_at = decision.created_at;
     this.attestations = decision.attestations;
     this.salt = decision.salt;
@@ -150,9 +150,11 @@ export class Decision extends VDXFObject {
         this.attestations = [];
         const attestationsLength = reader.readCompactSize();
   
-        if (attestationsLength > 0) {
-          throw new Error("Attestations currently unsupported");
-        }  
+        for (let i = 0; i < attestationsLength; i++) {
+          const _att = new Attestation();
+          reader.offset = _att.fromBuffer(reader.buffer, reader.offset);
+          this.attestations.push(_att);
+        }
       }
 
       const _context = new Context();
