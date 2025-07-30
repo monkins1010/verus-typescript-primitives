@@ -18,9 +18,9 @@ export interface SignatureJsonDataInterface {
   signaturehash: string;
   identityid: string;
   signaturetype: number;
-  vdxfkeys: Array<string>;
-  vdxfkeynames: Array<string>;
-  boundhashes: Array<string>;
+  vdxfkeys?: Array<string>;
+  vdxfkeynames?: Array<string>;
+  boundhashes?: Array<string>;
   signature: string;
 }
 
@@ -193,37 +193,37 @@ export class SignatureData implements SerializableEntity {
       this.system_ID);
   }
 
-  toJson() {
+  toJson(): SignatureJsonDataInterface {
 
-    const returnObj = {
+    const returnObj: SignatureJsonDataInterface = {
       version: this.version.toNumber(),
       systemid: this.system_ID,
-      hashtype: this.hash_type.toNumber()
-    }
+      hashtype: this.hash_type.toNumber(),
+      signaturehash: '', // Will be set below
+      identityid: this.identity_ID,
+      signaturetype: this.sig_type.toNumber(),
+      signature: this.signature_as_vch.toString('base64')
+    };
 
     if (this.hash_type.eq(new BN(Number(EHashTypes.HASH_SHA256)))) {
-      returnObj['signaturehash'] = Buffer.from(this.signature_hash).toString('hex');
+      returnObj.signaturehash = Buffer.from(this.signature_hash).toString('hex');
     } else {
-      returnObj['signaturehash'] = Buffer.from(this.signature_hash).reverse().toString('hex');
+      returnObj.signaturehash = Buffer.from(this.signature_hash).reverse().toString('hex');
     }
 
-    returnObj['identityid'] = this.identity_ID;
-    returnObj['signaturetype'] = this.sig_type.toNumber();
-    returnObj['signature'] = this.signature_as_vch.toString('base64');
-
-    if (this.vdxf_keys) {
-      returnObj['vdxfkeys'] = this.vdxf_keys;
+    if (this.vdxf_keys && this.vdxf_keys.length > 0) {
+      returnObj.vdxfkeys = this.vdxf_keys;
     }
 
-    if (this.vdxf_key_names) {
-      returnObj['vdxfkeynames'] = this.vdxf_key_names;
+    if (this.vdxf_key_names && this.vdxf_key_names.length > 0) {
+      returnObj.vdxfkeynames = this.vdxf_key_names;
     }
 
-    if (this.bound_hashes) {
-      returnObj['boundhashes'] = this.bound_hashes.map((hash) => Buffer.from(hash).reverse().toString('hex'));
+    if (this.bound_hashes && this.bound_hashes.length > 0) {
+      returnObj.boundhashes = this.bound_hashes.map((hash) => Buffer.from(hash).reverse().toString('hex'));
     }
 
-    return returnObj
+    return returnObj;
   }
 
   getIdentityHash(sigObject: { version: number, hash_type: number, height: number }) {
