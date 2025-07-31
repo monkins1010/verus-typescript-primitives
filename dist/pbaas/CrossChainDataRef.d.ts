@@ -1,9 +1,8 @@
-/// <reference types="node" />
 import { SerializableEntity } from '../utils/types/SerializableEntity';
 import { PBaaSEvidenceRef, PBaaSEvidenceRefJson } from './PBaaSEvidenceRef';
 import { IdentityMultimapRef, IdentityMultimapRefJson } from './IdentityMultimapRef';
 import { URLRef, URLRefJson } from './URLRef';
-export declare type CrossChainDataRefJson = (PBaaSEvidenceRefJson & {
+export type CrossChainDataRefJson = (PBaaSEvidenceRefJson & {
     type: number;
 }) | (IdentityMultimapRefJson & {
     type: number;
@@ -18,7 +17,7 @@ export declare class CrossChainDataRef implements SerializableEntity {
     constructor(data?: PBaaSEvidenceRef | IdentityMultimapRef | URLRef | any);
     which(): number;
     getByteLength(): number;
-    toBuffer(): Buffer;
+    toBuffer(): Buffer<ArrayBufferLike>;
     fromBuffer(buffer: Buffer, offset?: number): number;
     isValid(): boolean;
     toJson(): {

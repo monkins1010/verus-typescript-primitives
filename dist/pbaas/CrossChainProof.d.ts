@@ -1,5 +1,3 @@
-/// <reference types="bn.js" />
-/// <reference types="node" />
 import { BigNumber } from '../utils/types/BigNumber';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
 import { EvidenceData, EvidenceDataInChainObjectJson } from './EvidenceData';
@@ -9,15 +7,15 @@ export interface CrossChainProofJson {
 }
 export declare enum CHAIN_OBJECT_TYPES {
     CHAINOBJ_INVALID = 0,
-    CHAINOBJ_HEADER = 1,
-    CHAINOBJ_HEADER_REF = 2,
-    CHAINOBJ_TRANSACTION_PROOF = 3,
-    CHAINOBJ_PROOF_ROOT = 4,
-    CHAINOBJ_COMMITMENTDATA = 5,
-    CHAINOBJ_RESERVETRANSFER = 6,
-    CHAINOBJ_RESERVED = 7,
-    CHAINOBJ_CROSSCHAINPROOF = 8,
-    CHAINOBJ_NOTARYSIGNATURE = 9,
+    CHAINOBJ_HEADER = 1,// serialized full block header w/proof
+    CHAINOBJ_HEADER_REF = 2,// equivalent to header, but only includes non-canonical data
+    CHAINOBJ_TRANSACTION_PROOF = 3,// serialized transaction or partial transaction with proof
+    CHAINOBJ_PROOF_ROOT = 4,// merkle proof of preceding block or transaction
+    CHAINOBJ_COMMITMENTDATA = 5,// prior block commitments to ensure recognition of overlapping notarizations
+    CHAINOBJ_RESERVETRANSFER = 6,// serialized transaction, sometimes without an opret, which will be reconstructed
+    CHAINOBJ_RESERVED = 7,// unused and reserved
+    CHAINOBJ_CROSSCHAINPROOF = 8,// specific composite object, which is a single or multi-proof
+    CHAINOBJ_NOTARYSIGNATURE = 9,// notary signature
     CHAINOBJ_EVIDENCEDATA = 10
 }
 export declare class CrossChainProof implements SerializableEntity {
@@ -33,7 +31,7 @@ export declare class CrossChainProof implements SerializableEntity {
     });
     static KnownVDXFKeys(): Map<string, CHAIN_OBJECT_TYPES>;
     getByteLength(): number;
-    toBuffer(): Buffer;
+    toBuffer(): Buffer<ArrayBufferLike>;
     fromBuffer(buffer: Buffer, offset?: number): number;
     isValid(): boolean;
     toJson(): {

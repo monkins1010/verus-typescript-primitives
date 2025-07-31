@@ -1,4 +1,3 @@
-/// <reference types="node" />
 export declare const encode: (number: number, buffer: Buffer, offset: number) => {
     buffer: Buffer;
     bytes: number;

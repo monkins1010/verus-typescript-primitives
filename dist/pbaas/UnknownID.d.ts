@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { SerializableEntity } from "../utils/types/SerializableEntity";
 export declare class UnknownID implements SerializableEntity {
     bytes: Buffer;

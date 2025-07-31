@@ -15,7 +15,7 @@ var ETypes;
     ETypes[ETypes["TYPE_DATA"] = 1] = "TYPE_DATA";
     ETypes[ETypes["TYPE_MULTIPART_DATA"] = 2] = "TYPE_MULTIPART_DATA";
     ETypes[ETypes["TYPE_LAST_VALID"] = 2] = "TYPE_LAST_VALID";
-})(ETypes = exports.ETypes || (exports.ETypes = {}));
+})(ETypes || (exports.ETypes = ETypes = {}));
 ;
 class MultiPartDescriptor {
     constructor(data) {

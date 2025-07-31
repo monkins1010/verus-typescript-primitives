@@ -1,5 +1,3 @@
-/// <reference types="bn.js" />
-/// <reference types="node" />
 import { BigNumber } from '../utils/types/BigNumber';
 import { DataDescriptor, DataDescriptorJson } from './DataDescriptor';
 import { EHashTypes } from './DataDescriptor';

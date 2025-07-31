@@ -1,6 +1,6 @@
 import { ApiRequest } from "../../ApiRequest";
 import { RequestParams, ApiPrimitiveJson } from "../../ApiPrimitive";
-declare type QueryObject = {
+type QueryObject = {
     launchstate?: "prelaunch" | "launched" | "refund" | "complete";
     systemtype?: "local" | "imported" | "gateway" | "pbaas";
     fromsystem?: string;

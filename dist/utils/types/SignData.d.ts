@@ -1,4 +1,4 @@
-export declare type SignDataParameters = {
+export type SignDataParameters = {
     filename?: string;
     message?: string;
     messagehex?: string;

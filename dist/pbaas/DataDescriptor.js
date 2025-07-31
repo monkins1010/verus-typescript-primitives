@@ -328,5 +328,5 @@ var EHashTypes;
     EHashTypes[EHashTypes["HASH_SHA256D"] = 4] = "HASH_SHA256D";
     EHashTypes[EHashTypes["HASH_SHA256"] = 5] = "HASH_SHA256";
     EHashTypes[EHashTypes["HASH_LASTTYPE"] = 5] = "HASH_LASTTYPE";
-})(EHashTypes = exports.EHashTypes || (exports.EHashTypes = {}));
+})(EHashTypes || (exports.EHashTypes = EHashTypes = {}));
 ;

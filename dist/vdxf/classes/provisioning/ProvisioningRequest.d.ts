@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { VerusIDSignatureInterface } from "../../";
 import { Request } from "../Request";
 import { ProvisioningChallenge, ProvisioningChallengeInterface } from "./ProvisioningChallenge";
@@ -37,7 +36,7 @@ export declare class ProvisioningRequest extends Request {
             redirect_uris: any;
         };
     };
-    getChallengeHash(): Buffer;
+    getChallengeHash(): Buffer<ArrayBufferLike>;
     dataByteLength(): number;
     toDataBuffer(): Buffer;
     fromDataBuffer(buffer: Buffer, offset?: number): number;

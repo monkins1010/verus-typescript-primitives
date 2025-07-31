@@ -1,5 +1,3 @@
-/// <reference types="node" />
-/// <reference types="bn.js" />
 import { BigNumber } from '../utils/types/BigNumber';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
 import { IdentityID } from './IdentityID';
@@ -29,12 +27,12 @@ export declare class DefinedKey implements SerializableEntity {
     combinesKey(): boolean;
     combinesHash(): boolean;
     combinesIndexNum(): boolean;
-    getFqnBuffer(): Buffer;
+    getFqnBuffer(): Buffer<ArrayBuffer>;
     private getDataKey;
     getIAddr(testnet?: boolean): string;
     getNameSpaceID(testnet?: boolean): string;
     private getSelfByteLength;
     getByteLength(): number;
-    toBuffer(): Buffer;
+    toBuffer(): Buffer<ArrayBufferLike>;
     fromBuffer(buffer: Buffer, offset?: number): number;
 }

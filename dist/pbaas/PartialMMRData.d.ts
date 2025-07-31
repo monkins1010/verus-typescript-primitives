@@ -1,21 +1,19 @@
-/// <reference types="node" />
-/// <reference types="bn.js" />
 import { BigNumber } from '../utils/types/BigNumber';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
 import { AllowedHashes } from '../constants/pbaas';
 import { VdxfUniValue, VdxfUniValueJson } from './VdxfUniValue';
-export declare type PartialMMRDataUnit = {
+export type PartialMMRDataUnit = {
     type: BigNumber;
     data: Buffer | VdxfUniValue;
 };
-export declare type PartialMMRDataInitData = {
+export type PartialMMRDataInitData = {
     flags?: BigNumber;
     data?: Array<PartialMMRDataUnit>;
     salt?: Array<Buffer>;
     mmrhashtype?: BigNumber;
     priormmr?: Array<Buffer>;
 };
-export declare type PartialMMRDataJson = {
+export type PartialMMRDataJson = {
     flags?: string;
     data?: Array<{
         type: string;
@@ -25,14 +23,14 @@ export declare type PartialMMRDataJson = {
     mmrhashtype?: string;
     priormmr?: Array<string>;
 };
-export declare type CLIMMRDataStringKey = "filename" | "serializedhex" | "serializedbase64" | "message" | "datahash";
-export declare type CLIMMRDataKey = CLIMMRDataStringKey | "vdxfdata";
-export declare type SingleKeyMMRData = {
+export type CLIMMRDataStringKey = "filename" | "serializedhex" | "serializedbase64" | "message" | "datahash";
+export type CLIMMRDataKey = CLIMMRDataStringKey | "vdxfdata";
+export type SingleKeyMMRData = {
     [K in CLIMMRDataStringKey]: {
         [P in K]: string;
     };
 }[CLIMMRDataStringKey];
-export declare type PartialMMRDataCLIJson = {
+export type PartialMMRDataCLIJson = {
     mmrdata: Array<SingleKeyMMRData | string | {
         ['vdxfdata']: VdxfUniValueJson;
     }>;

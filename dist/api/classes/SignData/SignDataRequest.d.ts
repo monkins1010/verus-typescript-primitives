@@ -2,7 +2,7 @@ import { ApiRequest } from "../../ApiRequest";
 import { ApiPrimitiveJson, RequestParams } from "../../ApiPrimitive";
 import { DataDescriptorInfo } from "../../../utils/types/DataDescriptor";
 import { SignDataParameters } from "../../../utils/types/SignData";
-export declare type SignDataArgs = {
+export type SignDataArgs = {
     address?: string;
     filename?: string;
     message?: string;

@@ -1,5 +1,3 @@
-/// <reference types="bn.js" />
-/// <reference types="node" />
 export declare const VDXF_OBJECT_DEFAULT_VERSION: import("bn.js");
 export declare const HASH160_BYTE_LENGTH = 20;
 export declare const HASH256_BYTE_LENGTH = 32;

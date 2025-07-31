@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { VDXFObject } from "..";
 export declare class Context extends VDXFObject {
     kv: {

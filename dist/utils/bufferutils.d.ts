@@ -1,5 +1,3 @@
-/// <reference types="node" />
-/// <reference types="bn.js" />
 import { BigNumber } from "./types/BigNumber";
 export declare const readUInt64LE: (buffer: Buffer, offset: number) => number;
 export declare const writeUInt64LE: (buffer: Buffer, value: number, offset: number) => number;
@@ -39,8 +37,8 @@ declare class BufferReader {
     readInt64(): BigNumber;
     readCompactSize(): number;
     readVarInt(): import("bn.js");
-    readSlice(n: number): Buffer;
-    readVarSlice(): Buffer;
+    readSlice(n: number): Buffer<ArrayBuffer>;
+    readVarSlice(): Buffer<ArrayBuffer>;
     readVector(): any[];
     readArray(sliceLength: number): any[];
 }

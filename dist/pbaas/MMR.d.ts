@@ -1,4 +1,3 @@
-/// <reference types="node" />
 export declare class MMRLayer<NODE_TYPE> {
     private vSize;
     private nodes;
@@ -42,7 +41,7 @@ export declare class MMRBranch {
     toBuffer(): Buffer;
     fromBuffer(buffer: Buffer, offset?: number): number;
     digest(input: any): any;
-    safeCheck(hash: Buffer): Buffer;
+    safeCheck(hash: Buffer): Buffer<ArrayBufferLike>;
 }
 export declare class MMRProof {
     proofSequence: Array<MMRBranch>;

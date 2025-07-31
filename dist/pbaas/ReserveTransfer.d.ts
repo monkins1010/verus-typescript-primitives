@@ -1,5 +1,3 @@
-/// <reference types="bn.js" />
-/// <reference types="node" />
 import { CurrencyValueMap } from './CurrencyValueMap';
 import { BigNumber } from '../utils/types/BigNumber';
 import { TokenOutput } from './TokenOutput';
@@ -56,6 +54,6 @@ export declare class ReserveTransfer extends TokenOutput implements Serializable
     isCurrencyExport(): boolean;
     isArbitrageOnly(): boolean;
     getByteLength(): number;
-    toBuffer(): Buffer;
+    toBuffer(): Buffer<ArrayBufferLike>;
     fromBuffer(buffer: Buffer, offset?: number): number;
 }

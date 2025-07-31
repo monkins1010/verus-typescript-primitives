@@ -1,6 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isDefinedHashType = exports.isCanonicalPubKey = exports.fromASM = exports.toASM = exports.decompile = exports.compile = exports.asMinimalOP = exports.isPushOnly = exports.isPushOnlyChunk = exports.isOPInt = void 0;
+exports.isOPInt = isOPInt;
+exports.isPushOnlyChunk = isPushOnlyChunk;
+exports.isPushOnly = isPushOnly;
+exports.asMinimalOP = asMinimalOP;
+exports.compile = compile;
+exports.decompile = decompile;
+exports.toASM = toASM;
+exports.fromASM = fromASM;
+exports.isCanonicalPubKey = isCanonicalPubKey;
+exports.isDefinedHashType = isDefinedHashType;
 const pushdata = require("./pushdata");
 const ops_1 = require("./ops");
 const reverseops_1 = require("./reverseops");
@@ -11,15 +20,12 @@ function isOPInt(value) {
         (value >= ops_1.OPS.OP_1 && value <= ops_1.OPS.OP_16) ||
         (value === ops_1.OPS.OP_1NEGATE));
 }
-exports.isOPInt = isOPInt;
 function isPushOnlyChunk(value) {
     return Buffer.isBuffer(value) || isOPInt(value);
 }
-exports.isPushOnlyChunk = isPushOnlyChunk;
 function isPushOnly(value) {
     return value.every(isPushOnlyChunk);
 }
-exports.isPushOnly = isPushOnly;
 function asMinimalOP(buffer) {
     if (buffer.length === 0)
         return ops_1.OPS.OP_0;
@@ -30,7 +36,6 @@ function asMinimalOP(buffer) {
     if (buffer[0] === 0x81)
         return ops_1.OPS.OP_1NEGATE;
 }
-exports.asMinimalOP = asMinimalOP;
 function compile(chunks) {
     if (Buffer.isBuffer(chunks))
         return chunks;
@@ -73,7 +78,6 @@ function compile(chunks) {
         throw new Error('Could not decode chunks');
     return buffer;
 }
-exports.compile = compile;
 function decompile(buffer) {
     if (Array.isArray(buffer))
         return buffer;
@@ -109,7 +113,6 @@ function decompile(buffer) {
     }
     return chunks;
 }
-exports.decompile = decompile;
 function toASM(chunks) {
     if (Buffer.isBuffer(chunks)) {
         chunks = decompile(chunks);
@@ -126,7 +129,6 @@ function toASM(chunks) {
         return reverseops_1.default[chunk];
     }).join(' ');
 }
-exports.toASM = toASM;
 function fromASM(asm) {
     return compile(asm.split(' ').map(function (chunkStr) {
         // opcode?
@@ -138,7 +140,6 @@ function fromASM(asm) {
         return Buffer.from(chunkStr, 'hex');
     }));
 }
-exports.fromASM = fromASM;
 function isCanonicalPubKey(buffer) {
     if (!Buffer.isBuffer(buffer))
         return false;
@@ -153,9 +154,7 @@ function isCanonicalPubKey(buffer) {
     }
     return false;
 }
-exports.isCanonicalPubKey = isCanonicalPubKey;
 function isDefinedHashType(hashType) {
     var hashTypeMod = hashType & ~0xc0;
     return hashTypeMod > 0x00 && hashTypeMod < 0x04;
 }
-exports.isDefinedHashType = isDefinedHashType;

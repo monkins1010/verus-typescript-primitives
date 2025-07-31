@@ -1,5 +1,3 @@
-/// <reference types="node" />
-/// <reference types="bn.js" />
 import { VDXFKeyInterface } from './keys';
 import { BigNumber } from "../utils/types/BigNumber";
 export * from './keys';
@@ -24,7 +22,7 @@ export interface VDXFObjectInterface {
 export interface VerusIDSignatureInterface {
     signature: string;
 }
-export declare type VerusIDSignatureJson = {
+export type VerusIDSignatureJson = {
     signature: string;
     vdxfkey: string;
     serializekey: boolean;
@@ -38,13 +36,13 @@ export declare class VDXFObject implements VDXFObjectInterface {
     toJson(): {};
     toString(includeKey?: boolean): string;
     dataByteLength(): number;
-    toDataBuffer(): Buffer;
+    toDataBuffer(): Buffer<ArrayBuffer>;
     fromDataBuffer(buffer: Buffer, offset?: number): number;
     isValidVersion(): boolean;
     fromBuffer(buffer: Buffer, offset?: number, vdxfkey?: string): number;
     byteLength(includeKey?: boolean): number;
-    toBuffer(includeKey?: boolean): Buffer;
-    toSha256(): Buffer;
+    toBuffer(includeKey?: boolean): Buffer<ArrayBufferLike>;
+    toSha256(): Buffer<ArrayBufferLike>;
 }
 export declare class BufferDataVdxfObject extends VDXFObject {
     data: string;

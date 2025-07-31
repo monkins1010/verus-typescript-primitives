@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { VDXFObject, VerusIDSignature, VerusIDSignatureInterface } from "../../";
 import { SignedSessionObjectData } from "./SignedSessionObjectData";
 export interface AuthorizedWebRequestInterface {
@@ -13,7 +12,7 @@ export declare class SignedSessionObject extends VDXFObject {
     signature?: VerusIDSignature;
     data: SignedSessionObjectData;
     constructor(request?: AuthorizedWebRequestInterface);
-    getDataHash(signedBlockheight: number, signatureVersion?: number): Buffer;
+    getDataHash(signedBlockheight: number, signatureVersion?: number): Buffer<ArrayBufferLike>;
     toJson(): {
         vdxfkey: string;
         system_id: string;

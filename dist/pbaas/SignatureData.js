@@ -151,7 +151,7 @@ class SignatureData {
             version: this.version.toNumber(),
             systemid: this.system_ID,
             hashtype: this.hash_type.toNumber(),
-            signaturehash: '',
+            signaturehash: '', // Will be set below
             identityid: this.identity_ID,
             signaturetype: this.sig_type.toNumber(),
             signature: this.signature_as_vch.toString('base64')

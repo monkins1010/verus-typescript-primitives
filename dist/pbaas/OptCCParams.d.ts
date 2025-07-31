@@ -1,8 +1,7 @@
-/// <reference types="node" />
 import { TxDestination } from './TxDestination';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
 import { BigNumber } from '../utils/types/BigNumber';
-export declare type VData = Array<Buffer>;
+export type VData = Array<Buffer>;
 export declare class OptCCParams implements SerializableEntity {
     version: BigNumber;
     eval_code: BigNumber;

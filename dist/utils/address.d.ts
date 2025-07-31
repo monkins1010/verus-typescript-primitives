@@ -1,5 +1,3 @@
-/// <reference types="node" />
-import { hash } from "./hash";
 export declare const fromBase58Check: (address: string) => {
     version: number;
     hash: Buffer;

@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { Decision, DecisionInterface } from "./Decision";
 import { VDXFObject, VerusIDSignature, VerusIDSignatureInterface } from "../";
 export interface ResponseInterface {
@@ -13,7 +12,7 @@ export declare class Response extends VDXFObject {
     signature?: VerusIDSignature;
     decision: Decision;
     constructor(response?: ResponseInterface, vdxfkey?: string);
-    getDecisionHash(signedBlockheight: number, signatureVersion?: number): Buffer;
+    getDecisionHash(signedBlockheight: number, signatureVersion?: number): Buffer<ArrayBufferLike>;
     dataByteLength(): number;
     toDataBuffer(): Buffer;
     fromDataBuffer(buffer: Buffer, offset?: number): number;

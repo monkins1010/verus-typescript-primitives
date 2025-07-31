@@ -1,8 +1,6 @@
-/// <reference types="node" />
-/// <reference types="bn.js" />
 import { BigNumber } from '../../../utils/types/BigNumber';
 import { SerializableEntity } from '../../../utils/types/SerializableEntity';
-export declare type IdentityUpdateResponseDetailsJson = {
+export type IdentityUpdateResponseDetailsJson = {
     flags: string;
     requestid: string;
     createdat: string;
@@ -29,9 +27,9 @@ export declare class IdentityUpdateResponseDetails implements SerializableEntity
     containsSalt(): boolean;
     toggleContainsTxid(): void;
     toggleContainsSalt(): void;
-    toSha256(): Buffer;
+    toSha256(): Buffer<ArrayBufferLike>;
     getByteLength(): number;
-    toBuffer(): Buffer;
+    toBuffer(): Buffer<ArrayBufferLike>;
     fromBuffer(buffer: Buffer, offset?: number): number;
     toJson(): IdentityUpdateResponseDetailsJson;
     static fromJson(json: IdentityUpdateResponseDetailsJson): IdentityUpdateResponseDetails;

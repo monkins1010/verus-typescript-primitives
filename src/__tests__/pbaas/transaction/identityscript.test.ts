@@ -26,7 +26,7 @@ describe('Serializes and deserializes SmartTransactionScripts', () => {
       version: 1,
       identityaddress: 'iEHpmxiynXmwZKNgMm7BpXWP3EqCJt663q'
     });
-    expect(() => IdentityScript.fromIdentity(script.getIdentity())).toThrowError()
+    expect(() => IdentityScript.fromIdentity(script.getIdentity())).toThrow()
   });
   test('(de)serialize a basic identity registration outscript for a revoked ID', () => {
     const idjson = {

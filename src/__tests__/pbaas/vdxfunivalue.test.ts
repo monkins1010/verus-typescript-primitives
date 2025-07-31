@@ -69,7 +69,7 @@ describe('Encodes and decodes VdxfUniValue', () => {
 
     const vFromBuf = new VdxfUniValue();
 
-    expect(() => vFromBuf.fromBuffer(v.toBuffer(), 0)).toThrowError();
+    expect(() => vFromBuf.fromBuffer(v.toBuffer(), 0)).toThrow();
   });
 
   // This test uses serialized data from the daemon adter putting in the Rating object into a contentmultimap.

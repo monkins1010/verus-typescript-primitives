@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { Challenge } from "../Challenge";
 import { Context } from "../Context";
 export interface ProvisioningChallengeInterface {

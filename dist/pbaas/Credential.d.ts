@@ -1,8 +1,6 @@
-/// <reference types="bn.js" />
-/// <reference types="node" />
 import { BigNumber } from "../utils/types/BigNumber";
 import { SerializableEntity } from "../utils/types/SerializableEntity";
-export declare type CredentialJson = {
+export type CredentialJson = {
     version?: number;
     flags?: number;
     credentialkey?: string;

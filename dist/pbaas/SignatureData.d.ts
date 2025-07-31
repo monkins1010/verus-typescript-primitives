@@ -1,5 +1,3 @@
-/// <reference types="node" />
-/// <reference types="bn.js" />
 import { BigNumber } from '../utils/types/BigNumber';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
 export interface SignatureJsonDataInterface {
@@ -59,7 +57,7 @@ export declare class SignatureData implements SerializableEntity {
      */
     static getSignatureHashType(input: Buffer): number;
     getByteLength(): number;
-    toBuffer(): Buffer;
+    toBuffer(): Buffer<ArrayBufferLike>;
     fromBuffer(buffer: Buffer, offset?: number): number;
     isValid(): boolean;
     toJson(): SignatureJsonDataInterface;

@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { BigNumber } from '../utils/types/BigNumber';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
 export declare class UTXORef implements SerializableEntity {
@@ -9,7 +8,7 @@ export declare class UTXORef implements SerializableEntity {
         n?: BigNumber;
     });
     getByteLength(): number;
-    toBuffer(): Buffer;
+    toBuffer(): Buffer<ArrayBufferLike>;
     fromBuffer(buffer: Buffer, offset?: number): number;
     isValid(): boolean;
     toJson(): {

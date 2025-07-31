@@ -1,5 +1,3 @@
-/// <reference types="bn.js" />
-/// <reference types="node" />
 import { BigNumber } from '../utils/types/BigNumber';
 import { BufferDataVdxfObject } from '../vdxf/index';
 import { SerializableEntity } from '../utils/types/SerializableEntity';

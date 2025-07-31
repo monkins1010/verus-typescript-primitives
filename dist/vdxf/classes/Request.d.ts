@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { VDXFObject, VerusIDSignature, VerusIDSignatureInterface } from "../";
 import { Challenge, ChallengeInterface } from "./Challenge";
 export interface RequestInterface {
@@ -13,7 +12,7 @@ export declare class Request extends VDXFObject {
     signature?: VerusIDSignature;
     challenge: Challenge;
     constructor(request?: RequestInterface, vdxfkey?: string);
-    getChallengeHash(signedBlockheight: number, signatureVersion?: number): Buffer;
+    getChallengeHash(signedBlockheight: number, signatureVersion?: number): Buffer<ArrayBufferLike>;
     toJson(): {
         vdxfkey: string;
         system_id: string;

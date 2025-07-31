@@ -1,5 +1,3 @@
-/// <reference types="bn.js" />
-/// <reference types="node" />
 import { BigNumber } from '../utils/types/BigNumber';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
 import { UTXORef } from './UTXORef';
@@ -32,7 +30,7 @@ export declare class PBaaSEvidenceRef implements SerializableEntity {
     });
     setFlags(): void;
     getByteLength(): number;
-    toBuffer(): Buffer;
+    toBuffer(): Buffer<ArrayBufferLike>;
     fromBuffer(buffer: Buffer, offset?: number): number;
     isValid(): boolean;
     toJson(): PBaaSEvidenceRefJson;

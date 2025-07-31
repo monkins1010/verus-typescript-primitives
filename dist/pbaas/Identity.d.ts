@@ -1,5 +1,3 @@
-/// <reference types="bn.js" />
-/// <reference types="node" />
 import { BigNumber } from '../utils/types/BigNumber';
 import { Principal } from './Principal';
 import { IdentityID } from './IdentityID';
@@ -16,8 +14,8 @@ export declare const IDENTITY_FLAG_LOCKED: import("bn.js");
 export declare const IDENTITY_FLAG_TOKENIZED_CONTROL: import("bn.js");
 export declare const IDENTITY_MAX_UNLOCK_DELAY: import("bn.js");
 export declare const IDENTITY_MAX_NAME_LEN: import("bn.js");
-export declare type Hashes = Map<string, Buffer>;
-export declare type VerusCLIVerusIDJsonBase<T = ContentMultiMapJson> = {
+export type Hashes = Map<string, Buffer>;
+export type VerusCLIVerusIDJsonBase<T = ContentMultiMapJson> = {
     contentmap?: {
         [key: string]: string;
     };
@@ -35,8 +33,8 @@ export declare type VerusCLIVerusIDJsonBase<T = ContentMultiMapJson> = {
     timelock?: number;
     version?: number;
 };
-export declare type VerusCLIVerusIDJson = VerusCLIVerusIDJsonBase<ContentMultiMapJson>;
-export declare type VerusIDInitData = {
+export type VerusCLIVerusIDJson = VerusCLIVerusIDJsonBase<ContentMultiMapJson>;
+export type VerusIDInitData = {
     version?: BigNumber;
     flags?: BigNumber;
     min_sigs?: BigNumber;
@@ -81,7 +79,7 @@ export declare class Identity extends Principal implements SerializableEntity {
     private getIdentityByteLength;
     getByteLength(): number;
     clearContentMultiMap(): void;
-    toBuffer(): Buffer;
+    toBuffer(): Buffer<ArrayBufferLike>;
     fromBuffer(buffer: Buffer, offset?: number, parseVdxfObjects?: boolean): number;
     toJson(): VerusCLIVerusIDJson;
     getIdentityAddress(): string;

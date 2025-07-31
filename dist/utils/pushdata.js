@@ -1,7 +1,9 @@
 "use strict";
 // The MIT License (MIT)
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.decode = exports.encode = exports.encodingLength = void 0;
+exports.encodingLength = encodingLength;
+exports.encode = encode;
+exports.decode = decode;
 // Copyright (c) 2016 Daniel Cousens
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +27,6 @@ function encodingLength(i) {
             : i <= 0xffff ? 3
                 : 5;
 }
-exports.encodingLength = encodingLength;
 function encode(buffer, number, offset) {
     var size = encodingLength(number);
     // ~6 bit
@@ -49,7 +50,6 @@ function encode(buffer, number, offset) {
     }
     return size;
 }
-exports.encode = encode;
 function decode(buffer, offset) {
     var opcode = buffer.readUInt8(offset);
     var number, size;
@@ -87,4 +87,3 @@ function decode(buffer, offset) {
         size: size
     };
 }
-exports.decode = decode;

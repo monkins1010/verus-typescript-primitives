@@ -1,5 +1,3 @@
-/// <reference types="node" />
-/// <reference types="bn.js" />
 import { BigNumber } from '../../../utils/types/BigNumber';
 import { MMRDescriptor, MMRDescriptorJson } from '../../../pbaas/MMRDescriptor';
 import { SignatureData, SignatureJsonDataInterface } from '../../../pbaas/SignatureData';

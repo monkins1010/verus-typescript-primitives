@@ -1,5 +1,5 @@
 import { DataDescriptorInfo } from './DataDescriptor';
-export declare type MmrDescriptorParameters = {
+export type MmrDescriptorParameters = {
     version?: number;
     objecthashtype?: number;
     mmrhashtype?: number;

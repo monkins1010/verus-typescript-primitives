@@ -1,5 +1,3 @@
-/// <reference types="bn.js" />
-/// <reference types="node" />
 import { CurrencyValueMap } from './CurrencyValueMap';
 import { BigNumber } from '../utils/types/BigNumber';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
@@ -16,7 +14,7 @@ export declare class TokenOutput implements SerializableEntity {
         version?: BigNumber;
     });
     getByteLength(): number;
-    toBuffer(): Buffer;
+    toBuffer(): Buffer<ArrayBufferLike>;
     fromBuffer(buffer: Buffer, offset?: number): number;
     firstCurrency(): any;
     firstValue(): any;

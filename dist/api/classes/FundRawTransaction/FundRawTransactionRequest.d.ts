@@ -1,6 +1,6 @@
 import { ApiRequest } from "../../ApiRequest";
 import { ApiPrimitiveJson, RequestParams } from "../../ApiPrimitive";
-declare type Utxo = {
+type Utxo = {
     voutnum: number;
     txid: string;
 };

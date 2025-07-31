@@ -1,5 +1,3 @@
-/// <reference types="node" />
-/// <reference types="bn.js" />
 import { VDXFData } from '../vdxf/index';
 export declare class SaltedData extends VDXFData {
     salt: Buffer;
@@ -10,7 +8,7 @@ export declare class SaltedData extends VDXFData {
     constructor(data?: Buffer, salt?: Buffer);
     static fromJson(data: any): SaltedData;
     getByteLength(): number;
-    toBuffer(): Buffer;
+    toBuffer(): Buffer<ArrayBufferLike>;
     fromBuffer(buffer: Buffer, offset?: number): number;
     toJson(): any;
     getHash(hw: (data: Buffer) => Buffer): Buffer;

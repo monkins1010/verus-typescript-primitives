@@ -1,5 +1,3 @@
-/// <reference types="bn.js" />
-/// <reference types="node" />
 import { VDXFObject, VerusIDSignature, VerusIDSignatureInterface, VerusIDSignatureJson } from "../../";
 import { VerusPayInvoiceDetails, VerusPayInvoiceDetailsJson } from "./VerusPayInvoiceDetails";
 import { BigNumber } from "../../../utils/types/BigNumber";
@@ -15,7 +13,7 @@ export interface VerusPayInvoiceInterface {
     signature?: VerusIDSignatureInterface;
     version?: BigNumber;
 }
-export declare type VerusPayInvoiceJson = {
+export type VerusPayInvoiceJson = {
     vdxfkey: string;
     details: VerusPayInvoiceDetailsJson;
     system_id?: string;
@@ -33,7 +31,7 @@ export declare class VerusPayInvoice extends VDXFObject {
     isValidVersion(): boolean;
     isSigned(): boolean;
     setSigned(): void;
-    getDetailsHash(signedBlockheight: number, signatureVersion?: number): Buffer;
+    getDetailsHash(signedBlockheight: number, signatureVersion?: number): Buffer<ArrayBufferLike>;
     protected _dataByteLength(signer?: string): number;
     protected _toDataBuffer(signer?: string): Buffer;
     dataByteLength(): number;

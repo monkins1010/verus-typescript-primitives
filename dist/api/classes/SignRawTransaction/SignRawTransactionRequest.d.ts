@@ -1,13 +1,13 @@
 import { ApiRequest } from "../../ApiRequest";
 import { ApiPrimitiveJson, RequestParams } from "../../ApiPrimitive";
-declare type PrevTx = {
+type PrevTx = {
     txid: string;
     vout: number;
     scriptPubKey: string;
     redeemScript: string;
     amount: number;
 };
-declare type SigHashType = "ALL" | "NONE" | "SINGLE" | "ALL|ANYONECANPAY" | "NONE|ANYONECANPAY" | "SINGLE|ANYONECANPAY";
+type SigHashType = "ALL" | "NONE" | "SINGLE" | "ALL|ANYONECANPAY" | "NONE|ANYONECANPAY" | "SINGLE|ANYONECANPAY";
 export declare class SignRawTransactionRequest extends ApiRequest {
     hexstring: string;
     prevtxs?: Array<PrevTx>;

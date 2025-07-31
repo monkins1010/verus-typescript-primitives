@@ -1,5 +1,3 @@
-/// <reference types="node" />
-/// <reference types="bn.js" />
 import { BigNumber } from '../utils/types/BigNumber';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
 export interface ContentMultiMapRemoveJson {
@@ -30,7 +28,7 @@ export declare class ContentMultiMapRemove implements SerializableEntity {
         value_hash?: Buffer;
     });
     getByteLength(): number;
-    toBuffer(): Buffer;
+    toBuffer(): Buffer<ArrayBufferLike>;
     fromBuffer(buffer: Buffer, offset?: number): number;
     static fromJson(data: ContentMultiMapRemoveJson): ContentMultiMapRemove;
     toJson(): ContentMultiMapRemoveJson;
