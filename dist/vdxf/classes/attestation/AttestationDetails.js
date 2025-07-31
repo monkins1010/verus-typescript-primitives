@@ -108,6 +108,8 @@ class AttestationDetails {
         if (options === null || options === void 0 ? void 0 : options.timestamp) {
             attestationDetails.setTimestamp(new bn_js_1.BN(options.timestamp));
         }
+        // Update flags based on set metadata
+        attestationDetails.setFlags();
         return attestationDetails;
     }
     /**
@@ -133,6 +135,8 @@ class AttestationDetails {
         if (options === null || options === void 0 ? void 0 : options.timestamp) {
             attestationDetails.setTimestamp(new bn_js_1.BN(options.timestamp));
         }
+        // Update flags based on set metadata
+        attestationDetails.setFlags();
         return attestationDetails;
     }
     hasLabel() {
@@ -283,6 +287,7 @@ class AttestationDetails {
             this.attestations.length > 0;
     }
     toJson() {
+        this.setFlags(); // Ensure flags are set before converting to JSON
         const retval = {
             version: this.version.toNumber(),
             attestations: this.attestations.map((attestation) => attestation.toJson())
