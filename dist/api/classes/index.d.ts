@@ -6,6 +6,8 @@ import { GetAddressUtxosRequest } from './GetAddressUtxos/GetAddressUtxosRequest
 import { GetAddressUtxosResponse } from './GetAddressUtxos/GetAddressUtxosResponse';
 import { GetBlockRequest } from './GetBlock/GetBlockRequest';
 import { GetBlockResponse } from './GetBlock/GetBlockResponse';
+import { GetBlockCountRequest } from './GetBlockCount/GetBlockCountRequest';
+import { GetBlockCountResponse } from './GetBlockCount/GetBlockCountResponse';
 import { GetVdxfIdRequest } from './GetVdxfId/GetVdxfIdRequest';
 import { GetVdxfIdResponse } from './GetVdxfId/GetVdxfIdResponse';
 import { GetIdentityRequest } from './GetIdentity/GetIdentityRequest';

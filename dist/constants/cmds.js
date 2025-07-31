@@ -9,6 +9,7 @@ exports.GET_CURRENCY = 'getcurrency';
 exports.GET_ADDRESS_BALANCE = 'getaddressbalance';
 exports.GET_INFO = 'getinfo';
 exports.GET_BLOCK = 'getblock';
+exports.GET_BLOCK_COUNT = 'getblockcount';
 exports.GET_VDXF_ID = 'getvdxfid';
 exports.GET_RAW_TRANSACTION = 'getrawtransaction';
 exports.GET_ADDRESS_DELTAS = 'getaddressdeltas';
