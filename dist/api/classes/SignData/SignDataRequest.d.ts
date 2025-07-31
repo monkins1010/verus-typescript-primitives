@@ -16,7 +16,7 @@ export declare type SignDataArgs = {
     priormmr?: Array<string>;
     vdxfkeys?: Array<string>;
     vdxfkeynames?: Array<string>;
-    boundhahses?: Array<string>;
+    boundhashes?: Array<string>;
     hashtype?: string;
     signature?: string;
     encrypttoaddress?: string;
