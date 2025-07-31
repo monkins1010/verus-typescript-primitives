@@ -25,16 +25,34 @@ class Principal {
                 this.primary_addresses = data.primary_addresses;
         }
     }
+    containsFlags() {
+        return true;
+    }
+    containsVersion() {
+        return true;
+    }
+    containsPrimaryAddresses() {
+        return true;
+    }
+    containsMinSigs() {
+        return true;
+    }
     getSelfByteLength() {
         let byteLength = 0;
-        byteLength += 4; //uint32 version size
-        byteLength += 4; //uint32 flags size
-        byteLength += varuint_1.default.encodingLength(this.primary_addresses.length);
-        for (const addr of this.primary_addresses) {
-            byteLength += varuint_1.default.encodingLength(addr.getByteLength());
-            byteLength += addr.getByteLength();
+        if (this.containsVersion())
+            byteLength += 4; //uint32 version size
+        if (this.containsFlags())
+            byteLength += 4; //uint32 flags size
+        if (this.containsPrimaryAddresses()) {
+            byteLength += varuint_1.default.encodingLength(this.primary_addresses.length);
+            for (const addr of this.primary_addresses) {
+                byteLength += varuint_1.default.encodingLength(addr.getByteLength());
+                byteLength += addr.getByteLength();
+            }
         }
-        byteLength += 4; //uint32 minimum signatures size
+        if (this.containsMinSigs()) {
+            byteLength += 4; //uint32 minimum signatures size
+        }
         return byteLength;
     }
     getByteLength() {
@@ -42,29 +60,38 @@ class Principal {
     }
     toBuffer() {
         const writer = new BufferWriter(Buffer.alloc(this.getSelfByteLength()));
-        writer.writeUInt32(this.version.toNumber());
-        writer.writeUInt32(this.flags.toNumber());
-        writer.writeVector(this.primary_addresses.map(x => x.toBuffer()));
-        writer.writeUInt32(this.min_sigs.toNumber());
+        if (this.containsVersion())
+            writer.writeUInt32(this.version.toNumber());
+        if (this.containsFlags())
+            writer.writeUInt32(this.flags.toNumber());
+        if (this.containsPrimaryAddresses())
+            writer.writeVector(this.primary_addresses.map(x => x.toBuffer()));
+        if (this.containsMinSigs())
+            writer.writeUInt32(this.min_sigs.toNumber());
         return writer.buffer;
     }
     fromBuffer(buffer, offset = 0) {
         const reader = new BufferReader(buffer, offset);
-        this.version = new bn_js_1.BN(reader.readUInt32(), 10);
-        this.flags = new bn_js_1.BN(reader.readUInt32(), 10);
-        this.primary_addresses = reader.readVector().map(x => {
-            if (x.length === 20) {
-                return new KeyID_1.KeyID(x);
-            }
-            else if (x.length === 33) {
-                //TODO: Implement pubkey principal by adding PubKey class as possible TxDestination
-                throw new Error("Pubkey Principal not yet supported");
-            }
-            else {
-                return new NoDestination_1.NoDestination();
-            }
-        });
-        this.min_sigs = new bn_js_1.BN(reader.readUInt32(), 10);
+        if (this.containsVersion())
+            this.version = new bn_js_1.BN(reader.readUInt32(), 10);
+        if (this.containsFlags())
+            this.flags = new bn_js_1.BN(reader.readUInt32(), 10);
+        if (this.containsPrimaryAddresses()) {
+            this.primary_addresses = reader.readVector().map(x => {
+                if (x.length === 20) {
+                    return new KeyID_1.KeyID(x);
+                }
+                else if (x.length === 33) {
+                    //TODO: Implement pubkey principal by adding PubKey class as possible TxDestination
+                    throw new Error("Pubkey Principal not yet supported");
+                }
+                else {
+                    return new NoDestination_1.NoDestination();
+                }
+            });
+        }
+        if (this.containsMinSigs())
+            this.min_sigs = new bn_js_1.BN(reader.readUInt32(), 10);
         return reader.offset;
     }
 }

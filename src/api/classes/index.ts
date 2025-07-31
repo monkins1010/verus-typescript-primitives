@@ -27,14 +27,20 @@ import { SendRawTransactionRequest } from './SendRawTransaction/SendRawTransacti
 import { SendRawTransactionResponse } from './SendRawTransaction/SendRawTransactionResponse'
 import { SignMessageRequest } from './SignMessage/SignMessageRequest'
 import { SignMessageResponse } from './SignMessage/SignMessageResponse'
+import { SignDataRequest } from './SignData/SignDataRequest'
+import { SignDataResponse } from './SignData/SignDataResponse'
 import { VerifyMessageRequest } from './VerifyMessage/VerifyMessageRequest'
 import { VerifyMessageResponse } from './VerifyMessage/VerifyMessageResponse'
 import { GetAddressMempoolResponse } from './GetAddressMempool/GetAddressMempoolResponse'
 import { GetAddressMempoolRequest } from './GetAddressMempool/GetAddressMempoolRequest'
 import { SendCurrencyRequest } from './SendCurrency/SendCurrencyRequest'
 import { SendCurrencyResponse } from './SendCurrency/SendCurrencyResponse'
+import { UpdateIdentityRequest } from './UpdateIdentity/UpdateIdentityRequest'
+import { UpdateIdentityResponse } from './UpdateIdentity/UpdateIdentityResponse'
 import { FundRawTransactionRequest } from './FundRawTransaction/FundRawTransactionRequest'
 import { FundRawTransactionResponse } from './FundRawTransaction/FundRawTransactionResponse'
+import { SignRawTransactionRequest } from './SignRawTransaction/SignRawTransactionRequest'
+import { SignRawTransactionResponse } from './SignRawTransaction/SignRawTransactionResponse'
 import { GetCurrencyConvertersRequest } from './GetCurrencyConverters/GetCurrencyConvertersRequest'
 import { GetCurrencyConvertersResponse } from './GetCurrencyConverters/GetCurrencyConvertersResponse'
 import { ListCurrenciesRequest } from './ListCurrencies/ListCurrenciesRequest'
@@ -78,8 +84,12 @@ export {
   VerifyMessageResponse,
   SignMessageRequest,
   SignMessageResponse,
+  SignDataRequest,
+  SignDataResponse,
   SendCurrencyRequest,
   SendCurrencyResponse,
+  UpdateIdentityRequest,
+  UpdateIdentityResponse,
   FundRawTransactionRequest,
   FundRawTransactionResponse,
   GetCurrencyConvertersRequest,
@@ -89,7 +99,9 @@ export {
   EstimateConversionRequest,
   EstimateConversionResponse,
   ZGetOperationStatusRequest,
-  ZGetOperationStatusResponse
+  ZGetOperationStatusResponse,
+  SignRawTransactionRequest,
+  SignRawTransactionResponse
 }
 
 export type RpcRequest =
@@ -110,12 +122,15 @@ export type RpcRequest =
   | typeof GetRawTransactionRequest
   | typeof VerifyMessageRequest
   | typeof SignMessageRequest
+  | typeof SignDataRequest
   | typeof SendCurrencyRequest
+  | typeof UpdateIdentityRequest
   | typeof FundRawTransactionRequest
   | typeof GetCurrencyConvertersRequest
   | typeof ListCurrenciesRequest
   | typeof EstimateConversionRequest
-  | typeof ZGetOperationStatusRequest;
+  | typeof ZGetOperationStatusRequest
+  | typeof SignRawTransactionRequest;
 
 export type RpcResponse =
   | typeof MakeOfferResponse
@@ -134,9 +149,12 @@ export type RpcResponse =
   | typeof GetRawTransactionResponse
   | typeof VerifyMessageResponse
   | typeof SignMessageResponse
+  | typeof SignDataResponse
   | typeof SendCurrencyResponse
+  | typeof UpdateIdentityResponse
   | typeof FundRawTransactionResponse
   | typeof GetCurrencyConvertersResponse
   | typeof ListCurrenciesResponse
   | typeof EstimateConversionResponse
-  | typeof ZGetOperationStatusResponse;
+  | typeof ZGetOperationStatusResponse
+  | typeof SignRawTransactionResponse;

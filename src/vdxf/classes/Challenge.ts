@@ -185,7 +185,7 @@ export class Challenge extends VDXFObject implements ChallengeInterface {
     const _subject = this.subject ? this.subject : [];
     const _provisioning_info = this.provisioning_info ? this.provisioning_info : [];
     const _alt_auth_factors = [];
-    const _attestations = [];
+    const _attestations = this.attestations ? this.attestations : [];
     const _redirect_uris = this.redirect_uris ? this.redirect_uris : [];
     const _context = this.context ? this.context : new Context({});
 
@@ -223,6 +223,10 @@ export class Challenge extends VDXFObject implements ChallengeInterface {
       length += varuint.encodingLength(_alt_auth_factors.length);
 
       length += varuint.encodingLength(_attestations.length);
+      length += _attestations.reduce(
+        (sum, current) => sum + current.byteLength(),
+        0
+      );
 
       length += varuint.encodingLength(_redirect_uris.length);
       length += _redirect_uris.reduce(
@@ -255,7 +259,7 @@ export class Challenge extends VDXFObject implements ChallengeInterface {
     const _subject = this.subject ? this.subject : [];
     const _provisioning_info = this.provisioning_info ? this.provisioning_info : [];
     const _alt_auth_factors = [];
-    const _attestations = [];
+    const _attestations = this.attestations ? this.attestations : [];
     const _redirect_uris = this.redirect_uris ? this.redirect_uris : [];
     const _context = this.context ? this.context : new Context({});
 
@@ -366,8 +370,10 @@ export class Challenge extends VDXFObject implements ChallengeInterface {
         this.attestations = [];
         const attestationsLength = reader.readCompactSize();
 
-        if (attestationsLength > 0) {
-          throw new Error("Attestations currently unsupported");
+        for (let i = 0; i < attestationsLength; i++) {
+          const _att = new Attestation();
+          reader.offset = _att.fromBuffer(reader.buffer, reader.offset);
+          this.attestations.push(_att);
         }
 
         this.redirect_uris = [];

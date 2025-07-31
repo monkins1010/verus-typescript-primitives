@@ -5,8 +5,14 @@ export interface VDXFKeyInterface {
         name: string;
         namespace: string;
     };
+    bounddata?: {
+        vdxfkey: string;
+    };
+    indexid?: string;
 }
 export declare const VERUSPAY_INVOICE_VDXF_KEY: VDXFKeyInterface;
+export declare const IDENTITY_UPDATE_REQUEST_VDXF_KEY: VDXFKeyInterface;
+export declare const IDENTITY_UPDATE_RESPONSE_VDXF_KEY: VDXFKeyInterface;
 export declare const IDENTITY_AUTH_SIG_VDXF_KEY: VDXFKeyInterface;
 export declare const LOGIN_CONSENT_RESPONSE_SIG_VDXF_KEY: VDXFKeyInterface;
 export declare const LOGIN_CONSENT_REQUEST_VDXF_KEY: VDXFKeyInterface;
@@ -16,6 +22,8 @@ export declare const LOGIN_CONSENT_DECISION_VDXF_KEY: VDXFKeyInterface;
 export declare const WALLET_VDXF_KEY: VDXFKeyInterface;
 export declare const LOGIN_CONSENT_REDIRECT_VDXF_KEY: VDXFKeyInterface;
 export declare const LOGIN_CONSENT_WEBHOOK_VDXF_KEY: VDXFKeyInterface;
+export declare const LOGIN_CONSENT_ATTESTATION_WEBHOOK_VDXF_KEY: VDXFKeyInterface;
+export declare const LOGIN_CONSENT_PERSONALINFO_WEBHOOK_VDXF_KEY: VDXFKeyInterface;
 export declare const LOGIN_CONSENT_CONTEXT_VDXF_KEY: VDXFKeyInterface;
 export declare const LOGIN_CONSENT_ID_PROVISIONING_WEBHOOK_VDXF_KEY: VDXFKeyInterface;
 export declare const ID_ADDRESS_VDXF_KEY: VDXFKeyInterface;
@@ -42,4 +50,24 @@ export declare const LOGIN_CONSENT_PROVISIONING_ERROR_KEY_TRANSFER_FAILED: VDXFK
 export declare const SIGNED_SESSION_OBJECT_DATA: VDXFKeyInterface;
 export declare const SIGNED_SESSION_OBJECT: VDXFKeyInterface;
 export declare const CURRENCY_ADDRESS: VDXFKeyInterface;
+export declare const ATTESTATION_PROVISION_URL: VDXFKeyInterface;
+export declare const ATTESTATION_PROVISION_TYPE: VDXFKeyInterface;
+export declare const ATTESTATION_PROVISION_OBJECT: VDXFKeyInterface;
+export declare const ATTESTATION_VIEW_REQUEST: VDXFKeyInterface;
+export declare const ATTESTATION_VIEW_RESPONSE: VDXFKeyInterface;
+export declare const ATTESTATION_ID: VDXFKeyInterface;
+export declare const ATTESTATION_NAME: VDXFKeyInterface;
+export declare const ATTESTATION_TYPE: VDXFKeyInterface;
+export declare const ATTESTATION_VIEW_REQUEST_KEY: VDXFKeyInterface;
+export declare const ATTESTATION_VIEW_REQUEST_NAME: VDXFKeyInterface;
+export declare const ATTESTATION_VIEW_REQUEST_ATTESTOR: VDXFKeyInterface;
+export declare const ATTESTATION_VIEW_REQUEST_ID: VDXFKeyInterface;
+export declare const PROFILE_DATA_VIEW_REQUEST: VDXFKeyInterface;
+export declare const IDENTITY_SIGNDATA_REQUEST: VDXFKeyInterface;
 export declare const DATA_TYPE_STRING: VDXFKeyInterface;
+export declare const DATA_TYPE_DEFINEDKEY: VDXFKeyInterface;
+export declare const DATA_TYPE_OBJECT_DATADESCRIPTOR: VDXFKeyInterface;
+export declare const DATA_TYPE_OBJECT_CREDENTIAL: VDXFKeyInterface;
+export declare const IDENTITY_CREDENTIALS: VDXFKeyInterface;
+export declare const IDENTITY_CREDENTIAL_PLAINLOGIN: VDXFKeyInterface;
+export declare const IDENTITY_CREDENTIAL_USERNAME: VDXFKeyInterface;

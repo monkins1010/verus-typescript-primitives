@@ -19,12 +19,12 @@ export declare const FLAG_DEST_AUX: import("bn.js");
 export declare const FLAG_DEST_GATEWAY: import("bn.js");
 export declare const FLAG_MASK: import("bn.js");
 export declare type TransferDestinationJson = {
-    type: string;
-    destination_bytes: string;
-    gateway_id?: string;
-    gateway_code?: string;
-    fees: string;
-    aux_dests: Array<TransferDestinationJson>;
+    type: number;
+    address: string;
+    gateway?: string;
+    gatewaycode?: string;
+    fees?: string;
+    auxdests?: Array<TransferDestinationJson>;
 };
 export declare class TransferDestination implements SerializableEntity {
     type: BigNumber;
@@ -53,4 +53,6 @@ export declare class TransferDestination implements SerializableEntity {
     fromBuffer(buffer: Buffer, offset?: number): number;
     static fromJson(data: TransferDestinationJson): TransferDestination;
     toJson(): TransferDestinationJson;
+    isValid(): boolean;
+    getAuxDest(destNum: any): TransferDestination;
 }

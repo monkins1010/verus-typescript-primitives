@@ -2,9 +2,10 @@ import bufferutils from '../utils/bufferutils'
 import { BN } from 'bn.js';
 import { BigNumber } from '../utils/types/BigNumber';
 import varuint from '../utils/varuint';
-import { fromBase58Check, toBase58Check } from '../utils/address';
-import { I_ADDR_VERSION, R_ADDR_VERSION } from '../constants/vdxf';
+import { fromBase58Check, toBase58Check, decodeDestination, decodeEthDestination } from '../utils/address';
+import { I_ADDR_VERSION, R_ADDR_VERSION, HASH160_BYTE_LENGTH } from '../constants/vdxf';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
+import { bnToDecimal, decimalToBn } from '../utils/numberConversion';
 const { BufferReader, BufferWriter } = bufferutils
 
 export const DEST_INVALID = new BN(0, 10)
@@ -24,13 +25,14 @@ export const FLAG_DEST_AUX = new BN(64, 10)
 export const FLAG_DEST_GATEWAY = new BN(128, 10)
 export const FLAG_MASK = FLAG_DEST_AUX.add(FLAG_DEST_GATEWAY)
 
+
 export type TransferDestinationJson = {
-  type: string;
-  destination_bytes: string;
-  gateway_id?: string;
-  gateway_code?: string;
-  fees: string;
-  aux_dests: Array<TransferDestinationJson>
+  type: number;
+  address: string;
+  gateway?: string;
+  gatewaycode?: string;
+  fees?: string;
+  auxdests?: Array<TransferDestinationJson>
 }
 
 export class TransferDestination implements SerializableEntity {
@@ -107,9 +109,9 @@ export class TransferDestination implements SerializableEntity {
       if (this.gateway_code) {
         length += fromBase58Check(this.gateway_code).hash.length; // gateway_code
       } else {
-        length += 20
+        length += HASH160_BYTE_LENGTH
       }
-      length += 8 // fees
+      length += 8 // fees int64
     }
 
     if (this.hasAuxDests()) {
@@ -137,7 +139,7 @@ export class TransferDestination implements SerializableEntity {
       if (this.gateway_code) {
         writer.writeSlice(fromBase58Check(this.gateway_code).hash);
       } else {
-        writer.writeSlice(Buffer.alloc(20));
+        writer.writeSlice(Buffer.alloc(HASH160_BYTE_LENGTH));
       }
       writer.writeInt64(this.fees);
     }
@@ -177,24 +179,115 @@ export class TransferDestination implements SerializableEntity {
   }
 
   static fromJson(data: TransferDestinationJson): TransferDestination {
+
+    const type = new BN(data.type);
+    let destination = null;
+
+    switch (type.and(FLAG_MASK.notn(FLAG_MASK.bitLength())).toString()) {
+      case DEST_PKH.toString():
+      case DEST_SH.toString():
+      case DEST_ID.toString():
+      case DEST_QUANTUM.toString():    
+        destination = decodeDestination(data.address);  
+        break;
+      case DEST_ETH.toString():
+        destination = decodeEthDestination(data.address);
+        break;
+      default:
+        throw new Error("Unknown destination type: " + type + "\nNote: Only DEST_PKH, DEST_SH, DEST_ID, DEST_QUANTUM and DEST_ETH are supported for now.");
+    }
+
+    let auxDests = [];
+    let fees = null;
+    if (type.and(FLAG_DEST_AUX).gt(new BN(0)) && data.auxdests.length > 0) {
+      auxDests = data.auxdests.map(x => TransferDestination.fromJson(x));
+    }
+
+    if (type.and(FLAG_DEST_GATEWAY).gt(new BN(0)) && data.fees) {
+      fees = decimalToBn(data.fees);
+    }
+
     return new TransferDestination({
-      type: new BN(data.type),
-      destination_bytes: Buffer.from(data.destination_bytes, 'hex'),
-      gateway_id: data.gateway_id,
-      gateway_code: data.gateway_code,
-      fees: new BN(data.fees),
-      aux_dests: data.aux_dests.map(x => TransferDestination.fromJson(x))
+      type: type,
+      destination_bytes: destination,
+      gateway_code: data.gatewaycode,
+      fees: fees,
+      aux_dests: auxDests
     })
   }
 
   toJson(): TransferDestinationJson {
-    return {
-      type: this.type.toString(),
-      destination_bytes: this.destination_bytes.toString('hex'),
-      gateway_id: this.gateway_id,
-      gateway_code: this.gateway_code,
-      fees: this.fees.toString(),
-      aux_dests: this.aux_dests.map(x => x.toJson())
+
+    let destVal: TransferDestinationJson = {
+      type: this.type.toNumber(),
+      address: ''
+    };
+
+    switch (this.typeNoFlags().toString()) {
+      case DEST_PKH.toString():
+      case DEST_SH.toString():
+      case DEST_ID.toString():
+      case DEST_QUANTUM.toString():
+      case DEST_ETH.toString():
+        destVal.address = this.getAddressString();
+        break;
+      default:
+        throw new Error("Unknown destination type: " + this.typeNoFlags() + "\nNote: Only DEST_PKH, DEST_SH, DEST_ID, DEST_QUANTUM and DEST_ETH are supported for now.");
     }
+
+    if (this.hasAuxDests()) {
+      destVal.auxdests = this.aux_dests.map(auxDest => auxDest.toJson());
+    }
+    if (this.isGateway()) {
+      destVal.gateway = this.gateway_id;
+    }
+
+    return destVal
   }
+
+  isValid(): boolean
+  {
+      // verify aux dests
+      let valid = (((this.type.and(FLAG_DEST_AUX).gt(new BN(0))) && this.aux_dests.length > 0) || (!(this.type.and(FLAG_DEST_AUX).gt(new BN(0))) && !(this.aux_dests.length > 0)));
+      if (valid && this.aux_dests && this.aux_dests.length > 0)
+      {
+          for (let i = 0; i < this.aux_dests.length; i++)
+          {
+              if (!this.getAuxDest(i).isValid())
+              {
+                  valid = false;
+                  break;
+              }
+          }
+      }
+      return !!(valid &&
+             !this.typeNoFlags().eq(DEST_INVALID) &&
+             this.typeNoFlags().lte(LAST_VALID_TYPE_NO_FLAGS) &&
+             (((this.type.and(FLAG_DEST_GATEWAY).eq(new BN(0))) && (this.gateway_id == null)) || this.gateway_id != null));
+  }
+
+  getAuxDest(destNum)
+  {
+    const retVal = this.aux_dests[destNum];
+    if (destNum >= 0 && destNum < this.aux_dests.length)
+    {
+        if (retVal.type.and(FLAG_DEST_AUX).gt(new BN(0)) || retVal.aux_dests.length > 0)
+        {
+            retVal.type = DEST_INVALID;
+        }
+        // no gateways or flags, only simple destinations work
+        switch (retVal.type.toString())
+        {
+            case DEST_ID.toString():
+            case DEST_PK.toString():
+            case DEST_PKH.toString():
+            case DEST_ETH.toString():
+            case DEST_SH.toString():
+                break;
+            default:
+                retVal.type = DEST_INVALID;
+        }
+    }
+    return retVal;
+}
 }

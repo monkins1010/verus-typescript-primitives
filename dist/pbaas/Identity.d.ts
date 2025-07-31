@@ -17,23 +17,39 @@ export declare const IDENTITY_FLAG_TOKENIZED_CONTROL: import("bn.js");
 export declare const IDENTITY_MAX_UNLOCK_DELAY: import("bn.js");
 export declare const IDENTITY_MAX_NAME_LEN: import("bn.js");
 export declare type Hashes = Map<string, Buffer>;
-export declare type VerusCLIVerusIDJson = {
+export declare type VerusCLIVerusIDJsonBase<T = ContentMultiMapJson> = {
     contentmap?: {
         [key: string]: string;
     };
-    contentmultimap?: ContentMultiMapJson;
-    flags: number;
-    identityaddress: string;
-    minimumsignatures: number;
-    name: string;
-    parent: string;
-    primaryaddresses: Array<string>;
+    contentmultimap?: T;
+    flags?: number;
+    identityaddress?: string;
+    minimumsignatures?: number;
+    name?: string;
+    parent?: string;
+    primaryaddresses?: Array<string>;
     privateaddress?: string;
-    recoveryauthority: string;
-    revocationauthority: string;
+    recoveryauthority?: string;
+    revocationauthority?: string;
     systemid?: string;
-    timelock: number;
-    version: number;
+    timelock?: number;
+    version?: number;
+};
+export declare type VerusCLIVerusIDJson = VerusCLIVerusIDJsonBase<ContentMultiMapJson>;
+export declare type VerusIDInitData = {
+    version?: BigNumber;
+    flags?: BigNumber;
+    min_sigs?: BigNumber;
+    primary_addresses?: Array<KeyID>;
+    parent?: IdentityID;
+    system_id?: IdentityID;
+    name?: string;
+    content_map?: Hashes;
+    content_multimap?: ContentMultiMap;
+    revocation_authority?: IdentityID;
+    recovery_authority?: IdentityID;
+    private_addresses?: Array<SaplingPaymentAddress>;
+    unlock_after?: BigNumber;
 };
 export declare class Identity extends Principal implements SerializableEntity {
     parent: IdentityID;
@@ -52,25 +68,21 @@ export declare class Identity extends Principal implements SerializableEntity {
     static VERSION_CURRENT: import("bn.js");
     static VERSION_FIRSTVALID: import("bn.js");
     static VERSION_LASTVALID: import("bn.js");
-    constructor(data?: {
-        version?: BigNumber;
-        flags?: BigNumber;
-        min_sigs?: BigNumber;
-        primary_addresses?: Array<KeyID>;
-        parent?: IdentityID;
-        system_id?: IdentityID;
-        name?: string;
-        content_map?: Hashes;
-        content_multimap?: ContentMultiMap;
-        revocation_authority?: IdentityID;
-        recovery_authority?: IdentityID;
-        private_addresses?: Array<SaplingPaymentAddress>;
-        unlock_after?: BigNumber;
-    });
+    constructor(data?: VerusIDInitData);
+    protected containsParent(): boolean;
+    protected containsSystemId(): boolean;
+    protected containsName(): boolean;
+    protected containsContentMap(): boolean;
+    protected containsContentMultiMap(): boolean;
+    protected containsRevocation(): boolean;
+    protected containsRecovery(): boolean;
+    protected containsPrivateAddresses(): boolean;
+    protected containsUnlockAfter(): boolean;
+    private getIdentityByteLength;
     getByteLength(): number;
     clearContentMultiMap(): void;
     toBuffer(): Buffer;
-    fromBuffer(buffer: Buffer, offset?: number, multimapKeylists?: Array<Array<string> | null>): number;
+    fromBuffer(buffer: Buffer, offset?: number, parseVdxfObjects?: boolean): number;
     toJson(): VerusCLIVerusIDJson;
     getIdentityAddress(): string;
     isRevoked(): boolean;
@@ -86,5 +98,6 @@ export declare class Identity extends Principal implements SerializableEntity {
     setRecovery(iAddr: string): void;
     setPrivateAddress(zAddr: string): void;
     upgradeVersion(version?: BigNumber): void;
+    protected static internalFromJson<T>(json: VerusCLIVerusIDJson, ctor: new (...args: any[]) => T): T;
     static fromJson(json: VerusCLIVerusIDJson): Identity;
 }
