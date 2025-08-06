@@ -34,8 +34,8 @@ export const IDENTITY_UPDATE_RESPONSE_VDXF_KEY: VDXFKeyInterface = {
   "hash160result": "667802c74fbf3dd3a9693bb9aec9bef1250b2b14",
   "indexid": "xA9GyS1bt1WGERamNVqVrhuGvGJeYuWyNk",
   "qualifiedname": {
-      "name": "vrsc::identity.update.response",
-      "namespace": "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV"
+    "name": "vrsc::identity.update.response",
+    "namespace": "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV"
   },
   "vdxfid": "i5KAWdaX2hHbcFhjWpBLtKNjtcHdeQFjuX"
 };
@@ -130,7 +130,7 @@ export const LOGIN_CONSENT_ATTESTATION_WEBHOOK_VDXF_KEY: VDXFKeyInterface = {
   },
 };
 
-export const LOGIN_CONSENT_PERSONALINFO_WEBHOOK_VDXF_KEY: VDXFKeyInterface ={
+export const LOGIN_CONSENT_PERSONALINFO_WEBHOOK_VDXF_KEY: VDXFKeyInterface = {
   vdxfid: "i8RW9fcZHh1oaAqR2fWWLCB99mfNW6Q2mQ",
   indexid: "xDFccU3e91EUCLiStMAfJahgBRgPHfYq74",
   hash160result: "fe40712687cd6f9f288e535ced75b653624f4636",
@@ -375,11 +375,11 @@ export const SIGNED_SESSION_OBJECT: VDXFKeyInterface = {
 };
 
 export const CURRENCY_ADDRESS: VDXFKeyInterface = {
-  "vdxfid":"iBy2s9cQL9RadMVPjog6bbSV5ityBxTuNR",
-  "hash160result":"4fb4c86b8ce18e596e28f62bc9a78f43d738255d",
+  "vdxfid": "iBy2s9cQL9RadMVPjog6bbSV5ityBxTuNR",
+  "hash160result": "4fb4c86b8ce18e596e28f62bc9a78f43d738255d",
   "qualifiedname": {
-    "namespace":"i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV",
-    "name":"vrsc::currency.address"
+    "namespace": "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV",
+    "name": "vrsc::currency.address"
   }
 }
 
@@ -522,12 +522,12 @@ export const IDENTITY_SIGNDATA_REQUEST: VDXFKeyInterface = {
 
 // DATA TYPES
 export const DATA_TYPE_STRING: VDXFKeyInterface = {
-    "vdxfid": "iK7a5JNJnbeuYWVHCDRpJosj3irGJ5Qa8c",
-    "hash160result": "e5c061641228a399169211e666de18448b7b8bab",
-    "qualifiedname": {
-      "namespace": "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV",
-      "name": "vrsc::data.type.string"
-    },
+  "vdxfid": "iK7a5JNJnbeuYWVHCDRpJosj3irGJ5Qa8c",
+  "hash160result": "e5c061641228a399169211e666de18448b7b8bab",
+  "qualifiedname": {
+    "namespace": "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV",
+    "name": "vrsc::data.type.string"
+  },
 };
 
 export const DATA_TYPE_DEFINEDKEY: VDXFKeyInterface = {
@@ -537,5 +537,15 @@ export const DATA_TYPE_DEFINEDKEY: VDXFKeyInterface = {
   "qualifiedname": {
     "namespace": "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV",
     "name": "vrsc::data.type.definedkey"
+  }
+}
+
+export const ATTESTATION_VIEW_REQUEST_MULTIPLEATTESTATIONS: VDXFKeyInterface = {
+  "vdxfid": "i4BWC5Lr7gAT7KzyDx82Ye5DeFQD8ckcXe",
+  "indexid": "x91cesmvxzP7jVt15dnBX2bkfuRDya9TPq",
+  "hash160result": "3c520f0bde6be181461ebbff11bce396a604c007",
+  "qualifiedname": {
+    "namespace": "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV",
+    "name": "vrsc::attestation.view.request.multipleattestations"
   }
 }

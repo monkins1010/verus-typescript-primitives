@@ -66,3 +66,4 @@ export declare const PROFILE_DATA_VIEW_REQUEST: VDXFKeyInterface;
 export declare const IDENTITY_SIGNDATA_REQUEST: VDXFKeyInterface;
 export declare const DATA_TYPE_STRING: VDXFKeyInterface;
 export declare const DATA_TYPE_DEFINEDKEY: VDXFKeyInterface;
+export declare const ATTESTATION_VIEW_REQUEST_MULTIPLEATTESTATIONS: VDXFKeyInterface;
