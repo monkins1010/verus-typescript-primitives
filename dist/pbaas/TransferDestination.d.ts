@@ -1,5 +1,3 @@
-/// <reference types="bn.js" />
-/// <reference types="node" />
 import { BigNumber } from '../utils/types/BigNumber';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
 export declare const DEST_INVALID: import("bn.js");
@@ -18,7 +16,7 @@ export declare const LAST_VALID_TYPE_NO_FLAGS: import("bn.js");
 export declare const FLAG_DEST_AUX: import("bn.js");
 export declare const FLAG_DEST_GATEWAY: import("bn.js");
 export declare const FLAG_MASK: import("bn.js");
-export declare type TransferDestinationJson = {
+export type TransferDestinationJson = {
     type: number;
     address: string;
     gateway?: string;
@@ -49,7 +47,7 @@ export declare class TransferDestination implements SerializableEntity {
     typeNoFlags(): import("bn.js");
     getAddressString(): string;
     getByteLength(): number;
-    toBuffer(): Buffer;
+    toBuffer(): Buffer<ArrayBufferLike>;
     fromBuffer(buffer: Buffer, offset?: number): number;
     static fromJson(data: TransferDestinationJson): TransferDestination;
     toJson(): TransferDestinationJson;

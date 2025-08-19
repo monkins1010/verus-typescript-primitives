@@ -9,7 +9,7 @@ export type SignDataArgs = {
   filename?: string;
   message?: string;
   messagehex?: string;
-  messsagebase64?: string;
+  messagebase64?: string;
   datahash?: string;
   vdxfdata?: string;
   mmrdata?: Array<DataDescriptorInfo | SignDataParameters>;
@@ -18,7 +18,7 @@ export type SignDataArgs = {
   priormmr?: Array<string>;
   vdxfkeys?: Array<string>;
   vdxfkeynames?: Array<string>;
-  boundhahses?: Array<string>;
+  boundhashes?: Array<string>;
   hashtype?: string;
   signature?: string;
   encrypttoaddress?: string;

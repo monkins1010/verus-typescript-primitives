@@ -1,5 +1,3 @@
-/// <reference types="bn.js" />
-/// <reference types="node" />
 import { BigNumber } from '../utils/types/BigNumber';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
 export interface RatingJson {
@@ -28,7 +26,7 @@ export declare class Rating implements SerializableEntity {
         ratings?: Map<string, Buffer>;
     });
     getByteLength(): number;
-    toBuffer(): Buffer;
+    toBuffer(): Buffer<ArrayBufferLike>;
     fromBuffer(buffer: Buffer, offset?: number): number;
     isValid(): boolean;
     toJson(): {

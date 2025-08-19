@@ -1,5 +1,5 @@
-export declare type IdentityDefinitionContentMultiMapPrimitive = number | string;
-export declare type IdentityDefinitionContentMultiMapValue = {
+export type IdentityDefinitionContentMultiMapPrimitive = number | string;
+export type IdentityDefinitionContentMultiMapValue = {
     [key: string]: IdentityDefinitionContentMultiMapPrimitive | IdentityDefinitionContentMultiMapValue;
 };
 export interface IdentityDefinition {

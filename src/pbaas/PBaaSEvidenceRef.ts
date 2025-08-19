@@ -96,7 +96,7 @@ export class PBaaSEvidenceRef implements SerializableEntity {
     this.object_num = reader.readVarInt();
     this.sub_object = reader.readVarInt();
 
-    if (this.flags.and(IdentityMultimapRef.FLAG_HAS_DATAHASH).gt(new BN(0))) {
+    if (this.flags.and(PBaaSEvidenceRef.FLAG_HAS_SYSTEM).gt(new BN(0))) {
       this.system_id = toBase58Check(reader.readSlice(20), I_ADDR_VERSION);
     }
 

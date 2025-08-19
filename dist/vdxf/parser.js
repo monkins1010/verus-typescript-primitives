@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.parseVdxfObjectString = void 0;
+exports.parseVdxfObjectString = parseVdxfObjectString;
 const base64url_1 = require("base64url");
 const classes_1 = require("./classes");
 const keys_1 = require("./keys");
@@ -42,4 +42,3 @@ function parseVdxfObjectString(str) {
             throw new Error("Unrecognized vdxf object type " + vdxfKey);
     }
 }
-exports.parseVdxfObjectString = parseVdxfObjectString;

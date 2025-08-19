@@ -269,7 +269,7 @@ class PartialMMRData {
                 data.push({ type: pbaas_1.DATA_TYPE_RAWSTRINGDATA, data: Buffer.from(unit, 'hex') });
             }
             else {
-                const unitMmrData = unit;
+                const unitMmrData = unit["vdxfdata"] ? unit : unit;
                 const dataKey = Object.keys(unitMmrData)[0];
                 const dataValue = unitMmrData[dataKey];
                 switch (dataKey) {

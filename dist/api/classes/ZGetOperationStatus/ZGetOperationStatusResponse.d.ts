@@ -1,5 +1,5 @@
 import { ApiResponse } from "../../ApiResponse";
-export declare type z_operation = {
+export type z_operation = {
     id: string;
     status: string;
     method: string;

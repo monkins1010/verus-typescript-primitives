@@ -1,5 +1,3 @@
-/// <reference types="node" />
-/// <reference types="bn.js" />
 import { BigNumber } from '../utils/types/BigNumber';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
 export interface SignatureJsonDataInterface {
@@ -43,9 +41,23 @@ export declare class SignatureData implements SerializableEntity {
         signature_as_vch?: Buffer;
     });
     static fromJson(data: SignatureJsonDataInterface | any): SignatureData;
+    /**
+     * Determines the signature hash type based on the input buffer.
+     *
+     * @param {Buffer} input - The input buffer containing signature data.
+     * @returns {number} - The hash type. If the version byte is `2`, the next byte
+     *                     in the buffer is returned as the hash type. Otherwise,
+     *                     it defaults to `EHashTypes.HASH_SHA256`.
+     *
+     * The method reads the first byte of the input buffer as the version. If the
+     * version is `2`, it reads the next byte as the hash type. This logic is used
+     * to support multiple versions of signature data formats, where version `2`
+     * introduces a new hash type. For all other versions, the default hash type
+     * is `EHashTypes.HASH_SHA256`.
+     */
     static getSignatureHashType(input: Buffer): number;
     getByteLength(): number;
-    toBuffer(): Buffer;
+    toBuffer(): Buffer<ArrayBufferLike>;
     fromBuffer(buffer: Buffer, offset?: number): number;
     isValid(): boolean;
     toJson(): SignatureJsonDataInterface;

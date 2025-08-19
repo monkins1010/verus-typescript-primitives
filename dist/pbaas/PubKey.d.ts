@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { SerializableEntity } from "../utils/types/SerializableEntity";
 export declare class PubKey implements SerializableEntity {
     static PUBLIC_KEY_SIZE: number;

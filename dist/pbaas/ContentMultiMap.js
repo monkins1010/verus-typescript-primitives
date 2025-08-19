@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ContentMultiMap = exports.isKvValueArrayItemVdxfUniValueJson = void 0;
+exports.ContentMultiMap = void 0;
+exports.isKvValueArrayItemVdxfUniValueJson = isKvValueArrayItemVdxfUniValueJson;
 const varuint_1 = require("../utils/varuint");
 const bufferutils_1 = require("../utils/bufferutils");
 const address_1 = require("../utils/address");
@@ -20,7 +21,6 @@ function isKvValueArrayItemVdxfUniValueJson(x) {
         }
     });
 }
-exports.isKvValueArrayItemVdxfUniValueJson = isKvValueArrayItemVdxfUniValueJson;
 class ContentMultiMap {
     constructor(data) {
         if (data === null || data === void 0 ? void 0 : data.kv_content)

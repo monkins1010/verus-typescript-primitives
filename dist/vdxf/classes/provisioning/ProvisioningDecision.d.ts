@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { Decision } from "../Decision";
 import { Context } from "../Context";
 import { ProvisioningRequest } from "./ProvisioningRequest";

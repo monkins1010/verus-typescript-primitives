@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.decimalToBn = exports.bnToDecimal = void 0;
+exports.bnToDecimal = bnToDecimal;
+exports.decimalToBn = decimalToBn;
 const bn_js_1 = require("bn.js");
 /**
  * Converts a BN instance to a number with 8 decimal places.
@@ -28,7 +29,6 @@ function bnToDecimal(value) {
     const resultStr = (isNegative ? '-' : '') + integerPart + '.' + decimalPart;
     return resultStr;
 }
-exports.bnToDecimal = bnToDecimal;
 /**
  * Converts a decimal number (string or number) to a BN instance representing the integer value (multiplied by 1e8)
  * Uses string manipulation to avoid floating point errors.
@@ -45,4 +45,3 @@ function decimalToBn(value) {
     const bn = new bn_js_1.BN(bnStr);
     return isNegative ? bn.neg() : bn;
 }
-exports.decimalToBn = decimalToBn;

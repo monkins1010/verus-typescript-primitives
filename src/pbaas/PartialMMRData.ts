@@ -371,7 +371,7 @@ export class PartialMMRData implements SerializableEntity {
       if (typeof unit === 'string') {
         data.push({ type: DATA_TYPE_RAWSTRINGDATA, data: Buffer.from(unit, 'hex') })
       } else {
-        const unitMmrData = unit as SingleKeyMMRData;
+        const unitMmrData = unit["vdxfdata"] ? unit as { ['vdxfdata']: VdxfUniValueJson } : unit as SingleKeyMMRData;
         const dataKey: CLIMMRDataKey = Object.keys(unitMmrData)[0] as CLIMMRDataKey;
         const dataValue = unitMmrData[dataKey];
 

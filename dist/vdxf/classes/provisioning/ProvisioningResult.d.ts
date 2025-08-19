@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { HexDataVdxfObject, VDXFObject } from "../..";
 export interface ProvisioningResultInterface {
     state: string;

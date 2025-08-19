@@ -1,5 +1,3 @@
-/// <reference types="bn.js" />
-/// <reference types="node" />
 import { BigNumber } from '../utils/types/BigNumber';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
 export interface URLRefJson {
@@ -25,7 +23,7 @@ export declare class URLRef implements SerializableEntity {
         data_hash?: Buffer;
     });
     getByteLength(): number;
-    toBuffer(): Buffer;
+    toBuffer(): Buffer<ArrayBufferLike>;
     fromBuffer(buffer: Buffer, offset?: number): number;
     isValid(): boolean;
     toJson(): {

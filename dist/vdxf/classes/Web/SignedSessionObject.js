@@ -109,10 +109,10 @@ class SignedSessionObject extends __1.VDXFObject {
     }
     getHeaders() {
         return {
-            ['VDXF-Key']: this.vdxfkey,
-            ['VDXF-Version']: this.version.toString(),
-            ['VerusID-Session-ID']: this.data.session_id,
-            ['VerusID-Timestamp-Micro']: this.data.timestamp_micro.toString(),
+            ['VDXF-Key']: this.vdxfkey, // VDXF key of signed session object (SSO), denoting that this is a SSO
+            ['VDXF-Version']: this.version.toString(), // SSO version
+            ['VerusID-Session-ID']: this.data.session_id, // Session ID of original response made
+            ['VerusID-Timestamp-Micro']: this.data.timestamp_micro.toString(), // Microsecond timestamp
             ['VerusID-Signature']: this.signature.signature // Signature of this SSO serialized
         };
     }

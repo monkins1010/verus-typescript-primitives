@@ -1,5 +1,3 @@
-/// <reference types="node" />
-/// <reference types="bn.js" />
 import { BigNumber } from '../utils/types/BigNumber';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
 export interface IdentityMultimapRefJson {
@@ -30,7 +28,7 @@ export declare class IdentityMultimapRef implements SerializableEntity {
     constructor(data?: any);
     setFlags(): void;
     getByteLength(): number;
-    toBuffer(): Buffer;
+    toBuffer(): Buffer<ArrayBufferLike>;
     fromBuffer(buffer: Buffer, offset?: number): number;
     isValid(): boolean;
     hasDataHash(): boolean;

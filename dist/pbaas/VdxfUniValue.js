@@ -463,6 +463,16 @@ class VdxfUniValue {
         }
         // this should be an object with "vdxfkey" as the key and {object} as the json object to serialize
         for (let i = 0; i < obj.length; i++) {
+            if (typeof (obj[i]) != 'object') {
+                if (typeof (obj[i]) != 'string')
+                    throw new Error('Not JSON string as expected');
+                if ((0, string_1.isHexString)(obj[i])) {
+                    arrayItem.push({ [""]: Buffer.from(obj[i], "hex") });
+                    continue;
+                }
+                arrayItem.push({ [""]: Buffer.from(obj[i], "utf-8") });
+                continue;
+            }
             const oneValKeys = Object.keys(obj[i]);
             const oneValValues = Object.values(obj[i]);
             for (let k = 0; k < oneValKeys.length; k++) {

@@ -1,4 +1,4 @@
-export declare type CurrencyDefinition = {
+export type CurrencyDefinition = {
     version: number;
     options: number;
     name: string;

@@ -1,5 +1,3 @@
-/// <reference types="bn.js" />
-/// <reference types="node" />
 import { VDXFObject, VerusIDSignature } from "../..";
 import { BigNumber } from "../../../utils/types/BigNumber";
 import { IdentityUpdateRequestDetails, IdentityUpdateRequestDetailsJson } from "./IdentityUpdateRequestDetails";
@@ -10,8 +8,8 @@ export declare const IDENTITY_UPDATE_VERSION_FIRSTVALID: import("bn.js");
 export declare const IDENTITY_UPDATE_VERSION_LASTVALID: import("bn.js");
 export declare const IDENTITY_UPDATE_VERSION_SIGNED: import("bn.js");
 export declare const IDENTITY_UPDATE_VERSION_MASK: import("bn.js");
-export declare type IdentityUpdateDetails = IdentityUpdateRequestDetails | IdentityUpdateResponseDetails;
-export declare type IdentityUpdateDetailsJson = IdentityUpdateRequestDetailsJson | IdentityUpdateResponseDetailsJson;
+export type IdentityUpdateDetails = IdentityUpdateRequestDetails | IdentityUpdateResponseDetails;
+export type IdentityUpdateDetailsJson = IdentityUpdateRequestDetailsJson | IdentityUpdateResponseDetailsJson;
 export interface IdentityUpdateEnvelopeInterface {
     details: IdentityUpdateDetails;
     systemid?: IdentityID;
@@ -37,7 +35,7 @@ export declare class IdentityUpdateEnvelope extends VDXFObject {
     isValidVersion(): boolean;
     isSigned(): boolean;
     setSigned(): void;
-    getDetailsHash(signedBlockheight: number, signatureVersion?: number): Buffer;
+    getDetailsHash(signedBlockheight: number, signatureVersion?: number): Buffer<ArrayBufferLike>;
     protected _dataByteLength(signer?: IdentityID): number;
     protected _toDataBuffer(signer?: IdentityID): Buffer;
     dataByteLength(): number;

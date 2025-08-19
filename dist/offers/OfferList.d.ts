@@ -1,4 +1,4 @@
-export declare type ListedCurrencyOffering = {
+export type ListedCurrencyOffering = {
     [key: string]: number;
 };
 export interface ListedIdentityOffering {
@@ -7,7 +7,7 @@ export interface ListedIdentityOffering {
     systemid: string;
     original: number;
 }
-export declare type ListedValueOffering = ListedCurrencyOffering | ListedIdentityOffering;
+export type ListedValueOffering = ListedCurrencyOffering | ListedIdentityOffering;
 export interface ListedOfferTerms {
     offer: ListedValueOffering;
     accept: ListedValueOffering;
@@ -19,6 +19,6 @@ export interface ListedOffer {
     price: number;
     offer: ListedOfferTerms;
 }
-export declare type OfferList = {
+export type OfferList = {
     [key: string]: Array<ListedOffer>;
 };

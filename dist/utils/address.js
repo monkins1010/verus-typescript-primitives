@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.decodeEthDestination = exports.decodeDestination = exports.getDataKey = exports.toIAddress = exports.nameAndParentAddrToIAddr = exports.toBase58Check = exports.fromBase58Check = void 0;
+exports.decodeEthDestination = exports.decodeDestination = exports.toIAddress = exports.nameAndParentAddrToIAddr = exports.toBase58Check = exports.fromBase58Check = void 0;
+exports.getDataKey = getDataKey;
 const pbaas_1 = require("../constants/pbaas");
 const vdxf_1 = require("../constants/vdxf");
 const hash_1 = require("./hash");
@@ -239,7 +240,6 @@ function getDataKey(keyName, nameSpaceID, verusChainId = pbaas_1.DEFAULT_VERUS_C
     const parent = getID("::", nameSpaceID);
     return { id: getID(keyCopy, parent), namespace: nameSpaceID };
 }
-exports.getDataKey = getDataKey;
 const decodeDestination = (destination) => {
     try {
         const data = (0, exports.fromBase58Check)(destination);

@@ -1,5 +1,3 @@
-/// <reference types="bn.js" />
-/// <reference types="node" />
 import { BigNumber } from '../../../utils/types/BigNumber';
 import { TransferDestination, TransferDestinationJson } from '../../../pbaas/TransferDestination';
 export declare const VERUSPAY_INVALID: import("bn.js");
@@ -11,7 +9,7 @@ export declare const VERUSPAY_ACCEPTS_ANY_DESTINATION: import("bn.js");
 export declare const VERUSPAY_ACCEPTS_ANY_AMOUNT: import("bn.js");
 export declare const VERUSPAY_EXCLUDES_VERUS_BLOCKCHAIN: import("bn.js");
 export declare const VERUSPAY_IS_TESTNET: import("bn.js");
-export declare type VerusPayInvoiceDetailsJson = {
+export type VerusPayInvoiceDetailsJson = {
     flags?: string;
     amount?: string;
     destination?: TransferDestinationJson;
@@ -49,7 +47,7 @@ export declare class VerusPayInvoiceDetails {
     getFlagsJson(): {
         [key: string]: boolean;
     };
-    toSha256(): Buffer;
+    toSha256(): Buffer<ArrayBufferLike>;
     acceptsConversion(): boolean;
     acceptsNonVerusSystems(): boolean;
     acceptsAnyAmount(): boolean;
@@ -59,7 +57,7 @@ export declare class VerusPayInvoiceDetails {
     isTestnet(): boolean;
     isValid(): boolean;
     getByteLength(): number;
-    toBuffer(): Buffer;
+    toBuffer(): Buffer<ArrayBufferLike>;
     fromBuffer(buffer: Buffer, offset?: number): number;
     static fromJson(data: VerusPayInvoiceDetailsJson): VerusPayInvoiceDetails;
     toJson(): VerusPayInvoiceDetailsJson;

@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { VDXFObject } from "..";
 import { Attestation } from "./Challenge";
 import { Context } from "./Context";

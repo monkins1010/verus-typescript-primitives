@@ -1,5 +1,3 @@
-/// <reference types="node" />
-/// <reference types="bn.js" />
 import { BigNumber } from '../utils/types/BigNumber';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
 export interface EvidenceDataInChainObjectJson {
@@ -16,8 +14,8 @@ export interface EvidenceDataJson {
 export declare enum ETypes {
     TYPE_INVALID = 0,
     TYPE_FIRST_VALID = 1,
-    TYPE_DATA = 1,
-    TYPE_MULTIPART_DATA = 2,
+    TYPE_DATA = 1,// holding a transaction proof of export with finalization referencing finalization of root notarization
+    TYPE_MULTIPART_DATA = 2,// this is used to combine multiple outputs that can be used to reconstruct one evidence set
     TYPE_LAST_VALID = 2
 }
 export declare class MultiPartDescriptor implements SerializableEntity {
@@ -30,7 +28,7 @@ export declare class MultiPartDescriptor implements SerializableEntity {
         start: any;
     });
     getByteLength(): number;
-    toBuffer(): Buffer;
+    toBuffer(): Buffer<ArrayBufferLike>;
     fromBuffer(buffer: Buffer, offset?: number): number;
 }
 export declare class EvidenceData implements SerializableEntity {
@@ -51,7 +49,7 @@ export declare class EvidenceData implements SerializableEntity {
         data_vec: any;
     });
     getByteLength(): number;
-    toBuffer(): Buffer;
+    toBuffer(): Buffer<ArrayBufferLike>;
     fromBuffer(buffer: Buffer, offset?: number): number;
     isValid(): boolean;
     toJson(): {

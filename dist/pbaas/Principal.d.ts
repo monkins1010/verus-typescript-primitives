@@ -1,5 +1,3 @@
-/// <reference types="bn.js" />
-/// <reference types="node" />
 import { BigNumber } from '../utils/types/BigNumber';
 import { KeyID } from './KeyID';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
@@ -23,6 +21,6 @@ export declare class Principal implements SerializableEntity {
     protected containsMinSigs(): boolean;
     private getSelfByteLength;
     getByteLength(): number;
-    toBuffer(): Buffer;
+    toBuffer(): Buffer<ArrayBufferLike>;
     fromBuffer(buffer: Buffer, offset?: number): number;
 }

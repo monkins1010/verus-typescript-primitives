@@ -1,8 +1,6 @@
-/// <reference types="node" />
-/// <reference types="bn.js" />
 import { BigNumber } from "../../utils/types/BigNumber";
 import { SerializableEntity } from "../../utils/types/SerializableEntity";
-export declare type ResponseUriJson = {
+export type ResponseUriJson = {
     type: string;
     uri: string;
 };

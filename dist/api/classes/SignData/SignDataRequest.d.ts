@@ -2,12 +2,12 @@ import { ApiRequest } from "../../ApiRequest";
 import { ApiPrimitiveJson, RequestParams } from "../../ApiPrimitive";
 import { DataDescriptorInfo } from "../../../utils/types/DataDescriptor";
 import { SignDataParameters } from "../../../utils/types/SignData";
-export declare type SignDataArgs = {
+export type SignDataArgs = {
     address?: string;
     filename?: string;
     message?: string;
     messagehex?: string;
-    messsagebase64?: string;
+    messagebase64?: string;
     datahash?: string;
     vdxfdata?: string;
     mmrdata?: Array<DataDescriptorInfo | SignDataParameters>;
@@ -16,7 +16,7 @@ export declare type SignDataArgs = {
     priormmr?: Array<string>;
     vdxfkeys?: Array<string>;
     vdxfkeynames?: Array<string>;
-    boundhahses?: Array<string>;
+    boundhashes?: Array<string>;
     hashtype?: string;
     signature?: string;
     encrypttoaddress?: string;

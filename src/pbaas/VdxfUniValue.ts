@@ -30,13 +30,15 @@ export type VdxfUniType = string | Buffer | BigNumber | CurrencyValueMap | Ratin
   TransferDestination | ContentMultiMapRemove | CrossChainDataRef | SignatureData |
   DataDescriptor | MMRDescriptor | URLRef | IdentityMultimapRef | Credential;
 
-export interface VdxfUniValueJson {
+export interface VdxfUniValueInterface {
   [key: string]: string | number | RatingJson | TransferDestinationJson |
-  ContentMultiMapRemoveJson | CrossChainDataRefJson | SignatureJsonDataInterface | DataDescriptorJson | MMRDescriptorJson | VdxfUniValueJson;
+  ContentMultiMapRemoveJson | CrossChainDataRefJson | SignatureJsonDataInterface | DataDescriptorJson | MMRDescriptorJson | VdxfUniValueInterface;
   serializedhex?: string;
   serializedbase64?: string;
   message?: string;
 };
+
+export type VdxfUniValueJson = string | VdxfUniValueInterface;
 
 export type VdxfUniValueJsonArray = Array<VdxfUniValueJson>;
 
@@ -546,6 +548,17 @@ export class VdxfUniValue implements SerializableEntity {
 
     // this should be an object with "vdxfkey" as the key and {object} as the json object to serialize
     for (let i = 0; i < obj.length; i++) {
+
+      if (typeof (obj[i]) != 'object') {
+        if (typeof (obj[i]) != 'string') throw new Error('Not JSON string as expected');
+        if (isHexString(obj[i] as string)) {
+          arrayItem.push({ [""]: Buffer.from(obj[i] as string, "hex") })
+          continue;
+        }
+        arrayItem.push({ [""]: Buffer.from(obj[i] as string, "utf-8") })
+        continue;
+      }
+
       const oneValKeys = Object.keys(obj[i]);
       const oneValValues = Object.values(obj[i]);
 

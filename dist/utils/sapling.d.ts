@@ -1,4 +1,3 @@
-/// <reference types="node" />
 export declare const fromBech32: (address: string) => {
     version: number;
     prefix: string;

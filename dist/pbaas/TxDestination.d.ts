@@ -1,5 +1,3 @@
-/// <reference types="node" />
-/// <reference types="bn.js" />
 import { BigNumber } from '../utils/types/BigNumber';
 import { IdentityID } from './IdentityID';
 import { KeyID } from './KeyID';
@@ -10,7 +8,7 @@ import { SerializableEntity } from '../utils/types/SerializableEntity';
 export interface TxDestinationVariantInterface {
     new (hash?: Buffer): TxDestinationVariant;
 }
-export declare type TxDestinationVariant = IdentityID | KeyID | NoDestination | PubKey | UnknownID;
+export type TxDestinationVariant = IdentityID | KeyID | NoDestination | PubKey | UnknownID;
 export declare class TxDestination implements SerializableEntity {
     type: BigNumber;
     data: TxDestinationVariant;
@@ -30,5 +28,5 @@ export declare class TxDestination implements SerializableEntity {
     fromBuffer(buffer: Buffer, offset?: number): number;
     toBuffer(): Buffer;
     static fromChunk(chunk: Buffer): TxDestination;
-    toChunk(): Buffer;
+    toChunk(): Buffer<ArrayBuffer>;
 }

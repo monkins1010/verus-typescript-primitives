@@ -1,6 +1,6 @@
 import { ApiRequest } from "../../ApiRequest";
 import { ApiPrimitiveJson, RequestParams } from "../../ApiPrimitive";
-declare type Output = {
+type Output = {
     currency: string;
     amount: number;
     convertto: string;

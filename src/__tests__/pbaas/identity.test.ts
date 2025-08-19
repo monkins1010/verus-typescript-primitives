@@ -410,8 +410,8 @@ describe('Serializes and deserializes identity properly', () => {
     identity_frombuf.upgradeVersion(Identity.VERSION_PBAAS);
 
     expect(identity_frombuf.system_id.toAddress()).toBe(identity_frombuf.parent.toAddress());
-    expect(() => identity_frombuf.upgradeVersion(Identity.VERSION_VERUSID)).toThrowError();
-    expect(() => identity_frombuf.upgradeVersion(new BN(10))).toThrowError();
+    expect(() => identity_frombuf.upgradeVersion(Identity.VERSION_VERUSID)).toThrow();
+    expect(() => identity_frombuf.upgradeVersion(new BN(10))).toThrow();
   });
   test('clear ID contentmultimap', async () => {
     const identityJson = {

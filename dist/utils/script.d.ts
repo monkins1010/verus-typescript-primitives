@@ -1,5 +1,4 @@
-/// <reference types="node" />
-export declare type ScriptChunk = Buffer | number;
+export type ScriptChunk = Buffer | number;
 export declare function isOPInt(value: number): boolean;
 export declare function isPushOnlyChunk(value: ScriptChunk): boolean;
 export declare function isPushOnly(value: Array<ScriptChunk>): boolean;

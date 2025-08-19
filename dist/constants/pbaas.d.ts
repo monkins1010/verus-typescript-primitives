@@ -1,4 +1,3 @@
-/// <reference types="bn.js" />
 export declare const DATA_TYPE_UNKNOWN: import("bn.js");
 export declare const DATA_TYPE_MMRDATA: import("bn.js");
 export declare const DATA_TYPE_FILENAME: import("bn.js");
@@ -19,7 +18,7 @@ export declare const HASH_TYPE_KECCAK256_NAME = "keccak256";
 export declare const DEFAULT_HASH_TYPE: import("bn.js");
 export declare const DEFAULT_HASH_TYPE_MMR: import("bn.js");
 export declare const HASH_NAMES: string[];
-export declare type AllowedHashes = (typeof HASH_NAMES)[number];
+export type AllowedHashes = (typeof HASH_NAMES)[number];
 export declare const UINT_256_LENGTH = 32;
 export declare const DEFAULT_VERUS_CHAINID = "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV";
 export declare const TESTNET_VERUS_CHAINID = "iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq";

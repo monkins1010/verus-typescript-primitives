@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { SerializableEntity } from "../../utils/types/SerializableEntity";
 export declare class Hash160 {
     hash: Buffer;
@@ -16,7 +15,7 @@ export declare class Hash160 {
     toBuffer(): Buffer;
     fromBuffer(buffer: Buffer, varlength?: boolean, offset?: number): number;
     toJson(): {
-        hash: Buffer;
+        hash: Buffer<ArrayBufferLike>;
         version: number;
     };
 }

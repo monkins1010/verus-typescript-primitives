@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { Utf8DataVdxfObject, VDXFObject, Utf8OrBase58Object } from "../";
 import { Context } from "./Context";
 export declare class RedirectUri extends VDXFObject {

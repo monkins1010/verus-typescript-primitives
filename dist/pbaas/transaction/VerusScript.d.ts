@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { ScriptChunk } from "../../utils/script";
 import { SerializableEntity } from "../../utils/types/SerializableEntity";
 export declare class VerusScript implements SerializableEntity {

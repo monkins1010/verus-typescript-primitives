@@ -1,6 +1,6 @@
 import { ApiRequest } from "../../ApiRequest";
 import { RequestParams, ApiPrimitiveJson } from "../../ApiPrimitive";
-declare type InitialVdxfData = {
+type InitialVdxfData = {
     vdxfkey: string;
     uint256: string;
     indexnum: string;

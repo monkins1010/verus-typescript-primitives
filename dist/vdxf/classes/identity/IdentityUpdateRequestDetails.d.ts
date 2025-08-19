@@ -1,18 +1,16 @@
-/// <reference types="node" />
-/// <reference types="bn.js" />
 import { PartialIdentity } from '../../../pbaas/PartialIdentity';
 import { PartialSignData, PartialSignDataCLIJson, PartialSignDataJson } from '../../../pbaas/PartialSignData';
 import { BigNumber } from '../../../utils/types/BigNumber';
 import { ContentMultiMapJsonValue, IdentityID, VerusCLIVerusIDJson, VerusCLIVerusIDJsonBase } from '../../../pbaas';
 import { ResponseUri, ResponseUriJson } from '../ResponseUri';
 import { SerializableEntity } from '../../../utils/types/SerializableEntity';
-export declare type SignDataMap = Map<string, PartialSignData>;
-export declare type VerusCLIVerusIDJsonWithData = VerusCLIVerusIDJsonBase<{
+export type SignDataMap = Map<string, PartialSignData>;
+export type VerusCLIVerusIDJsonWithData = VerusCLIVerusIDJsonBase<{
     [key: string]: ContentMultiMapJsonValue | {
         data: PartialSignDataCLIJson;
     };
 }>;
-export declare type IdentityUpdateRequestDetailsJson = {
+export type IdentityUpdateRequestDetailsJson = {
     flags?: string;
     requestid?: string;
     createdat?: string;
@@ -71,10 +69,10 @@ export declare class IdentityUpdateRequestDetails implements SerializableEntity 
     toggleContainsResponseUris(): void;
     toggleContainsSalt(): void;
     toggleIsTestnet(): void;
-    toSha256(): Buffer;
+    toSha256(): Buffer<ArrayBufferLike>;
     getIdentityAddress(): string;
     getByteLength(): number;
-    toBuffer(): Buffer;
+    toBuffer(): Buffer<ArrayBufferLike>;
     fromBuffer(buffer: Buffer, offset?: number, parseVdxfObjects?: boolean): number;
     toJson(): IdentityUpdateRequestDetailsJson;
     static fromJson(json: IdentityUpdateRequestDetailsJson): IdentityUpdateRequestDetails;

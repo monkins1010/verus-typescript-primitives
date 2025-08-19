@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { VerusIDSignatureInterface } from "../../";
 import { ProvisioningDecisionInterface } from "./ProvisioningDecision";
 import { Response } from "../Response";

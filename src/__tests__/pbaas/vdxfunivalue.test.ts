@@ -69,7 +69,7 @@ describe('Encodes and decodes VdxfUniValue', () => {
 
     const vFromBuf = new VdxfUniValue();
 
-    expect(() => vFromBuf.fromBuffer(v.toBuffer(), 0)).toThrowError();
+    expect(() => vFromBuf.fromBuffer(v.toBuffer(), 0)).toThrow();
   });
 
   // This test uses serialized data from the daemon adter putting in the Rating object into a contentmultimap.
@@ -145,6 +145,73 @@ describe('Encodes and decodes VdxfUniValue', () => {
     expect(mmrDescriptor.toBuffer().toString('hex')).toBe(mmrDescriptorFromJson.toBuffer().toString('hex'));
   });
 
+  test('deserialize datadescriptor to Json back to Object', () => {
+
+    const nestedDescriptor = VdxfUniValue.fromJson({
+      "i4GC1YGEVD21afWudGoFJVdnfjJ5XWnCQv": {
+        "version": 1,
+        "flags": 2,
+        "objectdata": {
+          "i4GC1YGEVD21afWudGoFJVdnfjJ5XWnCQv": {
+            "version": 1,
+            "flags": 96,
+            "mimetype": "text/plain",
+            "objectdata": {
+              "message": "Something 1"
+            },
+            "label": "label 1"
+          }
+        },
+        "salt": "4f66603f256d3f757b6dc3ea44802d4041d2a1901e06005028fd60b85a5878a2"
+      }
+    });
+
+    const serializedUni = nestedDescriptor.toBuffer().toString('hex'); // Serialize the request to a hex string
+
+    const newVdxfValue = new VdxfUniValue();
+
+    newVdxfValue.fromBuffer(Buffer.from(serializedUni, 'hex')); // Deserialize the request from the hex string
+
+    const nestedJson = nestedDescriptor.toJson();
+
+    const newJson = newVdxfValue.toJson();
+
+    expect(nestedJson).toStrictEqual(newJson);
+  });
+
+  test('deserialize nested datadescriptor array with partial hex to Json back to Object', () => {
+    const partial = VdxfUniValue.fromJson([{
+      "i4GC1YGEVD21afWudGoFJVdnfjJ5XWnCQv": {
+        "version": 1,
+        "flags": 32,
+        "objectdata": [
+          {
+            "i4GC1YGEVD21afWudGoFJVdnfjJ5XWnCQv": {
+              "version": 1,
+              "flags": 32,
+              "objectdata": "01",
+              "label": "version"
+            }
+          },
+          "08a2ebb2c55f83a8e2a426a01600a656d706c6f796d656e7404747970650a746578742f706c61696e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d012301600f436869656620446576656c6f706572057469746c650a746578742f706c61696e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d0157016044426f6479206f6620636c61696d20676f657320686572652c207768617420796f75206861766520646f6e652c207768617420796f7520686176652061636869657665642e04626f64790a746578742f706c61696e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d011d016009323032312d323032340564617465730a746578742f706c61696e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d011f01600a323032352d30312d3239066973737565640a746578742f706c61696e08a2ebb2c55f83a8e2a426a53320ed4d42124f4d015a016040373962343830376333303465383035333831666438653165376234383865353062363032613033333366663266663633636264313564363362366163383835650b7265666572656e636549440a746578742f706c61696"
+        ],
+        "label": "i3bgiLuaxTr6smF8q6xLG4jvvhF1mmrkM2"
+      }
+    }
+    ])
+
+    const serializedUni = partial.toBuffer().toString('hex'); // Serialize the request to a hex string
+
+    const newVdxfValue = new VdxfUniValue();
+
+    newVdxfValue.fromBuffer(Buffer.from(serializedUni, 'hex')); // Deserialize the request from the hex string
+
+    const nestedJson = partial.toJson();
+
+    const newJson = newVdxfValue.toJson();
+
+    expect(nestedJson).toStrictEqual(newJson);
+  });
 
   test('deserialize various vdxfunivalues', () => {
 
@@ -254,6 +321,7 @@ describe('Encodes and decodes VdxfUniValue', () => {
     const credentialdata = '6d7401412e7ee923567eb8ac2d9f0c7102c2fb090151010101f503c4f232c4599167a02357c25b75d5ad3ff0177b226e616d65223a2254657374204163636f756e74227d1a7b2261646472657373223a22546573742041646472657373227d074c6162656c2031'
     const credentialObject = new VdxfUniValue();
     credentialObject.fromBuffer(Buffer.from(credentialdata, 'hex'));
+
     expect(credentialObject.toJson()).toStrictEqual(jsonData[12]);
     expect(credentialObject.toBuffer().toString('hex')).toBe(credentialdata);
     expect(credentialdata).toBe(VdxfUniValue.fromJson(jsonData[12]).toBuffer().toString('hex'));
