@@ -129,8 +129,8 @@ RequestItem.CLAIM = new bn_js_1.BN(2);
 RequestItem.CREDENTIAL = new bn_js_1.BN(3);
 class RequestInformation {
     constructor(data) {
-        this.version = new bn_js_1.BN(data.version) || RequestInformation.DEFAULT_VERSION;
-        this.items = data.items || [];
+        this.version = (data === null || data === void 0 ? void 0 : data.version) ? new bn_js_1.BN(data.version) : RequestInformation.DEFAULT_VERSION;
+        this.items = (data === null || data === void 0 ? void 0 : data.items) || [];
     }
     isValid() {
         let valid = this.version.gte(RequestInformation.FIRST_VERSION) && this.version.lte(RequestInformation.LAST_VERSION);

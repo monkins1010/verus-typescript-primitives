@@ -182,8 +182,8 @@ export class RequestInformation implements SerializableEntity {
   items: RequestItem[];
   
   constructor(data: RequestInformation) {
-    this.version = new BN(data.version) || RequestInformation.DEFAULT_VERSION;
-    this.items = data.items || [];
+    this.version = data?.version ? new BN(data.version) : RequestInformation.DEFAULT_VERSION;
+    this.items = data?.items || [];
   }
 
   isValid(): boolean {
