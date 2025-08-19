@@ -14,10 +14,11 @@ class Decision extends __1.VDXFObject {
         request: new Request_1.Request(),
         created_at: 0,
     }, vdxfkey = __1.LOGIN_CONSENT_DECISION_VDXF_KEY.vdxfid) {
+        var _a;
         super(vdxfkey);
         this.decision_id = decision.decision_id;
         this.request = new Request_1.Request(decision.request);
-        this.context = decision.context;
+        this.context = new Context_1.Context(((_a = decision.context) === null || _a === void 0 ? void 0 : _a.kv) || {});
         this.created_at = decision.created_at;
         this.attestations = decision.attestations;
         this.salt = decision.salt;
