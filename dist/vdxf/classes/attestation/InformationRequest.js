@@ -11,13 +11,13 @@ var RequestedFormatFlags;
     RequestedFormatFlags[RequestedFormatFlags["FULL_DATA"] = 1] = "FULL_DATA";
     RequestedFormatFlags[RequestedFormatFlags["PARTIAL_DATA"] = 2] = "PARTIAL_DATA";
     RequestedFormatFlags[RequestedFormatFlags["COLLECTION"] = 4] = "COLLECTION"; // Multiple FULL_DATA only
-})(RequestedFormatFlags = exports.RequestedFormatFlags || (exports.RequestedFormatFlags = {}));
+})(RequestedFormatFlags || (exports.RequestedFormatFlags = RequestedFormatFlags = {}));
 var InformationType;
 (function (InformationType) {
     InformationType[InformationType["ATTESTATION"] = 1] = "ATTESTATION";
     InformationType[InformationType["CLAIM"] = 2] = "CLAIM";
     InformationType[InformationType["CREDENTIAL"] = 3] = "CREDENTIAL";
-})(InformationType = exports.InformationType || (exports.InformationType = {}));
+})(InformationType || (exports.InformationType = InformationType = {}));
 class RequestItem {
     constructor(json) {
         this.version = (json === null || json === void 0 ? void 0 : json.version) || RequestItem.DEFAULT_VERSION;

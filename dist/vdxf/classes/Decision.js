@@ -14,7 +14,6 @@ class Decision extends __1.VDXFObject {
         request: new Request_1.Request(),
         created_at: 0,
     }, vdxfkey = __1.LOGIN_CONSENT_DECISION_VDXF_KEY.vdxfid) {
-        var _a;
         super(vdxfkey);
         this.decision_id = decision.decision_id;
         this.request = new Request_1.Request(decision.request);

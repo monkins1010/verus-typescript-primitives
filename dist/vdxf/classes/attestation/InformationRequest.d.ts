@@ -1,10 +1,8 @@
-/// <reference types="bn.js" />
-/// <reference types="node" />
 import { BigNumber } from '../../../utils/types/BigNumber';
 import { SerializableEntity } from '../../../utils/types/SerializableEntity';
 export declare enum RequestedFormatFlags {
-    FULL_DATA = 1,
-    PARTIAL_DATA = 2,
+    FULL_DATA = 1,// Whole Credential
+    PARTIAL_DATA = 2,// Particular leaf + proof + signature
     COLLECTION = 4
 }
 export declare enum InformationType {
