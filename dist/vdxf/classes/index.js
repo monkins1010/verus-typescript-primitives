@@ -63,3 +63,4 @@ var PersonalProfile_1 = require("./PersonalProfile");
 Object.defineProperty(exports, "DataCategory", { enumerable: true, get: function () { return PersonalProfile_1.DataCategory; } });
 __exportStar(require("./attestation/InformationRequest"), exports);
 __exportStar(require("./attestation/AttestationDetails"), exports);
+__exportStar(require("./endorsement/Endorsement"), exports);

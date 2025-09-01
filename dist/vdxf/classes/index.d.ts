@@ -31,3 +31,4 @@ export { Context } from './Context';
 export { DataCategory } from './PersonalProfile';
 export * from './attestation/InformationRequest';
 export * from './attestation/AttestationDetails';
+export * from './endorsement/Endorsement';
