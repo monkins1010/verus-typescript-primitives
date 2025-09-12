@@ -314,7 +314,7 @@ export class DataDescriptor implements SerializableEntity {
 
     processedObject.fromBuffer(this.objectdata);
 
-    if (processedObject.values[0][""]) {
+    if (processedObject.values[0]?.[""]) {
 
       const keys = Object.keys(processedObject.values[0]);
       const values = Object.values(processedObject.values[0]);
