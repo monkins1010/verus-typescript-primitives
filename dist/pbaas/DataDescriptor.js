@@ -205,6 +205,7 @@ class DataDescriptor {
         return !!(this.version.gte(DataDescriptor.FIRST_VERSION) && this.version.lte(DataDescriptor.LAST_VERSION) && this.flags.and(DataDescriptor.FLAG_MASK.notn(DataDescriptor.FLAG_MASK.bitLength())));
     }
     toJson() {
+        var _a;
         const retval = {
             version: this.version.toNumber(),
             flags: this.flags.toNumber()
@@ -217,7 +218,7 @@ class DataDescriptor {
         }
         let processedObject = new _1.VdxfUniValue();
         processedObject.fromBuffer(this.objectdata);
-        if (processedObject.values[0][""]) {
+        if ((_a = processedObject.values[0]) === null || _a === void 0 ? void 0 : _a[""]) {
             const keys = Object.keys(processedObject.values[0]);
             const values = Object.values(processedObject.values[0]);
             if (isText && Buffer.isBuffer(values[0]) && keys[0] === "") {
