@@ -8,7 +8,9 @@ export declare enum RequestedFormatFlags {
 export declare enum InformationType {
     ATTESTATION = 1,
     CLAIM = 2,
-    CREDENTIAL = 3
+    CREDENTIAL = 3,
+    ENDORSEMENT = 4,
+    TICKET = 5
 }
 export interface RequestItemJson {
     version: number;

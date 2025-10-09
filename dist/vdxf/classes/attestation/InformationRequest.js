@@ -17,6 +17,8 @@ var InformationType;
     InformationType[InformationType["ATTESTATION"] = 1] = "ATTESTATION";
     InformationType[InformationType["CLAIM"] = 2] = "CLAIM";
     InformationType[InformationType["CREDENTIAL"] = 3] = "CREDENTIAL";
+    InformationType[InformationType["ENDORSEMENT"] = 4] = "ENDORSEMENT";
+    InformationType[InformationType["TICKET"] = 5] = "TICKET";
 })(InformationType || (exports.InformationType = InformationType = {}));
 class RequestItem {
     constructor(json) {
