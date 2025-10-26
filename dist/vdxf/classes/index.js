@@ -14,7 +14,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DataCategory = exports.Context = exports.ProvisioningTxid = exports.Attestation = exports.AltAuthFactor = exports.Audience = exports.RequestedPermission = exports.ProvisioningInfo = exports.Subject = exports.RedirectUri = exports.Hash160 = exports.LoginConsentProvisioningResult = exports.LoginConsentProvisioningDecision = exports.LoginConsentProvisioningResponse = exports.LoginConsentProvisioningChallenge = exports.LoginConsentProvisioningRequest = exports.VerusPayInvoice = exports.VerusPayInvoiceDetails = exports.SignedSessionObjectData = exports.SignedSessionObject = exports.LoginConsentResponse = exports.LoginConsentRequest = exports.LoginConsentDecision = exports.LoginConsentChallenge = void 0;
+exports.VerifiableSignatureData = exports.DataCategory = exports.Context = exports.ProvisioningTxid = exports.Attestation = exports.AltAuthFactor = exports.Audience = exports.RequestedPermission = exports.ProvisioningInfo = exports.Subject = exports.RedirectUri = exports.Hash160 = exports.LoginConsentProvisioningResult = exports.LoginConsentProvisioningDecision = exports.LoginConsentProvisioningResponse = exports.LoginConsentProvisioningChallenge = exports.LoginConsentProvisioningRequest = exports.VerusPayInvoice = exports.VerusPayInvoiceDetails = exports.SignedSessionObjectData = exports.SignedSessionObject = exports.LoginConsentResponse = exports.LoginConsentRequest = exports.LoginConsentDecision = exports.LoginConsentChallenge = void 0;
 var Challenge_1 = require("./Challenge");
 Object.defineProperty(exports, "LoginConsentChallenge", { enumerable: true, get: function () { return Challenge_1.Challenge; } });
 var Decision_1 = require("./Decision");
@@ -68,3 +68,5 @@ __exportStar(require("./requestobjects/ProvisionIdentityDetails"), exports);
 __exportStar(require("./requestobjects/AppEncryptionRequestDetails"), exports);
 __exportStar(require("./requestobjects/PersonalUserDataDetails"), exports);
 __exportStar(require("./CompactIdAddressObject"), exports);
+var VerifiableSignatureData_1 = require("./VerifiableSignatureData");
+Object.defineProperty(exports, "VerifiableSignatureData", { enumerable: true, get: function () { return VerifiableSignatureData_1.VerifiableSignatureData; } });
