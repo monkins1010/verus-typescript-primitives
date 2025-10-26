@@ -10,13 +10,13 @@ import { BigNumber } from '../../utils/types/BigNumber';
 import { SerializableEntity } from '../../utils/types/SerializableEntity';
 export interface CompactIdAddressObjectJson {
     version: number;
-    flags: number;
+    type: number;
     address: string;
     rootsystemname: string;
 }
 export interface CompactIdAddressObjectInterface {
     version?: BigNumber;
-    flags?: BigNumber;
+    type?: number;
     address: string;
     rootSystemName?: string;
 }
@@ -25,10 +25,10 @@ export declare class CompactIdAddressObject implements SerializableEntity {
     static FIRST_VERSION: import("bn.js");
     static LAST_VERSION: import("bn.js");
     static DEFAULT_VERSION: import("bn.js");
-    static IS_FQN: import("bn.js");
-    static IS_IDENTITYID: import("bn.js");
+    static IS_FQN: number;
+    static IS_IDENTITYID: number;
     version: BigNumber;
-    flags: BigNumber;
+    type: number;
     address: string;
     rootSystemName: string;
     constructor(data?: CompactIdAddressObjectInterface);

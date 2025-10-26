@@ -18,7 +18,7 @@ class VerifiableSignatureData {
     constructor(data) {
         this.version = data && data.flags ? data.flags : new bn_js_1.BN(0);
         this.flags = data && data.flags ? data.flags : new bn_js_1.BN(0);
-        this.systemId = data && data.systemId ? data.systemId : new CompactIdAddressObject_1.CompactIdAddressObject({ flags: CompactIdAddressObject_1.CompactIdAddressObject.IS_FQN, address: pbaas_1.DEFAULT_VERUS_CHAINNAME });
+        this.systemId = data && data.systemId ? data.systemId : new CompactIdAddressObject_1.CompactIdAddressObject({ type: CompactIdAddressObject_1.CompactIdAddressObject.IS_FQN, address: pbaas_1.DEFAULT_VERUS_CHAINNAME });
         this.hashType = data && data.hashType ? data.hashType : pbaas_1.HASH_TYPE_SHA256;
         this.identityId = data ? data.identityId : undefined;
         this.vdxfKeys = data ? data.vdxfKeys : undefined;
@@ -193,7 +193,35 @@ class VerifiableSignatureData {
         });
     }
     toJson() {
-        return {};
+        var _a, _b;
+        this.setFlags();
+        return {
+            version: this.version.toNumber(),
+            flags: this.flags.toNumber(),
+            hashtype: this.hashType.toNumber(),
+            systemid: this.systemId.toJson(),
+            identityid: this.identityId.toJson(),
+            vdxfkeys: this.vdxfKeys,
+            vdxfkeynames: this.vdxfKeyNames,
+            boundhashes: (_a = this.boundHashes) === null || _a === void 0 ? void 0 : _a.map(x => x.toString('hex')),
+            statements: (_b = this.statements) === null || _b === void 0 ? void 0 : _b.map(x => x.toString('hex')),
+            signature: this.signatureAsVch.toString('hex')
+        };
+    }
+    static fromJson(json) {
+        var _a, _b;
+        const instance = new VerifiableSignatureData();
+        instance.version = new bn_js_1.BN(json.version);
+        instance.flags = new bn_js_1.BN(json.flags);
+        instance.hashType = new bn_js_1.BN(json.hashtype);
+        instance.systemId = CompactIdAddressObject_1.CompactIdAddressObject.fromJson(json.systemid);
+        instance.identityId = CompactIdAddressObject_1.CompactIdAddressObject.fromJson(json.identityid);
+        instance.vdxfKeys = json === null || json === void 0 ? void 0 : json.vdxfkeys;
+        instance.vdxfKeyNames = json === null || json === void 0 ? void 0 : json.vdxfkeynames;
+        instance.boundHashes = (_a = json.boundhashes) === null || _a === void 0 ? void 0 : _a.map(x => Buffer.from(x, 'hex'));
+        instance.statements = (_b = json.statements) === null || _b === void 0 ? void 0 : _b.map(x => Buffer.from(x, 'hex'));
+        instance.signatureAsVch = Buffer.from(json.signature, 'hex');
+        return instance;
     }
 }
 exports.VerifiableSignatureData = VerifiableSignatureData;

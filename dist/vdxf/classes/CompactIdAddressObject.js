@@ -19,15 +19,15 @@ const vdxf_1 = require("../../constants/vdxf");
 class CompactIdAddressObject {
     constructor(data) {
         this.version = (data === null || data === void 0 ? void 0 : data.version) || new bn_js_1.BN(CompactIdAddressObject.DEFAULT_VERSION);
-        this.flags = (data === null || data === void 0 ? void 0 : data.flags) || new bn_js_1.BN(0);
+        this.type = (data === null || data === void 0 ? void 0 : data.type) || 0;
         this.address = (data === null || data === void 0 ? void 0 : data.address) || '';
         this.rootSystemName = (data === null || data === void 0 ? void 0 : data.rootSystemName) || 'VRSC';
     }
     isFQN() {
-        return (this.flags.and(CompactIdAddressObject.IS_FQN).eq(CompactIdAddressObject.IS_FQN));
+        return (this.type === CompactIdAddressObject.IS_FQN);
     }
     isIaddress() {
-        return (this.flags.and(CompactIdAddressObject.IS_IDENTITYID).eq(CompactIdAddressObject.IS_IDENTITYID));
+        return (this.type === CompactIdAddressObject.IS_IDENTITYID);
     }
     isValid() {
         return this.address != null && this.address.length > 0 && (this.isFQN() || this.isIaddress());
@@ -44,7 +44,7 @@ class CompactIdAddressObject {
     static fromIAddress(iaddr) {
         return new CompactIdAddressObject({
             address: iaddr,
-            flags: CompactIdAddressObject.IS_IDENTITYID
+            type: CompactIdAddressObject.IS_IDENTITYID
         });
     }
     setAddressTransferType() {
@@ -56,18 +56,19 @@ class CompactIdAddressObject {
         }
         if (this.isFQN()) {
             if (this.address.length > 20) {
-                this.flags = CompactIdAddressObject.IS_IDENTITYID;
+                this.type = CompactIdAddressObject.IS_IDENTITYID;
                 this.address = (0, address_1.toIAddress)(this.address, this.rootSystemName);
             }
             else {
-                this.flags = CompactIdAddressObject.IS_FQN;
+                this.type = CompactIdAddressObject.IS_FQN;
             }
         }
     }
     getByteLength() {
         this.setAddressTransferType();
         let length = 0;
-        length += varint_1.default.encodingLength(this.flags);
+        length += varint_1.default.encodingLength(this.version);
+        length += varuint_1.default.encodingLength(this.type);
         if (this.isIaddress()) {
             length += 20; // identityuint160
         }
@@ -79,7 +80,8 @@ class CompactIdAddressObject {
     }
     toBuffer() {
         const writer = new BufferWriter(Buffer.alloc(this.getByteLength()));
-        writer.writeVarInt(this.flags);
+        writer.writeVarInt(this.version);
+        writer.writeCompactSize(this.type);
         if (this.isIaddress()) {
             writer.writeSlice((0, address_1.fromBase58Check)(this.address).hash);
         }
@@ -90,7 +92,8 @@ class CompactIdAddressObject {
     }
     fromBuffer(buffer, offset) {
         const reader = new BufferReader(buffer, offset);
-        this.flags = reader.readVarInt();
+        this.version = reader.readVarInt();
+        this.type = reader.readCompactSize();
         if (this.isIaddress()) {
             this.address = (0, address_1.toBase58Check)(reader.readSlice(20), vdxf_1.I_ADDR_VERSION);
         }
@@ -103,7 +106,7 @@ class CompactIdAddressObject {
         this.setAddressTransferType();
         return {
             version: this.version.toNumber(),
-            flags: this.flags.toNumber(),
+            flags: this.type,
             address: this.address,
             rootsystemname: this.rootSystemName,
         };
@@ -111,7 +114,7 @@ class CompactIdAddressObject {
     static fromJson(json) {
         const instance = new CompactIdAddressObject();
         instance.version = new bn_js_1.BN(json.version);
-        instance.flags = new bn_js_1.BN(json.flags);
+        instance.type = json.type;
         instance.address = json.address;
         instance.rootSystemName = json.rootsystemname;
         return instance;
@@ -122,5 +125,5 @@ CompactIdAddressObject.VERSION_INVALID = new bn_js_1.BN(0);
 CompactIdAddressObject.FIRST_VERSION = new bn_js_1.BN(1);
 CompactIdAddressObject.LAST_VERSION = new bn_js_1.BN(1);
 CompactIdAddressObject.DEFAULT_VERSION = new bn_js_1.BN(1);
-CompactIdAddressObject.IS_FQN = new bn_js_1.BN(1);
-CompactIdAddressObject.IS_IDENTITYID = new bn_js_1.BN(2);
+CompactIdAddressObject.IS_FQN = 1;
+CompactIdAddressObject.IS_IDENTITYID = 2;

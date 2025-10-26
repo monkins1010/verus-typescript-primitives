@@ -11,6 +11,7 @@ export interface SignatureJsonDataInterface {
     vdxfkeys?: Array<string>;
     vdxfkeynames?: Array<string>;
     boundhashes?: Array<string>;
+    statements?: Array<string>;
     signature: string;
 }
 export interface VerifiableSignatureDataInterface {
@@ -63,5 +64,17 @@ export declare class VerifiableSignatureData implements SerializableEntity {
     fromBuffer(buffer: Buffer, offset?: number): number;
     getIdentityHash(height: number, sigHash: Buffer): Buffer<ArrayBufferLike>;
     toSignatureData(sigHash: Buffer): SignatureData;
-    toJson(): {};
+    toJson(): {
+        version: number;
+        flags: number;
+        hashtype: number;
+        systemid: any;
+        identityid: any;
+        vdxfkeys: string[];
+        vdxfkeynames: string[];
+        boundhashes: string[];
+        statements: string[];
+        signature: string;
+    };
+    static fromJson(json: SignatureJsonDataInterface): VerifiableSignatureData;
 }

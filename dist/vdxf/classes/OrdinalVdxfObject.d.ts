@@ -2,6 +2,7 @@ import { BigNumber } from "../../utils/types/BigNumber";
 import { SerializableDataEntity, SerializableEntity } from "../../utils/types/SerializableEntity";
 import { DataDescriptor, DataDescriptorJson } from "../../pbaas";
 import { VerusPayInvoiceDetails, VerusPayInvoiceDetailsJson } from "./payment/VerusPayInvoiceDetails";
+import { LoginRequestDetails, LoginRequestDetailsJson } from "../..";
 export interface OrdinalVdxfObjectInterfaceTemplate<T> {
     version?: BigNumber;
     type?: BigNumber;
@@ -14,8 +15,8 @@ export type OrdinalVdxfObjectJsonTemplate<T> = {
     vdxfkey?: string;
     data?: T;
 };
-export type OrdinalVdxfObjectReservedData = DataDescriptor | VerusPayInvoiceDetails;
-export type OrdinalVdxfObjectReservedDataJson = DataDescriptorJson | VerusPayInvoiceDetailsJson;
+export type OrdinalVdxfObjectReservedData = DataDescriptor | VerusPayInvoiceDetails | LoginRequestDetails;
+export type OrdinalVdxfObjectReservedDataJson = DataDescriptorJson | VerusPayInvoiceDetailsJson | LoginRequestDetailsJson;
 export type BufferOrOrdinalVdxfObjectReservedData = Buffer | OrdinalVdxfObjectReservedData;
 export type StringOrOrdinalVdxfObjectReservedDataJson = string | OrdinalVdxfObjectReservedDataJson;
 export type OrdinalVdxfObjectInterface = OrdinalVdxfObjectInterfaceTemplate<BufferOrOrdinalVdxfObjectReservedData>;
@@ -34,6 +35,7 @@ export declare class OrdinalVdxfObject implements SerializableEntity {
     static VERSION_CURRENT: import("bn.js");
     static ORDINAL_DATA_DESCRIPTOR: import("bn.js");
     static ORDINAL_VERUSPAY_INVOICE: import("bn.js");
+    static ORDINAL_LOGIN_REQUEST_DETAILS: import("bn.js");
     static VDXF_OBJECT_RESERVED_BYTE_I_ADDR: import("bn.js");
     static VDXF_OBJECT_RESERVED_BYTE_VDXF_ID_STRING: import("bn.js");
     static VDXF_OBJECT_RESERVED_BYTE_ID_OR_CURRENCY: import("bn.js");
@@ -81,4 +83,9 @@ export declare class VerusPayInvoiceOrdinalVdxfObject extends SerializableEntity
     data: VerusPayInvoiceDetails;
     constructor(request?: OrdinalVdxfObjectInterfaceTemplate<VerusPayInvoiceDetails>);
     static fromJson(details: OrdinalVdxfObjectJsonTemplate<VerusPayInvoiceDetailsJson>): VerusPayInvoiceOrdinalVdxfObject;
+}
+export declare class LoginRequestDetailsOrdinalVdxfObject extends SerializableEntityOrdinalVdxfObject implements SerializableDataEntity {
+    data: LoginRequestDetails;
+    constructor(request?: OrdinalVdxfObjectInterfaceTemplate<LoginRequestDetails>);
+    static fromJson(details: OrdinalVdxfObjectJsonTemplate<LoginRequestDetailsJson>): LoginRequestDetailsOrdinalVdxfObject;
 }
