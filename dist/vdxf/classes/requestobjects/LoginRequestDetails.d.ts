@@ -66,11 +66,11 @@ export declare class LoginRequestDetails implements SerializableEntity {
     static REQUIRED_PARENT: number;
     static TYPE_WEBHOOK: number;
     static TYPE_REDIRECT: number;
-    static TYPE_DEEPLINK: number;
     constructor(request?: LoginRequestDetailsInterface);
     hasPermissions(): boolean;
     hascallbackUris(): boolean;
     hasExpiryTime(): boolean;
+    calcFlags(): BigNumber;
     getByteLength(): number;
     toBuffer(): Buffer;
     fromBuffer(buffer: Buffer, offset?: number): number;
@@ -80,7 +80,7 @@ export declare class LoginRequestDetails implements SerializableEntity {
         requestid: string;
         permissions: {
             type: number;
-            identity: any;
+            identity: CompactIdAddressObjectJson;
         }[];
         callbackUris: callbackUris[];
         expirytime: number;

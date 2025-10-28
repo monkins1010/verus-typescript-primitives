@@ -27,6 +27,7 @@ class ProvisionIdentityDetails {
         this.systemId = data === null || data === void 0 ? void 0 : data.systemId;
         this.parentId = data === null || data === void 0 ? void 0 : data.parentId;
         this.identityId = data === null || data === void 0 ? void 0 : data.identityId;
+        this.setFlags();
     }
     hasSystemId() {
         return this.flags.and(ProvisionIdentityDetails.FLAG_HAS_SYSTEMID).eq(ProvisionIdentityDetails.FLAG_HAS_SYSTEMID);
@@ -38,7 +39,6 @@ class ProvisionIdentityDetails {
         return this.flags.and(ProvisionIdentityDetails.FLAG_IS_A_DEFINED_NAME_TO_PROVISION).eq(ProvisionIdentityDetails.FLAG_IS_A_DEFINED_NAME_TO_PROVISION);
     }
     getByteLength() {
-        this.setFlags();
         let length = 0;
         length += varuint_1.default.encodingLength(this.flags.toNumber());
         if (this.hasSystemId()) {
@@ -89,10 +89,10 @@ class ProvisionIdentityDetails {
         return reader.offset;
     }
     toJson() {
-        this.setFlags();
+        const flags = this.calcFlags();
         return {
             version: this.version.toNumber(),
-            flags: this.flags.toNumber(),
+            flags: flags.toNumber(),
             systemid: this.systemId ? this.systemId.toJson() : null,
             parentid: this.parentId ? this.parentId.toJson() : null,
             identityid: this.identityId ? this.identityId.toJson() : null,
@@ -113,17 +113,21 @@ class ProvisionIdentityDetails {
         }
         return provision;
     }
-    setFlags() {
-        this.flags = new bn_js_1.BN(0, 10);
+    calcFlags() {
+        let flags = new bn_js_1.BN(0, 10);
         if (this.systemId) {
-            this.flags = this.flags.or(ProvisionIdentityDetails.FLAG_HAS_SYSTEMID);
+            flags = flags.or(ProvisionIdentityDetails.FLAG_HAS_SYSTEMID);
         }
         if (this.parentId) {
-            this.flags = this.flags.or(ProvisionIdentityDetails.FLAG_HAS_PARENTID);
+            flags = flags.or(ProvisionIdentityDetails.FLAG_HAS_PARENTID);
         }
         if (this.identityId) {
-            this.flags = this.flags.or(ProvisionIdentityDetails.FLAG_IS_A_DEFINED_NAME_TO_PROVISION);
+            flags = flags.or(ProvisionIdentityDetails.FLAG_IS_A_DEFINED_NAME_TO_PROVISION);
         }
+        return flags;
+    }
+    setFlags() {
+        this.flags = this.calcFlags();
     }
     isValid() {
         let valid = this.flags != null && this.flags.gte(new bn_js_1.BN(0));

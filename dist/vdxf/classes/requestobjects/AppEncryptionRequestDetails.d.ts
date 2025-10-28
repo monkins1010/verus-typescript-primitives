@@ -13,7 +13,7 @@
  */
 import { BigNumber } from '../../../utils/types/BigNumber';
 import { SerializableEntity } from '../../../utils/types/SerializableEntity';
-import { CompactIdAddressObject } from '../CompactIdAddressObject';
+import { CompactIdAddressObject, CompactIdAddressObjectJson } from '../CompactIdAddressObject';
 export interface AppEncryptionRequestDetailsInterface {
     version?: BigNumber;
     flags: BigNumber;
@@ -29,8 +29,8 @@ export interface AppEncryptionRequestDetailsJson {
     encrypttozaddress: string;
     derivationnumber: number;
     secondaryderivationnumber?: number;
-    fromaddress?: string;
-    toaddress?: string;
+    fromaddress?: CompactIdAddressObjectJson;
+    toaddress?: CompactIdAddressObjectJson;
 }
 /**
  * Checks if a string is a valid hexadecimal address
@@ -65,6 +65,7 @@ export declare class AppEncryptionRequestDetails implements SerializableEntity {
     toAddress?: CompactIdAddressObject;
     constructor(data?: AppEncryptionRequestDetailsInterface);
     setFlags(): void;
+    calcFlags(): BigNumber;
     isValid(): boolean;
     hasSecondarySeedDerivation(): boolean;
     hasFromAddress(): boolean;

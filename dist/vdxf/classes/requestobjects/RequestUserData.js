@@ -34,18 +34,20 @@ class RequestUserData {
         this.searchDataKey = (data === null || data === void 0 ? void 0 : data.searchDataKey) || [];
         this.signer = data === null || data === void 0 ? void 0 : data.signer;
         this.requestedKeys = data === null || data === void 0 ? void 0 : data.requestedKeys;
+        this.setFlags();
     }
-    setFlags() {
-        // Initialize flags if not already a BigNumber
-        if (!bn_js_1.BN.isBN(this.flags)) {
-            this.flags = new bn_js_1.BN(0);
-        }
+    calcFlags() {
+        let flags = new bn_js_1.BN(0);
         if (this.requestedKeys && this.requestedKeys.length > 0) {
-            this.flags = this.flags.or(RequestUserData.HAS_REQUESTED_KEYS);
+            flags = flags.or(RequestUserData.HAS_REQUESTED_KEYS);
         }
         if (this.signer) {
-            this.flags = this.flags.or(RequestUserData.HAS_SIGNER);
+            flags = flags.or(RequestUserData.HAS_SIGNER);
         }
+        return flags;
+    }
+    setFlags() {
+        this.flags = this.calcFlags();
     }
     hasSigner() {
         return this.flags.and(RequestUserData.HAS_SIGNER).eq(RequestUserData.HAS_SIGNER);
@@ -84,7 +86,6 @@ class RequestUserData {
         return valid;
     }
     getByteLength() {
-        this.setFlags();
         let length = 0;
         length += varuint_1.default.encodingLength(this.flags.toNumber());
         length += varuint_1.default.encodingLength(this.searchDataKey.length);
@@ -109,8 +110,6 @@ class RequestUserData {
         return length;
     }
     toBuffer() {
-        // Set flags before serialization
-        this.setFlags();
         const writer = new BufferWriter(Buffer.alloc(this.getByteLength()));
         writer.writeCompactSize(this.flags.toNumber());
         writer.writeCompactSize(this.searchDataKey.length);
@@ -160,11 +159,10 @@ class RequestUserData {
         return reader.offset;
     }
     toJson() {
-        // Set flags before serialization
-        this.setFlags();
+        const flags = this.calcFlags();
         return {
             version: this.version.toNumber(),
-            flags: this.flags.toNumber(),
+            flags: flags.toNumber(),
             searchdatakey: this.searchDataKey,
             signer: this.signer.toJson(),
             requestedkeys: this.requestedKeys

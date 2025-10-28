@@ -60,6 +60,7 @@ export declare class RequestUserData implements SerializableEntity {
     signer?: CompactIdAddressObject;
     requestedKeys?: string[];
     constructor(data?: RequestUserDataInterface);
+    calcFlags(): BigNumber;
     setFlags(): void;
     hasSigner(): boolean;
     hasRequestedKeys(): boolean;

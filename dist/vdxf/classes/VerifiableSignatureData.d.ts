@@ -1,13 +1,13 @@
 import { BigNumber } from '../../utils/types/BigNumber';
 import { SerializableEntity } from '../../utils/types/SerializableEntity';
-import { CompactIdAddressObject } from './CompactIdAddressObject';
+import { CompactIdAddressObject, CompactIdAddressObjectJson } from './CompactIdAddressObject';
 import { SignatureData } from '../../pbaas';
 export interface SignatureJsonDataInterface {
     version: number;
     flags: number;
     hashtype: number;
-    systemid: string;
-    identityid: string;
+    systemid: CompactIdAddressObjectJson;
+    identityid: CompactIdAddressObjectJson;
     vdxfkeys?: Array<string>;
     vdxfkeynames?: Array<string>;
     boundhashes?: Array<string>;
@@ -64,17 +64,6 @@ export declare class VerifiableSignatureData implements SerializableEntity {
     fromBuffer(buffer: Buffer, offset?: number): number;
     getIdentityHash(height: number, sigHash: Buffer): Buffer<ArrayBufferLike>;
     toSignatureData(sigHash: Buffer): SignatureData;
-    toJson(): {
-        version: number;
-        flags: number;
-        hashtype: number;
-        systemid: any;
-        identityid: any;
-        vdxfkeys: string[];
-        vdxfkeynames: string[];
-        boundhashes: string[];
-        statements: string[];
-        signature: string;
-    };
+    toJson(): SignatureJsonDataInterface;
     static fromJson(json: SignatureJsonDataInterface): VerifiableSignatureData;
 }

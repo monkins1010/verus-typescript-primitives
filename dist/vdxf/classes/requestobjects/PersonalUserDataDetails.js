@@ -30,18 +30,20 @@ class PersonalUserDataDetails {
         this.signableObjects = (data === null || data === void 0 ? void 0 : data.signableObjects) || [];
         this.statements = (data === null || data === void 0 ? void 0 : data.statements) || [];
         this.signature = (data === null || data === void 0 ? void 0 : data.signature) || undefined;
+        this.setFlags();
     }
     setFlags() {
-        // Initialize flags if not already a BigNumber
-        if (!bn_js_1.BN.isBN(this.flags)) {
-            this.flags = new bn_js_1.BN(0);
-        }
+        this.flags = this.calcFlags();
+    }
+    calcFlags() {
+        let flags = new bn_js_1.BN(0);
         if (this.statements && this.statements.length > 0) {
-            this.flags = this.flags.or(PersonalUserDataDetails.HAS_STATEMENTS);
+            flags = flags.or(PersonalUserDataDetails.HAS_STATEMENTS);
         }
         if (this.signature) {
-            this.flags = this.flags.or(PersonalUserDataDetails.HAS_SIGNATURE);
+            flags = flags.or(PersonalUserDataDetails.HAS_SIGNATURE);
         }
+        return flags;
     }
     hasStatements() {
         return this.flags.and(PersonalUserDataDetails.HAS_STATEMENTS).eq(PersonalUserDataDetails.HAS_STATEMENTS);
@@ -63,7 +65,6 @@ class PersonalUserDataDetails {
         return valid;
     }
     getByteLength() {
-        this.setFlags();
         let length = 0;
         length += varuint_1.default.encodingLength(this.flags.toNumber());
         // Add length for signableObjects array
@@ -85,7 +86,6 @@ class PersonalUserDataDetails {
         return length;
     }
     toBuffer() {
-        this.setFlags();
         const writer = new BufferWriter(Buffer.alloc(this.getByteLength()));
         writer.writeCompactSize(this.flags.toNumber());
         // Write signableObjects array
@@ -133,10 +133,10 @@ class PersonalUserDataDetails {
         return reader.offset;
     }
     toJson() {
-        this.setFlags();
+        const flags = this.calcFlags();
         return {
             version: this.version.toNumber(),
-            flags: this.flags.toNumber(),
+            flags: flags.toNumber(),
             signableobjects: this.signableObjects.map(obj => obj.toJson()),
             statements: this.statements,
             signature: this.signature ? this.signature.toJson() : undefined

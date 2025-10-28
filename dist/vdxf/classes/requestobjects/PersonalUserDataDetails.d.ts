@@ -49,6 +49,7 @@ export declare class PersonalUserDataDetails implements SerializableEntity {
     signature?: VerifiableSignatureData;
     constructor(data?: PersonalUserDataDetailsInterface);
     setFlags(): void;
+    calcFlags(): BigNumber;
     hasStatements(): boolean;
     hasSignature(): boolean;
     isValid(): boolean;

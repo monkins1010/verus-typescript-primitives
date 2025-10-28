@@ -46,18 +46,23 @@ class AppEncryptionRequestDetails {
         this.secondaryDerivationNumber = data === null || data === void 0 ? void 0 : data.secondaryDerivationNumber;
         this.fromAddress = data === null || data === void 0 ? void 0 : data.fromAddress;
         this.toAddress = data === null || data === void 0 ? void 0 : data.toAddress;
+        this.setFlags();
     }
     setFlags() {
-        this.flags = new bn_js_1.BN(0);
+        this.flags = this.calcFlags();
+    }
+    calcFlags() {
+        let flags = new bn_js_1.BN(0);
         if (this.secondaryDerivationNumber != null) {
-            this.flags = this.flags.or(AppEncryptionRequestDetails.HAS_SECONDARY_SEED_DERIVATION_NUMBER);
+            flags = flags.or(AppEncryptionRequestDetails.HAS_SECONDARY_SEED_DERIVATION_NUMBER);
         }
         if (this.fromAddress != null) {
-            this.flags = this.flags.or(AppEncryptionRequestDetails.HAS_FROM_ADDRESS);
+            flags = flags.or(AppEncryptionRequestDetails.HAS_FROM_ADDRESS);
         }
         if (this.toAddress != null) {
-            this.flags = this.flags.or(AppEncryptionRequestDetails.HAS_TO_ADDRESS);
+            flags = flags.or(AppEncryptionRequestDetails.HAS_TO_ADDRESS);
         }
+        return flags;
     }
     isValid() {
         let valid = this.encryptToZAddress != null && this.encryptToZAddress.length > 0;
@@ -92,8 +97,6 @@ class AppEncryptionRequestDetails {
         return length;
     }
     toBuffer() {
-        // Set flags before serialization
-        this.setFlags();
         const writer = new BufferWriter(Buffer.alloc(this.getByteLength()));
         // Write flags
         writer.writeCompactSize(this.flags.toNumber());
@@ -142,10 +145,10 @@ class AppEncryptionRequestDetails {
     toJson() {
         var _a;
         // Set flags before serialization
-        this.setFlags();
+        const flags = this.calcFlags();
         return {
             version: this.version.toNumber(),
-            flags: this.flags.toNumber(),
+            flags: flags.toNumber(),
             encrypttozaddress: this.encryptToZAddress,
             derivationnumber: this.derivationNumber.toNumber(),
             secondaryderivationnumber: (_a = this.secondaryDerivationNumber) === null || _a === void 0 ? void 0 : _a.toNumber(),

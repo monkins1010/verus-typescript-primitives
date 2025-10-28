@@ -30,6 +30,7 @@ class LoginRequestDetails {
         this.permissions = (request === null || request === void 0 ? void 0 : request.permissions) || null;
         this.callbackUris = (request === null || request === void 0 ? void 0 : request.callbackUris) || null;
         this.expiryTime = (request === null || request === void 0 ? void 0 : request.expiryTime) || null;
+        this.setFlags();
     }
     hasPermissions() {
         return this.flags.and(LoginRequestDetails.FLAG_HAS_PERMISSIONS).eq(LoginRequestDetails.FLAG_HAS_PERMISSIONS);
@@ -40,8 +41,20 @@ class LoginRequestDetails {
     hasExpiryTime() {
         return this.flags.and(LoginRequestDetails.FLAG_HAS_EXPIRY_TIME).eq(LoginRequestDetails.FLAG_HAS_EXPIRY_TIME);
     }
+    calcFlags() {
+        let flags = new bn_js_1.BN(0, 10);
+        if (this.permissions) {
+            flags = flags.or(LoginRequestDetails.FLAG_HAS_PERMISSIONS);
+        }
+        if (this.callbackUris) {
+            flags = flags.or(LoginRequestDetails.FLAG_HAS_CALLBACK_URI);
+        }
+        if (this.expiryTime) {
+            flags = flags.or(LoginRequestDetails.FLAG_HAS_EXPIRY_TIME);
+        }
+        return flags;
+    }
     getByteLength() {
-        this.setFlags(); // Ensure flags are set correctly for length calculation
         let length = 0;
         length += varuint_1.default.encodingLength(this.flags.toNumber());
         length += 20; // requestId hash length
@@ -122,10 +135,10 @@ class LoginRequestDetails {
         return reader.offset;
     }
     toJson() {
-        this.setFlags();
+        const flags = this.calcFlags();
         const retval = {
             version: this.version.toNumber(),
-            flags: this.flags.toNumber(),
+            flags: flags.toNumber(),
             requestid: this.requestId,
             permissions: this.permissions ? this.permissions.map(p => ({ type: p.type,
                 identity: p.identity.toJson() })) : undefined,
@@ -153,16 +166,7 @@ class LoginRequestDetails {
         return loginDetails;
     }
     setFlags() {
-        this.flags = new bn_js_1.BN(0, 10);
-        if (this.permissions) {
-            this.flags = this.flags.or(LoginRequestDetails.FLAG_HAS_PERMISSIONS);
-        }
-        if (this.callbackUris) {
-            this.flags = this.flags.or(LoginRequestDetails.FLAG_HAS_CALLBACK_URI);
-        }
-        if (this.expiryTime) {
-            this.flags = this.flags.or(LoginRequestDetails.FLAG_HAS_EXPIRY_TIME);
-        }
+        this.flags = this.calcFlags();
     }
     isValid() {
         let valid = this.requestId != null && this.requestId.length > 0;
@@ -200,11 +204,10 @@ LoginRequestDetails.VERSION_LASTVALID = new bn_js_1.BN(1, 10);
 LoginRequestDetails.FLAG_HAS_PERMISSIONS = new bn_js_1.BN(1, 10);
 LoginRequestDetails.FLAG_HAS_CALLBACK_URI = new bn_js_1.BN(2, 10);
 LoginRequestDetails.FLAG_HAS_EXPIRY_TIME = new bn_js_1.BN(4, 10);
-// Permission Types
+// Permission Types - What types of Identity can login, e.g. REQUIRED_SYSTEM and "VRSC" means only identities on the Verus chain can login
 LoginRequestDetails.REQUIRED_ID = 1;
 LoginRequestDetails.REQUIRED_SYSTEM = 2;
 LoginRequestDetails.REQUIRED_PARENT = 3;
 // Callback URI Types
 LoginRequestDetails.TYPE_WEBHOOK = 1;
 LoginRequestDetails.TYPE_REDIRECT = 2;
-LoginRequestDetails.TYPE_DEEPLINK = 3;
