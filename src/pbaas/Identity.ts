@@ -10,7 +10,6 @@ import { SaplingPaymentAddress } from './SaplingPaymentAddress';
 import { ContentMultiMap, ContentMultiMapJson } from './ContentMultiMap';
 import { SerializableEntity } from '../utils/types/SerializableEntity';
 import { KeyID } from './KeyID';
-import { PartialSignDataCLIJson } from './PartialSignData';
 
 export const IDENTITY_VERSION_VAULT = new BN(2, 10);
 export const IDENTITY_VERSION_PBAAS = new BN(3, 10);
@@ -425,7 +424,7 @@ export class Identity extends Principal implements SerializableEntity {
       unlockAfter = IDENTITY_MAX_UNLOCK_DELAY;
     }
 
-    this.flags = this.flags.xor(IDENTITY_FLAG_LOCKED);
+    this.flags = this.flags.or(IDENTITY_FLAG_LOCKED);
     this.unlock_after = unlockAfter;
   }
 
@@ -446,7 +445,7 @@ export class Identity extends Principal implements SerializableEntity {
   }
 
   revoke() {
-    this.flags = this.flags.xor(IDENTITY_FLAG_REVOKED);
+    this.flags = this.flags.or(IDENTITY_FLAG_REVOKED);
     this.unlock();
   }
 

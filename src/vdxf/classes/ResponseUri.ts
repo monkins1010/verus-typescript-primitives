@@ -17,6 +17,8 @@ export class ResponseUri implements SerializableEntity {
   static TYPE_INVALID = new BN(0, 10);
   static TYPE_REDIRECT = new BN(1, 10);
   static TYPE_POST = new BN(2, 10);
+  // TODO: Add TYPE_Z_ADDR_REF where response is encrypted and sent to encoded sapling address, 
+  // with optional amount specified
 
   constructor(data?: {
     uri?: Buffer,
@@ -44,7 +46,7 @@ export class ResponseUri implements SerializableEntity {
   getByteLength(): number {
     let length = 0;
     
-    length += varint.encodingLength(this.type);
+    length += varuint.encodingLength(this.type.toNumber());
 
     let uriBufLen = this.uri.length;
 
@@ -57,7 +59,7 @@ export class ResponseUri implements SerializableEntity {
   toBuffer(): Buffer {
     const writer = new bufferutils.BufferWriter(Buffer.alloc(this.getByteLength()));
 
-    writer.writeVarInt(this.type);
+    writer.writeCompactSize(this.type.toNumber());
     
     writer.writeVarSlice(this.uri);
 
@@ -67,7 +69,7 @@ export class ResponseUri implements SerializableEntity {
   fromBuffer(buffer: Buffer, offset?: number): number {
     const reader = new bufferutils.BufferReader(buffer, offset);
 
-    this.type = reader.readVarInt();
+    this.type = new BN(reader.readCompactSize());
 
     this.uri = reader.readVarSlice();
 
