@@ -66,8 +66,6 @@ export const IDENTITY_UPDATE_RESPONSE_VDXF_KEY: VDXFKeyInterface = {
   "qualifiedname": {
     "name": "vrsc::identity.update.response",
     "namespace": "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV"
-    "name": "vrsc::identity.update.response",
-    "namespace": "i5w5MuNik5NtLcYmNzcvaoixooEebB6MGV"
   },
   "vdxfid": "i5KAWdaX2hHbcFhjWpBLtKNjtcHdeQFjuX"
 };
