@@ -80,3 +80,6 @@ export declare const LOGIN_REQUEST_DETAILS_VDXF_KEY: VDXFKeyInterface;
 export declare const LOGIN_RESPONSE_DETAILS_VDXF_KEY: VDXFKeyInterface;
 export declare const PROVISION_IDENTITY_DETAILS_VDXF_KEY: VDXFKeyInterface;
 export declare const APP_ENCRYPTION_REQUEST_DETAILS_VDXF_KEY: VDXFKeyInterface;
+export declare const DATA_DESCRIPTOR_RESPONSE_VDXF_KEY: VDXFKeyInterface;
+export declare const USER_DATA_REQUEST_DETAILS_VDXF_KEY: VDXFKeyInterface;
+export declare const USER_SPECIFIC_DATA_PACKET_VDXF_KEY: VDXFKeyInterface;

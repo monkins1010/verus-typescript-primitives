@@ -26,4 +26,7 @@ __exportStar(require("./LoginRequestDetailsOrdinalVdxfObject"), exports);
 __exportStar(require("./LoginResponseDetailsOrdinalVdxfObject"), exports);
 __exportStar(require("./AppEncryptionRequestDetailsOrdinalVdxfObject"), exports);
 __exportStar(require("./ProvisionIdentityDetailsOrdinalVdxfObject"), exports);
+__exportStar(require("./DataDescriptorResponseOrdinalVdxfObject"), exports);
+__exportStar(require("./UserDataRequestDetailsOrdinalVdxfObject"), exports);
+__exportStar(require("./UserSpecificDataPacketDetailsOrdinalVdxfObject"), exports);
 (0, register_1.registerOrdinals)();

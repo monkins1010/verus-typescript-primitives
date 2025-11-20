@@ -22,6 +22,7 @@ export interface AppEncryptionRequestDetailsInterface {
     secondaryDerivationNumber?: BigNumber;
     fromAddress?: CompactIdAddressObject;
     toAddress?: CompactIdAddressObject;
+    requestID?: string;
 }
 export interface AppEncryptionRequestDetailsJson {
     version: number;
@@ -31,6 +32,7 @@ export interface AppEncryptionRequestDetailsJson {
     secondaryderivationnumber?: number;
     fromaddress?: CompactIdAddressObjectJson;
     toaddress?: CompactIdAddressObjectJson;
+    requestid?: string;
 }
 /**
  * Checks if a string is a valid hexadecimal address
@@ -56,6 +58,7 @@ export declare class AppEncryptionRequestDetails implements SerializableEntity {
     static HAS_FROM_ADDRESS: import("bn.js");
     static HAS_TO_ADDRESS: import("bn.js");
     static HAS_SECONDARY_SEED_DERIVATION_NUMBER: import("bn.js");
+    static HAS_REQUEST_ID: import("bn.js");
     version: BigNumber;
     flags: BigNumber;
     encryptToZAddress: string;
@@ -63,6 +66,7 @@ export declare class AppEncryptionRequestDetails implements SerializableEntity {
     secondaryDerivationNumber?: BigNumber;
     fromAddress?: CompactIdAddressObject;
     toAddress?: CompactIdAddressObject;
+    requestID?: string;
     constructor(data?: AppEncryptionRequestDetailsInterface);
     setFlags(): void;
     calcFlags(): BigNumber;
@@ -70,6 +74,7 @@ export declare class AppEncryptionRequestDetails implements SerializableEntity {
     hasSecondarySeedDerivation(flags?: BigNumber): boolean;
     hasFromAddress(flags?: BigNumber): boolean;
     hasToAddress(flags?: BigNumber): boolean;
+    hasRequestID(flags?: BigNumber): boolean;
     getByteLength(): number;
     toBuffer(): Buffer;
     fromBuffer(buffer: Buffer, offset?: number): number;

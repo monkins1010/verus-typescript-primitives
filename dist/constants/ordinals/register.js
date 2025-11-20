@@ -4,6 +4,9 @@ exports.registerOrdinals = void 0;
 const vdxf_1 = require("../../vdxf");
 const AppEncryptionRequestDetailsOrdinalVdxfObject_1 = require("../../vdxf/classes/ordinals/AppEncryptionRequestDetailsOrdinalVdxfObject");
 const DataDescriptorOrdinalVdxfObject_1 = require("../../vdxf/classes/ordinals/DataDescriptorOrdinalVdxfObject");
+const DataDescriptorResponseOrdinalVdxfObject_1 = require("../../vdxf/classes/ordinals/DataDescriptorResponseOrdinalVdxfObject");
+const UserDataRequestDetailsOrdinalVdxfObject_1 = require("../../vdxf/classes/ordinals/UserDataRequestDetailsOrdinalVdxfObject");
+const UserSpecificDataPacketDetailsOrdinalVdxfObject_1 = require("../../vdxf/classes/ordinals/UserSpecificDataPacketDetailsOrdinalVdxfObject");
 const IdentityUpdateRequestOrdinalVdxfObject_1 = require("../../vdxf/classes/ordinals/IdentityUpdateRequestOrdinalVdxfObject");
 const IdentityUpdateResponseOrdinalVdxfObject_1 = require("../../vdxf/classes/ordinals/IdentityUpdateResponseOrdinalVdxfObject");
 const LoginRequestDetailsOrdinalVdxfObject_1 = require("../../vdxf/classes/ordinals/LoginRequestDetailsOrdinalVdxfObject");
@@ -21,5 +24,8 @@ const registerOrdinals = () => {
     OrdinalVdxfObjectOrdinalMap_1.OrdinalVdxfObjectOrdinalMap.registerOrdinal(ordinals_1.VDXF_ORDINAL_IDENTITY_UPDATE_RESPONSE.toNumber(), vdxf_1.IDENTITY_UPDATE_RESPONSE_DETAILS_VDXF_KEY.vdxfid, IdentityUpdateResponseOrdinalVdxfObject_1.IdentityUpdateResponseOrdinalVdxfObject, false);
     OrdinalVdxfObjectOrdinalMap_1.OrdinalVdxfObjectOrdinalMap.registerOrdinal(ordinals_1.VDXF_ORDINAL_PROVISION_IDENTITY_DETAILS.toNumber(), vdxf_1.PROVISION_IDENTITY_DETAILS_VDXF_KEY.vdxfid, ProvisionIdentityDetailsOrdinalVdxfObject_1.ProvisionIdentityDetailsOrdinalVdxfObject, false);
     OrdinalVdxfObjectOrdinalMap_1.OrdinalVdxfObjectOrdinalMap.registerOrdinal(ordinals_1.VDXF_ORDINAL_APP_ENCRYPTION_REQUEST_DETAILS.toNumber(), vdxf_1.APP_ENCRYPTION_REQUEST_DETAILS_VDXF_KEY.vdxfid, AppEncryptionRequestDetailsOrdinalVdxfObject_1.AppEncryptionRequestDetailsOrdinalVdxfObject, false);
+    OrdinalVdxfObjectOrdinalMap_1.OrdinalVdxfObjectOrdinalMap.registerOrdinal(ordinals_1.VDXF_ORDINAL_DATA_DESCRIPTOR_RESPONSE.toNumber(), vdxf_1.DATA_DESCRIPTOR_RESPONSE_VDXF_KEY.vdxfid, DataDescriptorResponseOrdinalVdxfObject_1.DataDescriptorResponseOrdinalVdxfObject, false);
+    OrdinalVdxfObjectOrdinalMap_1.OrdinalVdxfObjectOrdinalMap.registerOrdinal(ordinals_1.VDXF_ORDINAL_USER_DATA_REQUEST.toNumber(), vdxf_1.USER_DATA_REQUEST_DETAILS_VDXF_KEY.vdxfid, UserDataRequestDetailsOrdinalVdxfObject_1.UserDataRequestDetailsOrdinalVdxfObject, false);
+    OrdinalVdxfObjectOrdinalMap_1.OrdinalVdxfObjectOrdinalMap.registerOrdinal(ordinals_1.VDXF_ORDINAL_USER_SPECIFIC_DATA_PACKET.toNumber(), vdxf_1.USER_SPECIFIC_DATA_PACKET_VDXF_KEY.vdxfid, UserSpecificDataPacketDetailsOrdinalVdxfObject_1.UserSpecificDataPacketDetailsOrdinalVdxfObject, false);
 };
 exports.registerOrdinals = registerOrdinals;
