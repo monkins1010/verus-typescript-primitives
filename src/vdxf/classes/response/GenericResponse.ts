@@ -5,6 +5,9 @@ import bufferutils from '../../../utils/bufferutils';
 import { BigNumber } from '../../../utils/types/BigNumber';
 import { EHashTypes } from '../../../pbaas/DataDescriptor';
 import varuint from '../../../utils/varuint';
+import { GENERIC_ENVELOPE_DEEPLINK_VDXF_KEY } from '../../keys';
+import base64url from 'base64url';
+import { DEEPLINK_PROTOCOL_URL_CURRENT_VERSION, DEEPLINK_PROTOCOL_URL_STRING } from '../../../constants/deeplink';
 
 export type GenericResponseJson = GenericEnvelopeJson & {
   requesthash?: string,

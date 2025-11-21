@@ -9,6 +9,6 @@ export * from './LoginRequestDetailsOrdinalVdxfObject';
 export * from './LoginResponseDetailsOrdinalVdxfObject';
 export * from './AppEncryptionRequestOrdinalVdxfObject';
 export * from './ProvisionIdentityDetailsOrdinalVdxfObject';
-export * from './DataResponseOrdinalVdxfObject';
+export * from './DataPacketResponseOrdinalVdxfObject';
 export * from './UserDataRequestOrdinalVdxfObject';
 export * from './UserSpecificDataPacketDetailsOrdinalVdxfObject';

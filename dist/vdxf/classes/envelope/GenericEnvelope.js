@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GenericEnvelope = void 0;
-const __1 = require("../../");
 const bufferutils_1 = require("../../../utils/bufferutils");
 const base64url_1 = require("base64url");
 const bn_js_1 = require("bn.js");
@@ -74,12 +73,12 @@ class GenericEnvelope {
     getRawDataSha256(includeSig = false) {
         return (0, crypto_1.createHash)("sha256").update(this.toBufferOptionalSig(includeSig)).digest();
     }
-    getDetailsHash(signedBlockheight) {
+    getDetailsIdentitySignatureHash(signedBlockheight) {
         if (this.isSigned()) {
             return this.signature.getIdentityHash(signedBlockheight, this.getRawDataSha256());
         }
         else
-            return this.getRawDataSha256();
+            throw new Error("Must contain verifiable signature with at least systemID and identityID to generate details identity signature hash");
     }
     getDetails(index = 0) {
         return this.details[index];
@@ -185,23 +184,6 @@ class GenericEnvelope {
     }
     toString() {
         return base64url_1.default.encode(this.toBuffer());
-    }
-    toWalletDeeplinkUri() {
-        return `${__1.WALLET_VDXF_KEY.vdxfid.toLowerCase()}:/${__1.GENERIC_REQUEST_DEEPLINK_VDXF_KEY.vdxfid}/${this.toString()}`;
-    }
-    static fromWalletDeeplinkUri(uri) {
-        const split = uri.split(`${__1.GENERIC_REQUEST_DEEPLINK_VDXF_KEY.vdxfid}/`);
-        const inv = new GenericEnvelope();
-        inv.fromBuffer(base64url_1.default.toBuffer(split[1]), 0);
-        return inv;
-    }
-    toQrString() {
-        return this.toString();
-    }
-    static fromQrString(qrstring) {
-        const inv = new GenericEnvelope();
-        inv.fromBuffer(base64url_1.default.toBuffer(qrstring), 0);
-        return inv;
     }
     toJson() {
         const details = [];

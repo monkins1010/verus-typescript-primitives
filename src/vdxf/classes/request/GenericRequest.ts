@@ -3,6 +3,9 @@ import { SerializableEntity } from "../../../utils/types/SerializableEntity";
 import { GenericEnvelope, GenericEnvelopeInterface, GenericEnvelopeJson } from "../envelope/GenericEnvelope";
 import { SaplingPaymentAddress } from '../../../pbaas/SaplingPaymentAddress';
 import bufferutils from '../../../utils/bufferutils';
+import { GENERIC_ENVELOPE_DEEPLINK_VDXF_KEY } from '../../keys';
+import base64url from 'base64url';
+import { DEEPLINK_PROTOCOL_URL_CURRENT_VERSION, DEEPLINK_PROTOCOL_URL_STRING } from '../../../constants/deeplink';
 
 export type GenericRequestJson = GenericEnvelopeJson & {
   encryptresponsetoaddress?: string;
@@ -104,5 +107,38 @@ export class GenericRequest extends GenericEnvelope implements SerializableEntit
     }
 
     return parentJson;
+  }
+
+  static fromWalletDeeplinkUri(uri: string): GenericRequest {
+    const urlProtocol = `${DEEPLINK_PROTOCOL_URL_STRING}:`;
+    
+    const split = uri.split(`/`);
+
+    if (split.length !== 4 || split.some(x => x == null)) throw new Error("Unrecognized URL format");
+
+    if (split[0] !== urlProtocol) throw new Error("Unrecognized URL protocol");
+    else if (isNaN(Number(split[2])) || !(new BN(split[2], 10).eq(DEEPLINK_PROTOCOL_URL_CURRENT_VERSION))) {
+      throw new Error("Unrecognized or incompatible generic request protocol version")
+    }
+
+    const inv = new GenericRequest();
+    inv.fromBuffer(base64url.toBuffer(split[3]), 0);
+
+    return inv;
+  }
+
+  static fromQrString(qrstring: string): GenericRequest {
+    const inv = new GenericRequest();
+    inv.fromBuffer(base64url.toBuffer(qrstring), 0);
+
+    return inv;
+  }
+
+  toWalletDeeplinkUri(): string {
+    return `${DEEPLINK_PROTOCOL_URL_STRING}://${DEEPLINK_PROTOCOL_URL_CURRENT_VERSION.toString()}/${this.toString()}`;
+  }
+
+  toQrString(): string {
+    return this.toString();
   }
 }

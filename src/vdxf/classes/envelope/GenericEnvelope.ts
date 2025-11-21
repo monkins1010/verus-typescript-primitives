@@ -1,6 +1,6 @@
 import {
   WALLET_VDXF_KEY,
-  GENERIC_REQUEST_DEEPLINK_VDXF_KEY
+  GENERIC_ENVELOPE_DEEPLINK_VDXF_KEY
 } from "../../";
 import bufferutils from "../../../utils/bufferutils";
 import base64url from "base64url";
@@ -11,6 +11,7 @@ import varuint from "../../../utils/varuint";
 import { SerializableEntity } from "../../../utils/types/SerializableEntity";
 import { createHash } from "crypto";
 import { VerifiableSignatureData, VerifiableSignatureDataJson } from "../VerifiableSignatureData";
+import { DEEPLINK_PROTOCOL_URL_CURRENT_VERSION, DEEPLINK_PROTOCOL_URL_STRING } from "../../../constants/deeplink";
 
 export interface GenericEnvelopeInterface {
   version?: BigNumber;
@@ -124,10 +125,10 @@ export class GenericEnvelope implements SerializableEntity {
     return createHash("sha256").update(this.toBufferOptionalSig(includeSig)).digest();
   }
 
-  getDetailsHash(signedBlockheight: number): Buffer<ArrayBufferLike> {
+  getDetailsIdentitySignatureHash(signedBlockheight: number): Buffer<ArrayBufferLike> {
     if (this.isSigned()) {
       return this.signature.getIdentityHash(signedBlockheight, this.getRawDataSha256());
-    } else return this.getRawDataSha256()
+    } else throw new Error("Must contain verifiable signature with at least systemID and identityID to generate details identity signature hash")
   }
 
   getDetails(index = 0): OrdinalVdxfObject {
@@ -272,32 +273,6 @@ export class GenericEnvelope implements SerializableEntity {
 
   toString() {
     return base64url.encode(this.toBuffer());
-  }
-
-  toWalletDeeplinkUri(): string {
-    return `${WALLET_VDXF_KEY.vdxfid.toLowerCase()}:/${
-      GENERIC_REQUEST_DEEPLINK_VDXF_KEY.vdxfid
-    }/${this.toString()}`;
-  }
-
-  static fromWalletDeeplinkUri(uri: string): GenericEnvelope {
-    const split = uri.split(`${GENERIC_REQUEST_DEEPLINK_VDXF_KEY.vdxfid}/`);
-
-    const inv = new GenericEnvelope();
-    inv.fromBuffer(base64url.toBuffer(split[1]), 0);
-
-    return inv;
-  }
-
-  toQrString(): string {
-    return this.toString();
-  }
-
-  static fromQrString(qrstring: string): GenericEnvelope {
-    const inv = new GenericEnvelope();
-    inv.fromBuffer(base64url.toBuffer(qrstring), 0);
-
-    return inv;
   }
 
   toJson(): GenericEnvelopeJson {

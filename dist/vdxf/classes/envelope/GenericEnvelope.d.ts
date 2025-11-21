@@ -48,7 +48,7 @@ export declare class GenericEnvelope implements SerializableEntity {
     setIsTestnet(): void;
     setFlags(): void;
     getRawDataSha256(includeSig?: boolean): Buffer<ArrayBufferLike>;
-    getDetailsHash(signedBlockheight: number): Buffer<ArrayBufferLike>;
+    getDetailsIdentitySignatureHash(signedBlockheight: number): Buffer<ArrayBufferLike>;
     getDetails(index?: number): OrdinalVdxfObject;
     protected getDetailsBufferLength(): number;
     protected getDetailsBuffer(): Buffer;
@@ -58,9 +58,5 @@ export declare class GenericEnvelope implements SerializableEntity {
     toBuffer(): Buffer;
     fromBuffer(buffer: Buffer, offset?: number): number;
     toString(): string;
-    toWalletDeeplinkUri(): string;
-    static fromWalletDeeplinkUri(uri: string): GenericEnvelope;
-    toQrString(): string;
-    static fromQrString(qrstring: string): GenericEnvelope;
     toJson(): GenericEnvelopeJson;
 }

@@ -1,18 +1,20 @@
 import { BN } from 'bn.js';
 import base64url from 'base64url';
 import { DEFAULT_VERUS_CHAINID, HASH_TYPE_SHA256 } from '../../constants/pbaas';
-import { WALLET_VDXF_KEY, GENERIC_REQUEST_DEEPLINK_VDXF_KEY, GenericRequest, SaplingPaymentAddress } from '../../';
+import { GenericRequest, SaplingPaymentAddress } from '../../';
 import { createHash } from 'crypto';
 import { VerifiableSignatureData } from '../../vdxf/classes/VerifiableSignatureData';
 import { CompactIdAddressObject } from '../../vdxf/classes/CompactIdAddressObject';
 import { GeneralTypeOrdinalVdxfObject } from '../../vdxf/classes/ordinals';
+import { DEEPLINK_PROTOCOL_URL_CURRENT_VERSION, DEEPLINK_PROTOCOL_URL_STRING } from '../../constants/deeplink';
 
 describe('GenericRequest — buffer / URI / QR operations', () => {
   function roundTripBuffer(req: GenericRequest): GenericRequest {
     const buf = req.toBuffer();
     const clone = new GenericRequest();
     clone.fromBuffer(buf, 0);
-    return clone;
+    
+    return GenericRequest.fromQrString((GenericRequest.fromWalletDeeplinkUri(clone.toWalletDeeplinkUri())).toQrString());
   }
 
   function rawDetailsSha256(req: GenericRequest): Buffer {
@@ -69,7 +71,7 @@ describe('GenericRequest — buffer / URI / QR operations', () => {
       systemID: CompactIdAddressObject.fromIAddress(DEFAULT_VERUS_CHAINID),
       hashType: HASH_TYPE_SHA256,
       identityID: CompactIdAddressObject.fromIAddress(DEFAULT_VERUS_CHAINID),
-      signatureAsVch: Buffer.from('abcd', 'hex'),
+      signatureAsVch: Buffer.from('AgX3RgAAAUEgHAVIHuui1Sc9oLxLbglKvmrv47JJLiM0/RBQwzYL1dlamI/2o9qBc93d79laLXWMhQomqZ4U3Mlr3ueuwl4JFA==', 'base64'),
       vdxfKeys: [DEFAULT_VERUS_CHAINID, DEFAULT_VERUS_CHAINID],
       vdxfKeyNames: ["VRSC", "VRSC"],
       boundHashes: [Buffer.from('abcd', 'hex')],
@@ -96,6 +98,45 @@ describe('GenericRequest — buffer / URI / QR operations', () => {
 
     const round = roundTripBuffer(req);
     expect(round.signature).toBeDefined();
+    expect(round.signature?.signatureAsVch.toString('base64')).toBe(sig.signatureAsVch.toString('base64'))
+    expect(round.createdAt?.toString()).toEqual(createdAt.toString());
+    expect(round.hasEncryptResponseToAddress()).toBe(true)
+    expect(round.encryptResponseToAddress?.toAddressString()).toBe(saplingAddr)
+    const d2 = round.getDetails(0);
+    expect((d2 as GeneralTypeOrdinalVdxfObject).data).toEqual(detail.data);
+    expect(round.toBuffer().toString('hex')).toEqual(req.toBuffer().toString('hex'));
+  });
+
+  it('round trips with createdAt, and valid signature that can be hashed', () => {
+    const sig = new VerifiableSignatureData({
+      systemID: CompactIdAddressObject.fromIAddress(DEFAULT_VERUS_CHAINID),
+      identityID: CompactIdAddressObject.fromIAddress(DEFAULT_VERUS_CHAINID),
+      signatureAsVch: Buffer.from('AgX3RgAAAUEgHAVIHuui1Sc9oLxLbglKvmrv47JJLiM0/RBQwzYL1dlamI/2o9qBc93d79laLXWMhQomqZ4U3Mlr3ueuwl4JFA==', 'base64'),
+    });
+
+    const detail = new GeneralTypeOrdinalVdxfObject({
+      data: Buffer.from('abcd', 'hex'),
+      key: DEFAULT_VERUS_CHAINID
+    });
+
+    const createdAt = new BN(9999);
+    const saplingAddr = "zs1wczplx4kegw32h8g0f7xwl57p5tvnprwdmnzmdnsw50chcl26f7tws92wk2ap03ykaq6jyyztfa"
+
+    const req = new GenericRequest({
+      details: [detail],
+      signature: sig,
+      createdAt,
+      encryptResponseToAddress: SaplingPaymentAddress.fromAddressString(saplingAddr)
+    });
+
+    expect(req.isSigned()).toBe(true);
+    expect(req.hasCreatedAt()).toBe(true);
+    expect(req.getDetailsIdentitySignatureHash(1000)).toBeDefined();
+    expect(req.signature?.signatureVersion.toString()).toBe("2");
+
+    const round = roundTripBuffer(req);
+    expect(round.signature).toBeDefined();
+    expect(round.signature?.signatureAsVch.toString('base64')).toBe(sig.signatureAsVch.toString('base64'))
     expect(round.createdAt?.toString()).toEqual(createdAt.toString());
     expect(round.hasEncryptResponseToAddress()).toBe(true)
     expect(round.encryptResponseToAddress?.toAddressString()).toBe(saplingAddr)
@@ -126,8 +167,7 @@ describe('GenericRequest — buffer / URI / QR operations', () => {
     const req = new GenericRequest({ details: [detail] });
     const uri = req.toWalletDeeplinkUri();
 
-    expect(uri).toContain(WALLET_VDXF_KEY.vdxfid.toLowerCase());
-    expect(uri).toContain(`${GENERIC_REQUEST_DEEPLINK_VDXF_KEY.vdxfid}/`);
+    expect(uri).toContain(`${DEEPLINK_PROTOCOL_URL_STRING}://${DEEPLINK_PROTOCOL_URL_CURRENT_VERSION}/`);
 
     const parsed = GenericRequest.fromWalletDeeplinkUri(uri);
     expect(parsed.version.toString()).toEqual(req.version.toString());
@@ -153,18 +193,5 @@ describe('GenericRequest — buffer / URI / QR operations', () => {
     expect(() => {
       req.fromBuffer(empty, 0);
     }).toThrow("Cannot create request from empty buffer");
-  });
-
-  it("returns raw SHA256 when not signed", () => {
-    const detail = new GeneralTypeOrdinalVdxfObject({
-      data: Buffer.from("abcd", "hex"),
-      key: DEFAULT_VERUS_CHAINID
-    });
-    const req = new GenericRequest({ details: [detail] });
-    expect(req.isSigned()).toBe(false);
-
-    const hash = req.getDetailsHash(123456);
-    const expected = rawDetailsSha256(req);
-    expect(hash).toEqual(expected);
   });
 });
