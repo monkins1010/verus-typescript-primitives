@@ -11,6 +11,10 @@ export interface VDXFKeyInterface {
     indexid?: string;
 }
 export declare const VERUSPAY_INVOICE_VDXF_KEY: VDXFKeyInterface;
+export declare const VERUSPAY_INVOICE_DETAILS_VDXF_KEY: VDXFKeyInterface;
+export declare const GENERIC_ENVELOPE_DEEPLINK_VDXF_KEY: VDXFKeyInterface;
+export declare const GENERIC_REQUEST_DEEPLINK_VDXF_KEY: VDXFKeyInterface;
+export declare const GENERIC_RESPONSE_DEEPLINK_VDXF_KEY: VDXFKeyInterface;
 export declare const IDENTITY_UPDATE_REQUEST_VDXF_KEY: VDXFKeyInterface;
 export declare const IDENTITY_UPDATE_RESPONSE_VDXF_KEY: VDXFKeyInterface;
 export declare const IDENTITY_AUTH_SIG_VDXF_KEY: VDXFKeyInterface;
@@ -72,3 +76,11 @@ export declare const IDENTITY_CREDENTIALS: VDXFKeyInterface;
 export declare const IDENTITY_CREDENTIAL_PLAINLOGIN: VDXFKeyInterface;
 export declare const IDENTITY_CREDENTIAL_USERNAME: VDXFKeyInterface;
 export declare const ATTESTATION_VIEW_REQUEST_MULTIPLEATTESTATIONS: VDXFKeyInterface;
+export declare const AUTHENTICATION_REQUEST_VDXF_KEY: VDXFKeyInterface;
+export declare const AUTHENTICATION_RESPONSE_VDXF_KEY: VDXFKeyInterface;
+export declare const PROVISION_IDENTITY_DETAILS_VDXF_KEY: VDXFKeyInterface;
+export declare const APP_ENCRYPTION_REQUEST_VDXF_KEY: VDXFKeyInterface;
+export declare const DATA_RESPONSE_VDXF_KEY: VDXFKeyInterface;
+export declare const USER_DATA_REQUEST_VDXF_KEY: VDXFKeyInterface;
+export declare const USER_SPECIFIC_DATA_PACKET_VDXF_KEY: VDXFKeyInterface;
+export declare const APP_ENCRYPTION_RESPONSE_VDXF_KEY: VDXFKeyInterface;

@@ -24,10 +24,14 @@ export { ProvisioningResponseInterface as LoginConsentProvisioningResponseInterf
 export { ProvisioningDecisionInterface as LoginConsentProvisioningDecisionInterface } from "./provisioning/ProvisioningDecision";
 export { ProvisioningResultInterface as LoginConsentProvisioningResultInterface } from "./provisioning/ProvisioningResult";
 
-export * from "./identity/IdentityUpdateEnvelope";
 export * from "./identity/IdentityUpdateRequestDetails";
 export * from "./identity/IdentityUpdateResponseDetails";
-export * from './ResponseUri';
+export * from './ResponseURI';
+export * from './request/GenericRequest';
+export * from './response/GenericResponse';
+export * from './appencryption/AppEncryptionResponseDetails'
+
+export * from './ordinals';
 
 export { Hash160 } from './Hash160'
 export {
@@ -44,6 +48,14 @@ export {
 } from './provisioning/ProvisioningResult'
 export { Context } from './Context'
 export { DataCategory } from './PersonalProfile'
+export * from './requestobjects/UserDataRequestDetails'
+export * from './login/AuthenticationRequestDetails'
+export * from './login/AuthenticationResponseDetails'
+export * from './requestobjects/ProvisionIdentityDetails'
+export * from './appencryption/AppEncryptionRequestDetails'
+export * from './requestobjects/UserSpecificDataPacketDetails'
+export * from './CompactAddressObject'
+export * from './VerifiableSignatureData'
 export * from './attestation/InformationRequest'
 export * from './attestation/AttestationDetails'
 export * from './endorsement/Endorsement'
