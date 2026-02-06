@@ -1,5 +1,5 @@
 /**
- * DataPacketResponse - Class for providing structured responses to various request types
+ * DataResponseDetails - Class for providing structured responses to various request types
  *
  * This class serves as a universal response mechanism that can be used to reply to multiple
  * types of requests. It packages response data within a DataDescriptor along with metadata
@@ -17,9 +17,9 @@
  *    - The requestID references the original UserDataRequestDetails.requestID
  *    - Allows selective disclosure of personal information
  *
- * 3. UserSpecificDataPacketDetails Response:
+ * 3. DataPacketRequestDetails Response:
  *    - The DataDescriptor 'data' field contains the response data or signed content
- *    - The requestID references the original UserSpecificDataPacketDetails.requestID
+ *    - The requestID references the original DataPacketRequestDetails.requestID
  *    - Supports bidirectional data exchange with signatures and statements
  *
  * REQUEST-RESPONSE CORRELATION:
@@ -37,32 +37,29 @@
 import { BigNumber } from '../../../utils/types/BigNumber';
 import { SerializableEntity } from '../../../utils/types/SerializableEntity';
 import { DataDescriptor, DataDescriptorJson } from '../../../pbaas';
-export interface DataResponseInterface {
+import { CompactAddressObjectJson, CompactIAddressObject } from '../CompactAddressObject';
+export interface DataResponseDetailsInterface {
     flags?: BigNumber;
-    requestID?: string;
+    requestID?: CompactIAddressObject;
     data: DataDescriptor;
 }
-export interface DataResponseJson {
+export interface DataResponseDetailsJson {
     flags?: number;
-    requestid?: string;
+    requestid?: CompactAddressObjectJson;
     data: DataDescriptorJson;
 }
-export declare class DataPacketResponse implements SerializableEntity {
+export declare class DataResponseDetails implements SerializableEntity {
     flags?: BigNumber;
-    requestID?: string;
+    requestID?: CompactIAddressObject;
     data: DataDescriptor;
     static RESPONSE_CONTAINS_REQUEST_ID: import("bn.js");
-    constructor(data?: {
-        flags?: BigNumber;
-        requestID?: string;
-        data: DataDescriptor;
-    });
+    constructor(initialData?: DataResponseDetailsInterface);
     containsRequestID(): boolean;
     toggleContainsRequestID(): void;
     toSha256(): Buffer<ArrayBufferLike>;
     getByteLength(): number;
     toBuffer(): Buffer<ArrayBufferLike>;
     fromBuffer(buffer: Buffer, offset?: number): number;
-    toJson(): DataResponseJson;
-    static fromJson(json: DataResponseJson): DataPacketResponse;
+    toJson(): DataResponseDetailsJson;
+    static fromJson(json: DataResponseDetailsJson): DataResponseDetails;
 }

@@ -3,8 +3,8 @@ import base64url from 'base64url';
 import { DATA_TYPE_MMRDATA, DEFAULT_VERUS_CHAINID, HASH_TYPE_SHA256, NULL_I_ADDR } from '../../constants/pbaas';
 import { ContentMultiMap, DEST_PKH, fromBase58Check, GenericRequest, IDENTITY_VERSION_PBAAS, IdentityID, IdentityUpdateRequestDetails, KeyID, PartialIdentity, PartialMMRData, PartialSignData, PartialSignDataInitData, ResponseURI, SaplingPaymentAddress, TransferDestination, VerusPayInvoiceDetails } from '../../';
 import { VerifiableSignatureData, VerifiableSignatureDataInterface } from '../../vdxf/classes/VerifiableSignatureData';
-import { CompactAddressObject } from '../../vdxf/classes/CompactAddressObject';
-import { GeneralTypeOrdinalVDXFObject, IdentityUpdateRequestOrdinalVDXFObject, VerusPayInvoiceOrdinalVDXFObject } from '../../vdxf/classes/ordinals';
+import { CompactIAddressObject } from '../../vdxf/classes/CompactAddressObject';
+import { GeneralTypeOrdinalVDXFObject, IdentityUpdateRequestOrdinalVDXFObject, VerusPayInvoiceDetailsOrdinalVDXFObject } from '../../vdxf/classes/ordinals';
 import { DEEPLINK_PROTOCOL_URL_CURRENT_VERSION, DEEPLINK_PROTOCOL_URL_STRING } from '../../constants/deeplink';
 
 describe('GenericRequest — buffer / URI / QR operations', () => {
@@ -61,9 +61,9 @@ describe('GenericRequest — buffer / URI / QR operations', () => {
     const sig = new VerifiableSignatureData({
       flags: new BN(0),
       version: new BN(1),
-      systemID: CompactAddressObject.fromIAddress(DEFAULT_VERUS_CHAINID),
+      systemID: CompactIAddressObject.fromAddress(DEFAULT_VERUS_CHAINID),
       hashType: HASH_TYPE_SHA256,
-      identityID: CompactAddressObject.fromIAddress(DEFAULT_VERUS_CHAINID),
+      identityID: CompactIAddressObject.fromAddress(DEFAULT_VERUS_CHAINID),
       signatureAsVch: Buffer.from('AgX3RgAAAUEgHAVIHuui1Sc9oLxLbglKvmrv47JJLiM0/RBQwzYL1dlamI/2o9qBc93d79laLXWMhQomqZ4U3Mlr3ueuwl4JFA==', 'base64'),
       vdxfKeys: [DEFAULT_VERUS_CHAINID, DEFAULT_VERUS_CHAINID],
       vdxfKeyNames: ["VRSC", "VRSC"],
@@ -82,10 +82,10 @@ describe('GenericRequest — buffer / URI / QR operations', () => {
     const req = new GenericRequest({
       details: [detail],
       signature: sig,
-      requestID: NULL_I_ADDR,
+      requestID: CompactIAddressObject.fromAddress(NULL_I_ADDR),
       createdAt,
       encryptResponseToAddress: SaplingPaymentAddress.fromAddressString(saplingAddr),
-      appOrDelegatedID: CompactAddressObject.fromIAddress(DEFAULT_VERUS_CHAINID),
+      appOrDelegatedID: CompactIAddressObject.fromAddress(DEFAULT_VERUS_CHAINID),
       responseURIs: [ResponseURI.fromUriString("https://verus.io/callback", ResponseURI.TYPE_POST), ResponseURI.fromUriString("https://example.com/callback", ResponseURI.TYPE_REDIRECT)]
     });
 
@@ -101,7 +101,7 @@ describe('GenericRequest — buffer / URI / QR operations', () => {
     expect(round.responseURIs![0].type.toString()).toBe(ResponseURI.TYPE_POST.toString())
     expect(round.responseURIs![1].getUriString()).toBe("https://example.com/callback")
     expect(round.responseURIs![1].type.toString()).toBe(ResponseURI.TYPE_REDIRECT.toString())
-    expect(round.requestID).toBe(NULL_I_ADDR)
+    expect(round.requestID?.toAddress()).toBe(NULL_I_ADDR)
     expect(round.appOrDelegatedID?.toIAddress()).toBe(DEFAULT_VERUS_CHAINID)
     expect(round.hasEncryptResponseToAddress()).toBe(true)
     expect(round.encryptResponseToAddress?.toAddressString()).toBe(saplingAddr)
@@ -112,8 +112,8 @@ describe('GenericRequest — buffer / URI / QR operations', () => {
 
   it('round trips with createdAt, and valid signature that can be hashed', () => {
     const sig = new VerifiableSignatureData({
-      systemID: CompactAddressObject.fromIAddress(DEFAULT_VERUS_CHAINID),
-      identityID: CompactAddressObject.fromIAddress(DEFAULT_VERUS_CHAINID),
+      systemID: CompactIAddressObject.fromAddress(DEFAULT_VERUS_CHAINID),
+      identityID: CompactIAddressObject.fromAddress(DEFAULT_VERUS_CHAINID),
       signatureAsVch: Buffer.from('AgX3RgAAAUEgHAVIHuui1Sc9oLxLbglKvmrv47JJLiM0/RBQwzYL1dlamI/2o9qBc93d79laLXWMhQomqZ4U3Mlr3ueuwl4JFA==', 'base64'),
     });
 
@@ -150,8 +150,8 @@ describe('GenericRequest — buffer / URI / QR operations', () => {
 
   it('round trips with createdAt, signature that can be hashed, and invoice', () => {
     const sig = new VerifiableSignatureData({
-      systemID: CompactAddressObject.fromIAddress(DEFAULT_VERUS_CHAINID),
-      identityID: CompactAddressObject.fromIAddress(DEFAULT_VERUS_CHAINID),
+      systemID: CompactIAddressObject.fromAddress(DEFAULT_VERUS_CHAINID),
+      identityID: CompactIAddressObject.fromAddress(DEFAULT_VERUS_CHAINID),
       signatureAsVch: Buffer.from('AgX3RgAAAUEgHAVIHuui1Sc9oLxLbglKvmrv47JJLiM0/RBQwzYL1dlamI/2o9qBc93d79laLXWMhQomqZ4U3Mlr3ueuwl4JFA==', 'base64'),
     });
 
@@ -177,7 +177,7 @@ describe('GenericRequest — buffer / URI / QR operations', () => {
     const saplingAddr = "zs1wczplx4kegw32h8g0f7xwl57p5tvnprwdmnzmdnsw50chcl26f7tws92wk2ap03ykaq6jyyztfa"
 
     const req = new GenericRequest({
-      details: [new VerusPayInvoiceOrdinalVDXFObject({
+      details: [new VerusPayInvoiceDetailsOrdinalVDXFObject({
         data: details,
       })],
       signature: sig,
@@ -197,7 +197,7 @@ describe('GenericRequest — buffer / URI / QR operations', () => {
     expect(round.hasEncryptResponseToAddress()).toBe(true)
     expect(round.encryptResponseToAddress?.toAddressString()).toBe(saplingAddr)
     const d2 = round.getDetails(0);
-    expect((d2 as VerusPayInvoiceOrdinalVDXFObject).data).toEqual(details);
+    expect((d2 as VerusPayInvoiceDetailsOrdinalVDXFObject).data).toEqual(details);
     expect(round.toBuffer().toString('hex')).toEqual(req.toBuffer().toString('hex'));
   });
 
@@ -207,7 +207,7 @@ describe('GenericRequest — buffer / URI / QR operations', () => {
     contentmap.set("iK7a5JNJnbeuYWVHCDRpJosj3irGJ5Qa8c", Buffer.alloc(32));
 
     const systemID = IdentityID.fromAddress("iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq");
-    const requestID = "iPsFBfFoCcxtuZNzE8yxPQhXVn4dmytf8j"
+    const requestID = CompactIAddressObject.fromAddress("iPsFBfFoCcxtuZNzE8yxPQhXVn4dmytf8j");
     const createdAt = new BN("1700000000", 10);
     const expiryHeight = new BN("123456");
     const salt = Buffer.from('=H319X:)@H2Z');
@@ -288,8 +288,8 @@ describe('GenericRequest — buffer / URI / QR operations', () => {
     });
 
     const unsignedSigData: VerifiableSignatureDataInterface = {
-      systemID: CompactAddressObject.fromIAddress(systemID.toAddress()!),
-      identityID: CompactAddressObject.fromIAddress(systemID.toAddress()!)
+      systemID: CompactIAddressObject.fromAddress(systemID.toAddress()!),
+      identityID: CompactIAddressObject.fromAddress(systemID.toAddress()!)
     }
 
     const req = new GenericRequest({

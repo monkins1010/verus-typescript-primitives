@@ -1,6 +1,6 @@
 "use strict";
 /**
- * DataPacketResponse - Class for providing structured responses to various request types
+ * DataResponseDetails - Class for providing structured responses to various request types
  *
  * This class serves as a universal response mechanism that can be used to reply to multiple
  * types of requests. It packages response data within a DataDescriptor along with metadata
@@ -18,9 +18,9 @@
  *    - The requestID references the original UserDataRequestDetails.requestID
  *    - Allows selective disclosure of personal information
  *
- * 3. UserSpecificDataPacketDetails Response:
+ * 3. DataPacketRequestDetails Response:
  *    - The DataDescriptor 'data' field contains the response data or signed content
- *    - The requestID references the original UserSpecificDataPacketDetails.requestID
+ *    - The requestID references the original DataPacketRequestDetails.requestID
  *    - Supports bidirectional data exchange with signatures and statements
  *
  * REQUEST-RESPONSE CORRELATION:
@@ -36,30 +36,29 @@
  * - Response validation and integrity checking via SHA-256 is required
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DataPacketResponse = void 0;
+exports.DataResponseDetails = void 0;
 const bn_js_1 = require("bn.js");
 const varint_1 = require("../../../utils/varint");
 const bufferutils_1 = require("../../../utils/bufferutils");
 const { BufferReader, BufferWriter } = bufferutils_1.default;
-const address_1 = require("../../../utils/address");
-const vdxf_1 = require("../../../constants/vdxf");
 const pbaas_1 = require("../../../pbaas");
 const createHash = require("create-hash");
-class DataPacketResponse {
-    constructor(data) {
-        this.flags = data && data.flags ? data.flags : new bn_js_1.BN("0", 10);
-        if (data === null || data === void 0 ? void 0 : data.requestID) {
+const CompactAddressObject_1 = require("../CompactAddressObject");
+class DataResponseDetails {
+    constructor(initialData) {
+        this.flags = initialData && initialData.flags ? initialData.flags : new bn_js_1.BN("0", 10);
+        if (initialData === null || initialData === void 0 ? void 0 : initialData.requestID) {
             if (!this.containsRequestID())
                 this.toggleContainsRequestID();
-            this.requestID = data.requestID;
+            this.requestID = initialData === null || initialData === void 0 ? void 0 : initialData.requestID;
         }
-        this.data = data === null || data === void 0 ? void 0 : data.data;
+        this.data = initialData && initialData.data ? initialData.data : new pbaas_1.DataDescriptor();
     }
     containsRequestID() {
-        return !!(this.flags.and(DataPacketResponse.RESPONSE_CONTAINS_REQUEST_ID).toNumber());
+        return !!(this.flags.and(DataResponseDetails.RESPONSE_CONTAINS_REQUEST_ID).toNumber());
     }
     toggleContainsRequestID() {
-        this.flags = this.flags.xor(DataPacketResponse.RESPONSE_CONTAINS_REQUEST_ID);
+        this.flags = this.flags.xor(DataResponseDetails.RESPONSE_CONTAINS_REQUEST_ID);
     }
     toSha256() {
         return createHash("sha256").update(this.toBuffer()).digest();
@@ -68,7 +67,7 @@ class DataPacketResponse {
         let length = 0;
         length += varint_1.default.encodingLength(this.flags);
         if (this.containsRequestID()) {
-            length += vdxf_1.HASH160_BYTE_LENGTH;
+            length += this.requestID.getByteLength();
         }
         length += this.data.getByteLength();
         return length;
@@ -77,7 +76,7 @@ class DataPacketResponse {
         const writer = new BufferWriter(Buffer.alloc(this.getByteLength()));
         writer.writeVarInt(this.flags);
         if (this.containsRequestID()) {
-            writer.writeSlice((0, address_1.fromBase58Check)(this.requestID).hash);
+            writer.writeSlice(this.requestID.toBuffer());
         }
         writer.writeSlice(this.data.toBuffer());
         return writer.buffer;
@@ -86,7 +85,8 @@ class DataPacketResponse {
         const reader = new BufferReader(buffer, offset);
         this.flags = reader.readVarInt();
         if (this.containsRequestID()) {
-            this.requestID = (0, address_1.toBase58Check)(reader.readSlice(vdxf_1.HASH160_BYTE_LENGTH), vdxf_1.I_ADDR_VERSION);
+            this.requestID = new CompactAddressObject_1.CompactIAddressObject();
+            reader.offset = this.requestID.fromBuffer(reader.buffer, reader.offset);
         }
         this.data = new pbaas_1.DataDescriptor();
         this.data.fromBuffer(reader.buffer, reader.offset);
@@ -96,17 +96,17 @@ class DataPacketResponse {
     toJson() {
         return {
             flags: this.flags.toNumber(),
-            requestid: this.containsRequestID() ? this.requestID : undefined,
+            requestid: this.containsRequestID() ? this.requestID.toJson() : undefined,
             data: this.data.toJson()
         };
     }
     static fromJson(json) {
-        return new DataPacketResponse({
+        return new DataResponseDetails({
             flags: new bn_js_1.BN(json.flags, 10),
-            requestID: json.requestid,
+            requestID: json.requestid ? CompactAddressObject_1.CompactIAddressObject.fromCompactAddressObjectJson(json.requestid) : undefined,
             data: pbaas_1.DataDescriptor.fromJson(json.data)
         });
     }
 }
-exports.DataPacketResponse = DataPacketResponse;
-DataPacketResponse.RESPONSE_CONTAINS_REQUEST_ID = new bn_js_1.BN(1, 10);
+exports.DataResponseDetails = DataResponseDetails;
+DataResponseDetails.RESPONSE_CONTAINS_REQUEST_ID = new bn_js_1.BN(1, 10);

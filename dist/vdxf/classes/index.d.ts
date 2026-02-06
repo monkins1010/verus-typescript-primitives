@@ -32,12 +32,12 @@ export { RedirectUri, Subject, ProvisioningInfo, RequestedPermission, Audience, 
 export { ProvisioningTxid } from './provisioning/ProvisioningResult';
 export { Context } from './Context';
 export { DataCategory } from './PersonalProfile';
-export * from './requestobjects/UserDataRequestDetails';
+export * from './data/UserDataRequestDetails';
 export * from './login/AuthenticationRequestDetails';
 export * from './login/AuthenticationResponseDetails';
-export * from './requestobjects/ProvisionIdentityDetails';
+export * from './provisioning/ProvisionIdentityDetails';
 export * from './appencryption/AppEncryptionRequestDetails';
-export * from './requestobjects/UserSpecificDataPacketDetails';
+export * from './data/DataPacketRequestDetails';
 export * from './CompactAddressObject';
 export * from './VerifiableSignatureData';
 export * from './attestation/InformationRequest';

@@ -23,27 +23,25 @@ import bufferutils from '../../../utils/bufferutils';
 const { BufferReader, BufferWriter } = bufferutils;
 import { decodeSaplingAddress, toBech32 } from '../../../utils/sapling';
 import { SerializableEntity } from '../../../utils/types/SerializableEntity';
-import { CompactAddressObject, CompactAddressObjectJson } from '../CompactAddressObject';
+import { CompactIAddressObject, CompactAddressObjectJson } from '../CompactAddressObject';
 import varuint from '../../../utils/varuint';
-import { fromBase58Check, toBase58Check } from '../../../utils/address';
-import { I_ADDR_VERSION, HASH160_BYTE_LENGTH } from '../../../constants/vdxf';
 
-export interface AppEncryptionRequestInterface {
+export interface AppEncryptionRequestDetailsInterface {
   version?: BigNumber;
   flags: BigNumber;
   encryptToZAddress: string;
   derivationNumber: BigNumber;
-  derivationID?: CompactAddressObject;
-  requestID?: string;
+  derivationID?: CompactIAddressObject;
+  requestID?: CompactIAddressObject;
 }
 
-export interface AppEncryptionRequestJson {
+export interface AppEncryptionRequestDetailsJson {
   version: number;
   flags: number;
   encrypttozaddress: string;
   derivationnumber: number;
   derivationid?: CompactAddressObjectJson;
-  requestid?: string;
+  requestid?: CompactAddressObjectJson;
 }
 
 /**
@@ -69,10 +67,10 @@ export class AppEncryptionRequestDetails implements SerializableEntity {
   flags: BigNumber;
   encryptToZAddress: string;                  // zaddress reply is encrypted to
   derivationNumber: BigNumber;
-  derivationID?: CompactAddressObject;      // Defaults to choosing the Z-address from the ID signing if not present
-  requestID?: string;                         // Unique identifier for the request
+  derivationID?: CompactIAddressObject;      // Defaults to choosing the Z-address from the ID signing if not present
+  requestID?: CompactIAddressObject;                         // Unique identifier for the request
 
-  constructor(data?: AppEncryptionRequestInterface) {
+  constructor(data?: AppEncryptionRequestDetailsInterface) {
     this.version = data?.version || AppEncryptionRequestDetails.DEFAULT_VERSION;
     this.flags = data?.flags || new BN(0);
     this.encryptToZAddress = data?.encryptToZAddress || '';
@@ -135,7 +133,7 @@ export class AppEncryptionRequestDetails implements SerializableEntity {
     }
 
     if (this.hasRequestID(flags)) {
-      length += HASH160_BYTE_LENGTH;
+      length += this.requestID.getByteLength();
     }
 
     return length;
@@ -160,8 +158,7 @@ export class AppEncryptionRequestDetails implements SerializableEntity {
     }
 
     if (this.hasRequestID(flags)) {
-
-      writer.writeSlice(fromBase58Check(this.requestID).hash);
+      writer.writeSlice(this.requestID.toBuffer());
     }
 
     return writer.buffer;
@@ -181,19 +178,21 @@ export class AppEncryptionRequestDetails implements SerializableEntity {
     this.derivationNumber = reader.readVarInt();
 
     if (this.hasDerivationID()) {
-      const derivationIDObj = new CompactAddressObject();
+      const derivationIDObj = new CompactIAddressObject();
       reader.offset = derivationIDObj.fromBuffer(reader.buffer, reader.offset);
       this.derivationID = derivationIDObj;
     }
 
     if (this.hasRequestID()) {
-      this.requestID = toBase58Check(reader.readSlice(20), I_ADDR_VERSION);
+      this.requestID = new CompactIAddressObject();
+
+      reader.offset = this.requestID.fromBuffer(reader.buffer, reader.offset);
     }
 
     return reader.offset;
   }
 
-  toJson(): AppEncryptionRequestJson {
+  toJson(): AppEncryptionRequestDetailsJson {
     // Set flags before serialization
     const flags = this.calcFlags();
 
@@ -203,11 +202,11 @@ export class AppEncryptionRequestDetails implements SerializableEntity {
       encrypttozaddress: this.encryptToZAddress,
       derivationnumber: this.derivationNumber.toNumber(),
       derivationid: this.derivationID?.toJson(),
-      requestid: this.requestID
+      requestid: this.requestID?.toJson()
     };
   }
 
-  static fromJson(json: AppEncryptionRequestJson): AppEncryptionRequestDetails {
+  static fromJson(json: AppEncryptionRequestDetailsJson): AppEncryptionRequestDetails {
     const instance = new AppEncryptionRequestDetails();
     instance.version = new BN(json.version);
     instance.flags = new BN(json.flags);
@@ -215,11 +214,11 @@ export class AppEncryptionRequestDetails implements SerializableEntity {
     instance.derivationNumber = new BN(json.derivationnumber);
     
     if(instance.hasDerivationID()) {
-      instance.derivationID = CompactAddressObject.fromJson(json?.derivationid);
+      instance.derivationID = CompactIAddressObject.fromCompactAddressObjectJson(json?.derivationid);
     }
     
     if(instance.hasRequestID()) {
-      instance.requestID = json?.requestid;
+      instance.requestID = CompactIAddressObject.fromCompactAddressObjectJson(json?.requestid);
     }
     
     return instance;

@@ -1,18 +1,19 @@
 import { BN } from "bn.js";
 import { 
   CompactAddressObject,
- UserSpecificDataPacketDetails, UserSpecificDataPacketDetailsJson
+  CompactIAddressObject,
+  DataPacketRequestDetails
 } from "../../vdxf/classes";
 import { DataDescriptor } from "../../pbaas";
 import { VerifiableSignatureData } from "../../vdxf/classes/VerifiableSignatureData";
 
 
-describe("UserSpecificDataPacketDetails", () => {
+describe("DataPacketRequestDetails", () => {
   describe("constructor and basic properties", () => {
     test("creates instance with custom values", () => {
-      const item = new UserSpecificDataPacketDetails({
-        version: new BN(UserSpecificDataPacketDetails.DEFAULT_VERSION),
-        flags: UserSpecificDataPacketDetails.HAS_STATEMENTS.or(UserSpecificDataPacketDetails.HAS_SIGNATURE).or(UserSpecificDataPacketDetails.HAS_DETAILS_ID),
+      const item = new DataPacketRequestDetails({
+        version: new BN(DataPacketRequestDetails.DEFAULT_VERSION),
+        flags: DataPacketRequestDetails.HAS_STATEMENTS.or(DataPacketRequestDetails.HAS_SIGNATURE).or(DataPacketRequestDetails.HAS_REQUEST_ID),
         signableObjects: [DataDescriptor.fromJson({ version: new BN(1), label: "123", objectdata: "0011223344aabbcc", flags: DataDescriptor.FLAG_LABEL_PRESENT })],
         statements: ["Statement 1", "Statement 2"],
         signature: new VerifiableSignatureData({
@@ -20,15 +21,15 @@ describe("UserSpecificDataPacketDetails", () => {
           signatureAsVch: Buffer.from("efc8d6b60c5b6efaeb3fce4b2c0749c317f2167549ec22b1bee411b8802d5aaf", 'hex'),
           hashType: new BN(1),
           flags: new BN(0),
-          identityID: new CompactAddressObject({ version: CompactAddressObject.DEFAULT_VERSION, type: CompactAddressObject.TYPE_I_ADDRESS, address: "i7LaXD2cdy1zeh33eHzZaEPyueT4yQmBfW", rootSystemName: "VRSC" }),
-          systemID: new CompactAddressObject({ version: CompactAddressObject.DEFAULT_VERSION, type: CompactAddressObject.TYPE_FQN, address: "VRSC", rootSystemName: "VRSC" }),
+          identityID: new CompactIAddressObject({ version: CompactAddressObject.DEFAULT_VERSION, type: CompactAddressObject.TYPE_I_ADDRESS, address: "i7LaXD2cdy1zeh33eHzZaEPyueT4yQmBfW", rootSystemName: "VRSC" }),
+          systemID: new CompactIAddressObject({ version: CompactAddressObject.DEFAULT_VERSION, type: CompactAddressObject.TYPE_FQN, address: "VRSC", rootSystemName: "VRSC" }),
         }),
-        detailsID: "iD4CrjbJBZmwEZQ4bCWgbHx9tBHGP9mdSQ"
+        requestID: CompactIAddressObject.fromAddress("iD4CrjbJBZmwEZQ4bCWgbHx9tBHGP9mdSQ")
       });
 
       const detailsBuffer = item.toBuffer();
 
-      const newDetails = new UserSpecificDataPacketDetails();
+      const newDetails = new DataPacketRequestDetails();
       newDetails.fromBuffer(detailsBuffer);
 
       expect(newDetails.toJson()).toEqual(item.toJson());

@@ -2,7 +2,7 @@
 
 
 /**
- * DataPacketResponse - Class for providing structured responses to various request types
+ * DataResponseDetails - Class for providing structured responses to various request types
  * 
  * This class serves as a universal response mechanism that can be used to reply to multiple
  * types of requests. It packages response data within a DataDescriptor along with metadata
@@ -20,9 +20,9 @@
  *    - The requestID references the original UserDataRequestDetails.requestID
  *    - Allows selective disclosure of personal information
  * 
- * 3. UserSpecificDataPacketDetails Response:
+ * 3. DataPacketRequestDetails Response:
  *    - The DataDescriptor 'data' field contains the response data or signed content
- *    - The requestID references the original UserSpecificDataPacketDetails.requestID
+ *    - The requestID references the original DataPacketRequestDetails.requestID
  *    - Supports bidirectional data exchange with signatures and statements
  * 
  * REQUEST-RESPONSE CORRELATION:
@@ -44,52 +44,46 @@ import varint from '../../../utils/varint';
 import bufferutils from '../../../utils/bufferutils';
 const { BufferReader, BufferWriter } = bufferutils;
 import { SerializableEntity } from '../../../utils/types/SerializableEntity';
-import { fromBase58Check, toBase58Check } from '../../../utils/address';
-import { HASH160_BYTE_LENGTH, I_ADDR_VERSION } from '../../../constants/vdxf';
 import { DataDescriptor, DataDescriptorJson } from '../../../pbaas';
 import createHash = require("create-hash");
+import { CompactAddressObjectJson, CompactIAddressObject } from '../CompactAddressObject';
 
-export interface DataResponseInterface {
+export interface DataResponseDetailsInterface {
   flags?: BigNumber;
-  requestID?: string;              // ID of request, to be referenced in response
+  requestID?: CompactIAddressObject;              // ID of request, to be referenced in response
   data: DataDescriptor;   
 }
 
-export interface  DataResponseJson {
+export interface DataResponseDetailsJson {
   flags?: number;
-  requestid?: string;              // ID of request, to be referenced in response
+  requestid?: CompactAddressObjectJson;              // ID of request, to be referenced in response
   data: DataDescriptorJson;   
 }
 
-export class DataPacketResponse implements SerializableEntity {
+export class DataResponseDetails implements SerializableEntity {
   flags?: BigNumber;
-  requestID?: string;              // ID of request, to be referenced in response
+  requestID?: CompactIAddressObject;              // ID of request, to be referenced in response
   data: DataDescriptor;    
 
   static RESPONSE_CONTAINS_REQUEST_ID = new BN(1, 10);
 
-  constructor (data?: {
-    flags?: BigNumber,
-    requestID?: string,
-    data: DataDescriptor
-  }) {
-    this.flags = data && data.flags ? data.flags : new BN("0", 10);
+  constructor (initialData?: DataResponseDetailsInterface) {
+    this.flags = initialData && initialData.flags ? initialData.flags : new BN("0", 10);
 
-    if (data?.requestID) {
+    if (initialData?.requestID) {
       if (!this.containsRequestID()) this.toggleContainsRequestID();
-      this.requestID = data.requestID;
+      this.requestID = initialData?.requestID;
     }
 
-    this.data = data?.data;
-
+    this.data = initialData && initialData.data ? initialData.data : new DataDescriptor();
   }
 
   containsRequestID() {
-    return !!(this.flags.and(DataPacketResponse.RESPONSE_CONTAINS_REQUEST_ID).toNumber());
+    return !!(this.flags.and(DataResponseDetails.RESPONSE_CONTAINS_REQUEST_ID).toNumber());
   }
 
   toggleContainsRequestID() {
-    this.flags = this.flags.xor(DataPacketResponse.RESPONSE_CONTAINS_REQUEST_ID);
+    this.flags = this.flags.xor(DataResponseDetails.RESPONSE_CONTAINS_REQUEST_ID);
   }
 
   toSha256() {
@@ -102,7 +96,7 @@ export class DataPacketResponse implements SerializableEntity {
     length += varint.encodingLength(this.flags);
 
     if (this.containsRequestID()) {
-      length += HASH160_BYTE_LENGTH;
+      length += this.requestID.getByteLength();
     }
 
     length += this.data.getByteLength();
@@ -116,7 +110,7 @@ export class DataPacketResponse implements SerializableEntity {
     writer.writeVarInt(this.flags);
 
     if (this.containsRequestID()) {
-      writer.writeSlice(fromBase58Check(this.requestID).hash);
+      writer.writeSlice(this.requestID.toBuffer());
     }
 
     writer.writeSlice(this.data.toBuffer());
@@ -130,7 +124,9 @@ export class DataPacketResponse implements SerializableEntity {
     this.flags = reader.readVarInt();
 
     if (this.containsRequestID()) {
-      this.requestID = toBase58Check(reader.readSlice(HASH160_BYTE_LENGTH), I_ADDR_VERSION);
+      this.requestID = new CompactIAddressObject();
+
+      reader.offset = this.requestID.fromBuffer(reader.buffer, reader.offset);
     }
 
     this.data = new DataDescriptor();
@@ -140,18 +136,18 @@ export class DataPacketResponse implements SerializableEntity {
     return reader.offset;
   }
 
-  toJson(): DataResponseJson {
+  toJson(): DataResponseDetailsJson {
     return {
       flags: this.flags.toNumber(),
-      requestid: this.containsRequestID() ? this.requestID : undefined,
+      requestid: this.containsRequestID() ? this.requestID.toJson() : undefined,
       data: this.data.toJson()
     }
   }
 
-  static fromJson(json: DataResponseJson): DataPacketResponse {
-    return new DataPacketResponse({
+  static fromJson(json: DataResponseDetailsJson): DataResponseDetails {
+    return new DataResponseDetails({
       flags: new BN(json.flags, 10),
-      requestID: json.requestid,
+      requestID: json.requestid ? CompactIAddressObject.fromCompactAddressObjectJson(json.requestid) : undefined,
       data: DataDescriptor.fromJson(json.data)
     });
   }
