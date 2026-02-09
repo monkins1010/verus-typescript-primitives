@@ -1,8 +1,8 @@
-import { VDXF_ORDINAL_PROVISION_IDENTITY_DETAILS } from "../../../constants/ordinals/ordinals";
+import { PROVISION_IDENTITY_DETAILS_VDXF_ORDINAL } from "../../../constants/ordinals/ordinals";
 import { SerializableDataEntity } from "../../../utils/types/SerializableEntity";
 import { OrdinalVDXFObjectInterfaceTemplate, OrdinalVDXFObjectJsonTemplate } from "./OrdinalVDXFObject";
 import { SerializableEntityOrdinalVDXFObject } from "./SerializableEntityOrdinalVDXFObject";
-import { ProvisionIdentityDetails, ProvisionIdentityDetailsJson } from "../requestobjects/ProvisionIdentityDetails";
+import { ProvisionIdentityDetails, ProvisionIdentityDetailsJson } from "../provisioning/ProvisionIdentityDetails";
 
 export class ProvisionIdentityDetailsOrdinalVDXFObject extends SerializableEntityOrdinalVDXFObject implements SerializableDataEntity {
   data: ProvisionIdentityDetails;
@@ -14,7 +14,7 @@ export class ProvisionIdentityDetailsOrdinalVDXFObject extends SerializableEntit
   ) {
     super(
       {
-        type: VDXF_ORDINAL_PROVISION_IDENTITY_DETAILS,
+        type: PROVISION_IDENTITY_DETAILS_VDXF_ORDINAL,
         data: request.data
       },
       ProvisionIdentityDetails

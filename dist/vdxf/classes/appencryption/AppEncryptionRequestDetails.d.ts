@@ -17,22 +17,22 @@
  */
 import { BigNumber } from '../../../utils/types/BigNumber';
 import { SerializableEntity } from '../../../utils/types/SerializableEntity';
-import { CompactAddressObject, CompactAddressObjectJson } from '../CompactAddressObject';
-export interface AppEncryptionRequestInterface {
+import { CompactIAddressObject, CompactAddressObjectJson } from '../CompactAddressObject';
+export interface AppEncryptionRequestDetailsInterface {
     version?: BigNumber;
     flags: BigNumber;
     encryptToZAddress: string;
     derivationNumber: BigNumber;
-    derivationID?: CompactAddressObject;
-    requestID?: string;
+    derivationID?: CompactIAddressObject;
+    requestID?: CompactIAddressObject;
 }
-export interface AppEncryptionRequestJson {
+export interface AppEncryptionRequestDetailsJson {
     version: number;
     flags: number;
     encrypttozaddress: string;
     derivationnumber: number;
     derivationid?: CompactAddressObjectJson;
-    requestid?: string;
+    requestid?: CompactAddressObjectJson;
 }
 /**
  * Checks if a string is a valid hexadecimal address
@@ -54,9 +54,9 @@ export declare class AppEncryptionRequestDetails implements SerializableEntity {
     flags: BigNumber;
     encryptToZAddress: string;
     derivationNumber: BigNumber;
-    derivationID?: CompactAddressObject;
-    requestID?: string;
-    constructor(data?: AppEncryptionRequestInterface);
+    derivationID?: CompactIAddressObject;
+    requestID?: CompactIAddressObject;
+    constructor(data?: AppEncryptionRequestDetailsInterface);
     setFlags(): void;
     calcFlags(): BigNumber;
     isValid(): boolean;
@@ -65,6 +65,6 @@ export declare class AppEncryptionRequestDetails implements SerializableEntity {
     getByteLength(): number;
     toBuffer(): Buffer;
     fromBuffer(buffer: Buffer, offset?: number): number;
-    toJson(): AppEncryptionRequestJson;
-    static fromJson(json: AppEncryptionRequestJson): AppEncryptionRequestDetails;
+    toJson(): AppEncryptionRequestDetailsJson;
+    static fromJson(json: AppEncryptionRequestDetailsJson): AppEncryptionRequestDetails;
 }

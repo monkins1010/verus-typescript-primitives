@@ -1,6 +1,6 @@
 "use strict";
 /**
- * UserSpecificDataPacketDetails - Class for sending personal data to user or requesting the user
+ * DataPacketRequestDetails - Class for sending personal data to user or requesting the user
  * signature on personal data
  *
  * This class is used when an application is requesting to transfer or receive personal
@@ -19,24 +19,22 @@
 
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserSpecificDataPacketDetails = void 0;
+exports.DataPacketRequestDetails = void 0;
 const bn_js_1 = require("bn.js");
 const varuint_1 = require("../../../utils/varuint");
 const bufferutils_1 = require("../../../utils/bufferutils");
 const { BufferReader, BufferWriter } = bufferutils_1.default;
 const pbaas_1 = require("../../../pbaas");
 const VerifiableSignatureData_1 = require("../VerifiableSignatureData");
-const address_1 = require("../../../utils/address");
-const vdxf_1 = require("../../../constants/vdxf");
-// User_specific_data_packet
-class UserSpecificDataPacketDetails {
+const CompactAddressObject_1 = require("../CompactAddressObject");
+class DataPacketRequestDetails {
     constructor(data) {
-        this.version = (data === null || data === void 0 ? void 0 : data.version) || UserSpecificDataPacketDetails.DEFAULT_VERSION;
+        this.version = (data === null || data === void 0 ? void 0 : data.version) || DataPacketRequestDetails.DEFAULT_VERSION;
         this.flags = (data === null || data === void 0 ? void 0 : data.flags) || new bn_js_1.BN(0);
         this.signableObjects = (data === null || data === void 0 ? void 0 : data.signableObjects) || [];
         this.statements = (data === null || data === void 0 ? void 0 : data.statements) || [];
         this.signature = (data === null || data === void 0 ? void 0 : data.signature) || undefined;
-        this.detailsID = data === null || data === void 0 ? void 0 : data.detailsID;
+        this.requestID = data === null || data === void 0 ? void 0 : data.requestID;
         this.setFlags();
     }
     setFlags() {
@@ -45,28 +43,28 @@ class UserSpecificDataPacketDetails {
     calcFlags() {
         let flags = new bn_js_1.BN(0);
         if (this.statements && this.statements.length > 0) {
-            flags = flags.or(UserSpecificDataPacketDetails.HAS_STATEMENTS);
+            flags = flags.or(DataPacketRequestDetails.HAS_STATEMENTS);
         }
         if (this.signature) {
-            flags = flags.or(UserSpecificDataPacketDetails.HAS_SIGNATURE);
+            flags = flags.or(DataPacketRequestDetails.HAS_SIGNATURE);
         }
-        if (this.detailsID) {
-            flags = flags.or(UserSpecificDataPacketDetails.HAS_DETAILS_ID);
+        if (this.requestID) {
+            flags = flags.or(DataPacketRequestDetails.HAS_REQUEST_ID);
         }
         return flags;
     }
     hasStatements() {
-        return this.flags.and(UserSpecificDataPacketDetails.HAS_STATEMENTS).eq(UserSpecificDataPacketDetails.HAS_STATEMENTS);
+        return this.flags.and(DataPacketRequestDetails.HAS_STATEMENTS).eq(DataPacketRequestDetails.HAS_STATEMENTS);
     }
     hasSignature() {
-        return this.flags.and(UserSpecificDataPacketDetails.HAS_SIGNATURE).eq(UserSpecificDataPacketDetails.HAS_SIGNATURE);
+        return this.flags.and(DataPacketRequestDetails.HAS_SIGNATURE).eq(DataPacketRequestDetails.HAS_SIGNATURE);
     }
-    hasDetailsID() {
-        return this.flags.and(UserSpecificDataPacketDetails.HAS_DETAILS_ID).eq(UserSpecificDataPacketDetails.HAS_DETAILS_ID);
+    hasRequestID() {
+        return this.flags.and(DataPacketRequestDetails.HAS_REQUEST_ID).eq(DataPacketRequestDetails.HAS_REQUEST_ID);
     }
     isValid() {
-        let valid = this.version.gte(UserSpecificDataPacketDetails.FIRST_VERSION) &&
-            this.version.lte(UserSpecificDataPacketDetails.LAST_VERSION);
+        let valid = this.version.gte(DataPacketRequestDetails.FIRST_VERSION) &&
+            this.version.lte(DataPacketRequestDetails.LAST_VERSION);
         // Check that we have signable objects
         valid && (valid = this.signableObjects.length > 0);
         if (this.hasStatements()) {
@@ -96,8 +94,8 @@ class UserSpecificDataPacketDetails {
         if (this.hasSignature() && this.signature) {
             length += this.signature.getByteLength();
         }
-        if (this.hasDetailsID()) {
-            length += vdxf_1.HASH160_BYTE_LENGTH;
+        if (this.hasRequestID()) {
+            length += this.requestID.getByteLength();
         }
         return length;
     }
@@ -119,8 +117,8 @@ class UserSpecificDataPacketDetails {
         if (this.hasSignature() && this.signature) {
             writer.writeSlice(this.signature.toBuffer());
         }
-        if (this.hasDetailsID()) {
-            writer.writeSlice((0, address_1.fromBase58Check)(this.detailsID).hash);
+        if (this.hasRequestID()) {
+            writer.writeSlice(this.requestID.toBuffer());
         }
         return writer.buffer;
     }
@@ -149,8 +147,9 @@ class UserSpecificDataPacketDetails {
             reader.offset = signature.fromBuffer(reader.buffer, reader.offset);
             this.signature = signature;
         }
-        if (this.hasDetailsID()) {
-            this.detailsID = (0, address_1.toBase58Check)(reader.readSlice(20), vdxf_1.I_ADDR_VERSION);
+        if (this.hasRequestID()) {
+            this.requestID = new CompactAddressObject_1.CompactIAddressObject();
+            reader.offset = this.requestID.fromBuffer(reader.buffer, reader.offset);
         }
         return reader.offset;
     }
@@ -162,11 +161,11 @@ class UserSpecificDataPacketDetails {
             signableobjects: this.signableObjects.map(obj => obj.toJson()),
             statements: this.statements,
             signature: this.signature ? this.signature.toJson() : undefined,
-            detailsid: this.detailsID
+            requestid: this.requestID ? this.requestID.toJson() : undefined,
         };
     }
     static fromJson(json) {
-        const instance = new UserSpecificDataPacketDetails();
+        const instance = new DataPacketRequestDetails();
         instance.version = new bn_js_1.BN(json.version);
         instance.flags = new bn_js_1.BN(json.flags);
         const dataDescriptorObjects = [];
@@ -177,19 +176,19 @@ class UserSpecificDataPacketDetails {
         instance.signableObjects = dataDescriptorObjects;
         instance.statements = json.statements || [];
         instance.signature = json.signature ? VerifiableSignatureData_1.VerifiableSignatureData.fromJson(json.signature) : undefined;
-        instance.detailsID = json.detailsid;
+        instance.requestID = json.requestid ? CompactAddressObject_1.CompactIAddressObject.fromCompactAddressObjectJson(json.requestid) : undefined;
         return instance;
     }
 }
-exports.UserSpecificDataPacketDetails = UserSpecificDataPacketDetails;
-UserSpecificDataPacketDetails.VERSION_INVALID = new bn_js_1.BN(0);
-UserSpecificDataPacketDetails.FIRST_VERSION = new bn_js_1.BN(1);
-UserSpecificDataPacketDetails.LAST_VERSION = new bn_js_1.BN(1);
-UserSpecificDataPacketDetails.DEFAULT_VERSION = new bn_js_1.BN(1);
+exports.DataPacketRequestDetails = DataPacketRequestDetails;
+DataPacketRequestDetails.VERSION_INVALID = new bn_js_1.BN(0);
+DataPacketRequestDetails.FIRST_VERSION = new bn_js_1.BN(1);
+DataPacketRequestDetails.LAST_VERSION = new bn_js_1.BN(1);
+DataPacketRequestDetails.DEFAULT_VERSION = new bn_js_1.BN(1);
 // types of data to sign
-UserSpecificDataPacketDetails.HAS_STATEMENTS = new bn_js_1.BN(1);
-UserSpecificDataPacketDetails.HAS_SIGNATURE = new bn_js_1.BN(2);
-UserSpecificDataPacketDetails.FOR_USERS_SIGNATURE = new bn_js_1.BN(4);
-UserSpecificDataPacketDetails.FOR_TRANSMITTAL_TO_USER = new bn_js_1.BN(8);
-UserSpecificDataPacketDetails.HAS_URL_FOR_DOWNLOAD = new bn_js_1.BN(16);
-UserSpecificDataPacketDetails.HAS_DETAILS_ID = new bn_js_1.BN(32);
+DataPacketRequestDetails.HAS_REQUEST_ID = new bn_js_1.BN(1);
+DataPacketRequestDetails.HAS_STATEMENTS = new bn_js_1.BN(2);
+DataPacketRequestDetails.HAS_SIGNATURE = new bn_js_1.BN(4);
+DataPacketRequestDetails.FOR_USERS_SIGNATURE = new bn_js_1.BN(8);
+DataPacketRequestDetails.FOR_TRANSMITTAL_TO_USER = new bn_js_1.BN(16);
+DataPacketRequestDetails.HAS_URL_FOR_DOWNLOAD = new bn_js_1.BN(32);

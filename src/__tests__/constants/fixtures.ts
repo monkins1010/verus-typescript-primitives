@@ -4,6 +4,7 @@ import { PartialIdentity } from "../../pbaas/PartialIdentity"
 import { PartialMMRData } from "../../pbaas/PartialMMRData"
 import { PartialSignData, PartialSignDataInitData } from "../../pbaas/PartialSignData"
 import { DATA_TYPE_MMRDATA } from "../../constants/pbaas"
+import { CompactIAddressObject } from "../../vdxf/classes"
 
 export const manyContentMultimapData = {
   "iGdWifeNFcN69JiFwmcZTYT1zPYpFumGhq": [
@@ -333,7 +334,7 @@ export const TEST_IDENTITY_ID = "i8jHXEEYEQ7KEoYe6eKXBib8cUBZ6vjWSd"
 
 export const TEST_SYSTEMID = IdentityID.fromAddress("iJhCezBExJHvtyH3fGhNnt2NhU4Ztkf2yq");
 export const TEST_SIGNINGID = IdentityID.fromAddress("iPsFBfFoCcxtuZNzE8yxPQhXVn4dmytf8j");
-export const TEST_REQUESTID = "iPsFBfFoCcxtuZNzE8yxPQhXVn4dmytf8j";
+export const TEST_REQUESTID = CompactIAddressObject.fromAddress("iPsFBfFoCcxtuZNzE8yxPQhXVn4dmytf8j");
 export const TEST_CREATEDAT = new BN("1700000000", 10);
 export const TEST_EXPIRYHEIGHT = new BN("123456");
 export const TEST_SALT = Buffer.from('=H319X:)@H2Z');
@@ -454,4 +455,4 @@ export const TEST_IDENTITY_ID_1 = "i7LaXD2cdy1zeh33eHzZaEPyueT4yQmBfW";
 export const TEST_IDENTITY_ID_2 = "i84T3MWcb6zWcwgNZoU3TXtrUn9EqM84A4";
 export const TEST_IDENTITY_ID_3 = "iJ5LnijKvp1wkL4hB3EsJ5kjcE4T8VL4hD";
 
-export const SERIALIZED_AUTHENTICATION_REQUEST_DETAILS = Buffer.from("03c72c5b342995a2186f96271e91686c5e942d13e1030101022a5fc0e9dedf4f1e8351fe652a140e9dd38fa5a9020102324afad29f51859c54050db854d2c9bb52acd9bd030102a0276f355ad37d8e5d2d10f16c1d051b6f6ead62ff9982d02aac020000", 'hex');
+export const SERIALIZED_AUTHENTICATION_REQUEST_DETAILS = Buffer.from("070102c72c5b342995a2186f96271e91686c5e942d13e1030101022a5fc0e9dedf4f1e8351fe652a140e9dd38fa5a9020102324afad29f51859c54050db854d2c9bb52acd9bd030102a0276f355ad37d8e5d2d10f16c1d051b6f6ead62ff9982d02aac020000", 'hex');

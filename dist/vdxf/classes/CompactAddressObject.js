@@ -8,7 +8,7 @@
  * and validation of the compact id object.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CompactXAddressObject = exports.CompactAddressObject = void 0;
+exports.CompactIAddressObject = exports.CompactXAddressObject = exports.CompactAddressObject = void 0;
 const bn_js_1 = require("bn.js");
 const bufferutils_1 = require("../../utils/bufferutils");
 const { BufferReader, BufferWriter } = bufferutils_1.default;
@@ -48,7 +48,12 @@ class CompactAddressObject {
         else if (this.isIaddress())
             return this.address;
         else if (this.isFQN()) {
-            return (0, address_1.toIAddress)(this.address, this.rootSystemName);
+            if (this.address.includes("::")) {
+                return (0, address_1.getDataKey)(this.address, this.nameSpace, (0, address_1.toIAddress)(this.rootSystemName), vdxf_1.I_ADDR_VERSION).id;
+            }
+            else {
+                return (0, address_1.toIAddress)(this.address, this.rootSystemName);
+            }
         }
         else
             throw new Error("Unknown type");
@@ -59,10 +64,25 @@ class CompactAddressObject {
         else if (this.isXaddress())
             return this.address;
         else if (this.isFQN()) {
-            return (0, address_1.getDataKey)(this.address, this.nameSpace, (0, address_1.toIAddress)(this.rootSystemName), vdxf_1.X_ADDR_VERSION).id;
+            if (this.address.includes("::")) {
+                return (0, address_1.getDataKey)(this.address, this.nameSpace, (0, address_1.toIAddress)(this.rootSystemName), vdxf_1.X_ADDR_VERSION).id;
+            }
+            else {
+                return (0, address_1.toXAddress)(this.address, this.rootSystemName);
+            }
         }
         else
             throw new Error("Unknown type");
+    }
+    toString() {
+        if (this.isIaddress()) {
+            return this.toIAddress();
+        }
+        else if (this.isXaddress()) {
+            return this.toXAddress();
+        }
+        else
+            return this.address;
     }
     static fromIAddress(iaddr) {
         return new CompactAddressObject({
@@ -150,6 +170,33 @@ class CompactXAddressObject extends CompactAddressObject {
     toAddress() {
         return this.toXAddress();
     }
+    static fromCompactAddressObjectJson(json) {
+        const inst = CompactAddressObject.fromJson(json);
+        return inst;
+    }
 }
 exports.CompactXAddressObject = CompactXAddressObject;
+;
+class CompactIAddressObject extends CompactAddressObject {
+    static fromAddress(iaddr, nameSpace = pbaas_1.DEFAULT_VERUS_CHAINID) {
+        return new CompactIAddressObject({
+            address: iaddr,
+            nameSpace: nameSpace,
+            type: CompactAddressObject.TYPE_I_ADDRESS
+        });
+    }
+    toAddress() {
+        return this.toIAddress();
+    }
+    static fromCompactAddressObjectJson(json) {
+        const inst = CompactAddressObject.fromJson(json);
+        return new CompactIAddressObject({
+            address: inst.address,
+            nameSpace: inst.nameSpace,
+            type: new bn_js_1.BN(inst.type),
+            rootSystemName: inst.rootSystemName
+        });
+    }
+}
+exports.CompactIAddressObject = CompactIAddressObject;
 ;
