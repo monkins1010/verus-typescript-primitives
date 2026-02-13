@@ -20,22 +20,17 @@ import { BN } from "bn.js";
 import { SerializableEntity } from "../../../utils/types/SerializableEntity";
 import varuint from "../../../utils/varuint";
 import { CompactIAddressObject, CompactAddressObjectJson } from "../CompactAddressObject";
+import {
+  RecipientConstraint,
+  RecipientConstraintInterface,
+  RecipientConstraintJson,
+} from "./RecipientConstraint";
 
 export interface AuthenticationRequestDetailsInterface {
   flags?: BigNumber;  
   requestID?: CompactIAddressObject;
-  recipientConstraints?: Array<RecipientConstraint>;
+  recipientConstraints?: Array<RecipientConstraint | RecipientConstraintInterface>;
   expiryTime?: BigNumber; // UNIX Timestamp
-}
-
-export interface RecipientConstraintJson {
-  type: number;
-  identity: CompactAddressObjectJson;
-}
-
-export interface RecipientConstraint {
-  type: number;
-  identity: CompactIAddressObject;
 }
 
 export interface AuthenticationRequestDetailsJson {
@@ -55,17 +50,12 @@ export class AuthenticationRequestDetails implements SerializableEntity {
   static FLAG_HAS_RECIPIENT_CONSTRAINTS = new BN(2, 10);
   static FLAG_HAS_EXPIRY_TIME = new BN(4, 10);
 
-  // Recipient Constraint Types - What types of Identity can login, e.g. REQUIRED_SYSTEM and "VRSC" means only identities on the Verus chain can login
-  static REQUIRED_ID = 1;
-  static REQUIRED_SYSTEM = 2;
-  static REQUIRED_PARENT = 3;
-
   constructor(
     request?: AuthenticationRequestDetailsInterface 
   ) {
     this.flags = request?.flags || new BN(0, 10);
     this.requestID = request?.requestID || null;
-    this.recipientConstraints = request?.recipientConstraints || null;
+    this.recipientConstraints = request?.recipientConstraints ? request.recipientConstraints.map(RecipientConstraint.fromData) : null;
     this.expiryTime = request?.expiryTime || null;
 
     this.setFlags();
@@ -108,8 +98,7 @@ export class AuthenticationRequestDetails implements SerializableEntity {
     if (this.hasRecipentConstraints()) {
       length += varuint.encodingLength(this.recipientConstraints.length);      
       for (let i = 0; i < this.recipientConstraints.length; i++) {
-        length += varuint.encodingLength(this.recipientConstraints[i].type);
-        length += this.recipientConstraints[i].identity.getByteLength();
+        length += this.recipientConstraints[i].getByteLength();
       }      
     }
 
@@ -132,8 +121,7 @@ export class AuthenticationRequestDetails implements SerializableEntity {
     if (this.hasRecipentConstraints()) {
       writer.writeCompactSize(this.recipientConstraints.length);   
       for (let i = 0; i < this.recipientConstraints.length; i++) {
-        writer.writeCompactSize(this.recipientConstraints[i].type);
-        writer.writeSlice(this.recipientConstraints[i].identity.toBuffer());
+        writer.writeSlice(this.recipientConstraints[i].toBuffer());
       }
     }
 
@@ -160,14 +148,9 @@ export class AuthenticationRequestDetails implements SerializableEntity {
       const recipientConstraintsLength = reader.readCompactSize();
 
       for (let i = 0; i < recipientConstraintsLength; i++) {
-        const compactId = new CompactIAddressObject();
-        const type = reader.readCompactSize();
-        const identityOffset = reader.offset;
-        reader.offset = compactId.fromBuffer(buffer, identityOffset);
-        this.recipientConstraints.push({
-          type: type,
-          identity: compactId
-        });
+        const recipientConstraint = new RecipientConstraint();
+        reader.offset = recipientConstraint.fromBuffer(buffer, reader.offset);
+        this.recipientConstraints.push(recipientConstraint);
       }
     } 
 
@@ -184,8 +167,7 @@ export class AuthenticationRequestDetails implements SerializableEntity {
     const retval = {
       flags: flags.toNumber(),
       requestid: this.requestID.toJson(),
-      recipientConstraints: this.recipientConstraints ? this.recipientConstraints.map(p => ({type: p.type,
-          identity: p.identity.toJson()})) : undefined,
+      recipientConstraints: this.recipientConstraints ? this.recipientConstraints.map(p => p.toJson()) : undefined,
       expirytime: this.expiryTime ? this.expiryTime.toNumber() : undefined
     };
 
@@ -198,9 +180,9 @@ export class AuthenticationRequestDetails implements SerializableEntity {
     loginDetails.flags = new BN(data?.flags || 0);
     loginDetails.requestID = data.requestid ? CompactIAddressObject.fromCompactAddressObjectJson(data.requestid) : undefined;
 
-    if(loginDetails.hasRecipentConstraints() && data.recipientconstraints) {
-      loginDetails.recipientConstraints = data.recipientconstraints.map(p => ({type: p.type,
-        identity: CompactIAddressObject.fromCompactAddressObjectJson(p.identity)}));
+    const recipientConstraints = data.recipientconstraints || data.recipientconstraints;
+    if(loginDetails.hasRecipentConstraints() && recipientConstraints) {
+      loginDetails.recipientConstraints = recipientConstraints.map(p => RecipientConstraint.fromJson(p));
     }
 
     if(loginDetails.hasExpiryTime() && data.expirytime) {

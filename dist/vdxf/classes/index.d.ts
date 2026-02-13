@@ -23,6 +23,7 @@ export { ProvisioningResultInterface as LoginConsentProvisioningResultInterface 
 export * from "./identity/IdentityUpdateRequestDetails";
 export * from "./identity/IdentityUpdateResponseDetails";
 export * from './ResponseURI';
+export * from './RequestURI';
 export * from './request/GenericRequest';
 export * from './response/GenericResponse';
 export * from './appencryption/AppEncryptionResponseDetails';
@@ -35,6 +36,7 @@ export { DataCategory } from './PersonalProfile';
 export * from './data/UserDataRequestDetails';
 export * from './login/AuthenticationRequestDetails';
 export * from './login/AuthenticationResponseDetails';
+export * from './login/RecipientConstraint';
 export * from './provisioning/ProvisionIdentityDetails';
 export * from './appencryption/AppEncryptionRequestDetails';
 export * from './data/DataPacketRequestDetails';

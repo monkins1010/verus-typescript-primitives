@@ -24,12 +24,15 @@ import {
   AuthenticationRequestDetails,
   AuthenticationResponseDetails,
   ProvisionIdentityDetails,
+  RequestURI,
+  ResponseURI,
   VerusPayInvoiceDetails,
   UserDataRequestDetails,
   DataPacketRequestDetails,
   AppEncryptionResponseOrdinalVDXFObject,
   AppEncryptionResponseDetails,
-  CompactIAddressObject
+  CompactIAddressObject,
+  RecipientConstraint
 } from '../../vdxf/classes';
 import { DEFAULT_VERUS_CHAINID } from '../../constants/pbaas';
 import { fromBase58Check } from '../../utils/address';
@@ -333,9 +336,9 @@ describe('OrdinalVDXFObject and subclasses round-trip serialization', () => {
     const details = new AuthenticationRequestDetails({
       requestID: CompactIAddressObject.fromAddress(TEST_CHALLENGE_ID, TEST_SYSTEMID.toAddress()!),
       recipientConstraints: [
-        { type: AuthenticationRequestDetails.REQUIRED_ID, identity: new CompactIAddressObject({ version: CompactAddressObject.DEFAULT_VERSION, type: CompactAddressObject.TYPE_I_ADDRESS, address: TEST_IDENTITY_ID_1, rootSystemName: "VRSC" }) },
-        { type: AuthenticationRequestDetails.REQUIRED_SYSTEM, identity: new CompactIAddressObject({ version: CompactAddressObject.DEFAULT_VERSION, type: CompactAddressObject.TYPE_I_ADDRESS, address: TEST_IDENTITY_ID_2, rootSystemName: "VRSC" }) },
-        { type: AuthenticationRequestDetails.REQUIRED_PARENT, identity: new CompactIAddressObject({ version: CompactAddressObject.DEFAULT_VERSION, type: CompactAddressObject.TYPE_I_ADDRESS, address: TEST_IDENTITY_ID_3, rootSystemName: "VRSC" }) }
+        { type: RecipientConstraint.REQUIRED_ID, identity: new CompactIAddressObject({ version: CompactAddressObject.DEFAULT_VERSION, type: CompactAddressObject.TYPE_I_ADDRESS, address: TEST_IDENTITY_ID_1, rootSystemName: "VRSC" }) },
+        { type: RecipientConstraint.REQUIRED_SYSTEM, identity: new CompactIAddressObject({ version: CompactAddressObject.DEFAULT_VERSION, type: CompactAddressObject.TYPE_I_ADDRESS, address: TEST_IDENTITY_ID_2, rootSystemName: "VRSC" }) },
+        { type: RecipientConstraint.REQUIRED_PARENT, identity: new CompactIAddressObject({ version: CompactAddressObject.DEFAULT_VERSION, type: CompactAddressObject.TYPE_I_ADDRESS, address: TEST_IDENTITY_ID_3, rootSystemName: "VRSC" }) }
       ],
       expiryTime: new BN(2938475938457)
     });
@@ -385,6 +388,7 @@ describe('OrdinalVDXFObject and subclasses round-trip serialization', () => {
     const details = new ProvisionIdentityDetails({
       version: new BN(1, 10),
       flags: ProvisionIdentityDetails.FLAG_HAS_SYSTEMID.or(ProvisionIdentityDetails.FLAG_HAS_PARENTID),
+      uri: RequestURI.fromUriString("https://127.0.0.1/provision"),
       systemID: new CompactIAddressObject({ version: CompactAddressObject.DEFAULT_VERSION, type: CompactAddressObject.TYPE_I_ADDRESS, address: TEST_IDENTITY_ID_1, rootSystemName: "VRSC" }),
       parentID: new CompactIAddressObject({ version: CompactAddressObject.DEFAULT_VERSION, type: CompactAddressObject.TYPE_I_ADDRESS, address: TEST_IDENTITY_ID_2, rootSystemName: "VRSC" })
     });
@@ -397,6 +401,9 @@ describe('OrdinalVDXFObject and subclasses round-trip serialization', () => {
     const d2 = (round as ProvisionIdentityDetailsOrdinalVDXFObject).data;
     expect(d2.systemID!.toIAddress()).toEqual(details.systemID!.toIAddress());
     expect(d2.parentID!.toIAddress()).toEqual(details.parentID!.toIAddress());
+    expect(d2.hasUri()).toBe(true);
+    expect(d2.uri!.getUriString()).toEqual(details.uri!.getUriString());
+    expect(d2.uri!.type.toString()).toEqual(ResponseURI.TYPE_POST.toString());
 
     const json = obj.toJson();
     expect(json.data).toBeDefined();
@@ -406,6 +413,9 @@ describe('OrdinalVDXFObject and subclasses round-trip serialization', () => {
     const d3 = (roundJ as ProvisionIdentityDetailsOrdinalVDXFObject).data;
     expect(d3.systemID!.toIAddress()).toEqual(details.systemID!.toIAddress());
     expect(d3.parentID!.toIAddress()).toEqual(details.parentID!.toIAddress());
+    expect(d3.hasUri()).toBe(true);
+    expect(d3.uri!.getUriString()).toEqual(details.uri!.getUriString());
+    expect(d3.uri!.type.toString()).toEqual(ResponseURI.TYPE_POST.toString());
   });
 
   it('should serialize / deserialize an AppEncryptionRequestOrdinalVDXFObject', () => {

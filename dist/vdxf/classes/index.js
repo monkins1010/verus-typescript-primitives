@@ -44,6 +44,7 @@ Object.defineProperty(exports, "LoginConsentProvisioningResult", { enumerable: t
 __exportStar(require("./identity/IdentityUpdateRequestDetails"), exports);
 __exportStar(require("./identity/IdentityUpdateResponseDetails"), exports);
 __exportStar(require("./ResponseURI"), exports);
+__exportStar(require("./RequestURI"), exports);
 __exportStar(require("./request/GenericRequest"), exports);
 __exportStar(require("./response/GenericResponse"), exports);
 __exportStar(require("./appencryption/AppEncryptionResponseDetails"), exports);
@@ -67,6 +68,7 @@ Object.defineProperty(exports, "DataCategory", { enumerable: true, get: function
 __exportStar(require("./data/UserDataRequestDetails"), exports);
 __exportStar(require("./login/AuthenticationRequestDetails"), exports);
 __exportStar(require("./login/AuthenticationResponseDetails"), exports);
+__exportStar(require("./login/RecipientConstraint"), exports);
 __exportStar(require("./provisioning/ProvisionIdentityDetails"), exports);
 __exportStar(require("./appencryption/AppEncryptionRequestDetails"), exports);
 __exportStar(require("./data/DataPacketRequestDetails"), exports);

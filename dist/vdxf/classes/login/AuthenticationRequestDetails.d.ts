@@ -15,19 +15,12 @@
 import { BigNumber } from "../../../utils/types/BigNumber";
 import { SerializableEntity } from "../../../utils/types/SerializableEntity";
 import { CompactIAddressObject, CompactAddressObjectJson } from "../CompactAddressObject";
+import { RecipientConstraint, RecipientConstraintInterface, RecipientConstraintJson } from "./RecipientConstraint";
 export interface AuthenticationRequestDetailsInterface {
     flags?: BigNumber;
     requestID?: CompactIAddressObject;
-    recipientConstraints?: Array<RecipientConstraint>;
+    recipientConstraints?: Array<RecipientConstraint | RecipientConstraintInterface>;
     expiryTime?: BigNumber;
-}
-export interface RecipientConstraintJson {
-    type: number;
-    identity: CompactAddressObjectJson;
-}
-export interface RecipientConstraint {
-    type: number;
-    identity: CompactIAddressObject;
 }
 export interface AuthenticationRequestDetailsJson {
     requestid?: CompactAddressObjectJson;
@@ -43,9 +36,6 @@ export declare class AuthenticationRequestDetails implements SerializableEntity 
     static FLAG_HAS_REQUEST_ID: import("bn.js");
     static FLAG_HAS_RECIPIENT_CONSTRAINTS: import("bn.js");
     static FLAG_HAS_EXPIRY_TIME: import("bn.js");
-    static REQUIRED_ID: number;
-    static REQUIRED_SYSTEM: number;
-    static REQUIRED_PARENT: number;
     constructor(request?: AuthenticationRequestDetailsInterface);
     hasRequestID(): boolean;
     hasRecipentConstraints(): boolean;
