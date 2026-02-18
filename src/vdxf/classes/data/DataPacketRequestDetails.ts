@@ -83,7 +83,9 @@ export class DataPacketRequestDetails implements SerializableEntity {
   }
 
   calcFlags(): BigNumber {
-    let flags = new BN(0);
+    let flags = new BN(this.flags.and(DataPacketRequestDetails.FLAG_FOR_USERS_SIGNATURE
+      .or(DataPacketRequestDetails.FLAG_FOR_TRANSMITTAL_TO_USER)
+      .or(DataPacketRequestDetails.FLAG_HAS_URL_FOR_DOWNLOAD)));
     
     if (this.statements && this.statements.length > 0) {
       flags = flags.or(DataPacketRequestDetails.FLAG_HAS_STATEMENTS);

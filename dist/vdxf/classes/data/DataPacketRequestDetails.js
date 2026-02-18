@@ -41,7 +41,9 @@ class DataPacketRequestDetails {
         this.flags = this.calcFlags();
     }
     calcFlags() {
-        let flags = new bn_js_1.BN(0);
+        let flags = new bn_js_1.BN(this.flags.and(DataPacketRequestDetails.FLAG_FOR_USERS_SIGNATURE
+            .or(DataPacketRequestDetails.FLAG_FOR_TRANSMITTAL_TO_USER)
+            .or(DataPacketRequestDetails.FLAG_HAS_URL_FOR_DOWNLOAD)));
         if (this.statements && this.statements.length > 0) {
             flags = flags.or(DataPacketRequestDetails.FLAG_HAS_STATEMENTS);
         }
