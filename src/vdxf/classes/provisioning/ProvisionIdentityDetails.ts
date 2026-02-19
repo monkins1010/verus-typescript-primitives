@@ -56,7 +56,7 @@ export class ProvisionIdentityDetails implements SerializableEntity {
   // flags include params // parent same as signer
   static FLAG_HAS_SYSTEMID = new BN(1, 10);
   static FLAG_HAS_PARENTID = new BN(2, 10);
-  static FLAG_IS_A_DEFINED_NAME_TO_PROVISION = new BN(4, 10);
+  static FLAG_HAS_IDENTITY_ID = new BN(4, 10);
   static FLAG_HAS_URI = new BN(8, 10);
 
   constructor(data?: ProvisionIdentityDetailsInterface) {
@@ -79,7 +79,7 @@ export class ProvisionIdentityDetails implements SerializableEntity {
   }
 
   hasIdentityId(): boolean {
-    return this.flags.and(ProvisionIdentityDetails.FLAG_IS_A_DEFINED_NAME_TO_PROVISION).eq(ProvisionIdentityDetails.FLAG_IS_A_DEFINED_NAME_TO_PROVISION);
+    return this.flags.and(ProvisionIdentityDetails.FLAG_HAS_IDENTITY_ID).eq(ProvisionIdentityDetails.FLAG_HAS_IDENTITY_ID);
   }
 
   hasUri(): boolean {
@@ -136,7 +136,7 @@ export class ProvisionIdentityDetails implements SerializableEntity {
     return writer.buffer;
   }
 
-  fromBuffer(buffer: Buffer, offset?: number): number {
+  fromBuffer(buffer: Buffer, offset?: number, rootSystemName: string = 'VRSC'): number {
     const reader = new bufferutils.BufferReader(buffer, offset);
     if (buffer.length == 0) throw new Error("Cannot create provision identity from empty buffer");
 
@@ -150,19 +150,19 @@ export class ProvisionIdentityDetails implements SerializableEntity {
     }
 
     if (this.hasSystemId()) {
-      const systemID = new CompactIAddressObject();
+      const systemID = new CompactIAddressObject({ type: CompactIAddressObject.TYPE_I_ADDRESS, address: '', rootSystemName });
       reader.offset = systemID.fromBuffer(reader.buffer, reader.offset);
       this.systemID = systemID;
     }
 
     if (this.hasParentId()) {
-      const parentID = new CompactIAddressObject();
+      const parentID = new CompactIAddressObject({ type: CompactIAddressObject.TYPE_I_ADDRESS, address: '', rootSystemName });
       reader.offset = parentID.fromBuffer(reader.buffer, reader.offset);
       this.parentID = parentID;
     }
 
     if (this.hasIdentityId()) {
-      const identityID = new CompactIAddressObject();
+      const identityID = new CompactIAddressObject({ type: CompactIAddressObject.TYPE_I_ADDRESS, address: '', rootSystemName });
       reader.offset = identityID.fromBuffer(reader.buffer, reader.offset);
       this.identityID = identityID;
     }
@@ -171,10 +171,9 @@ export class ProvisionIdentityDetails implements SerializableEntity {
   }
 
   toJson(): ProvisionIdentityDetailsJson {
-    const flags = this.calcFlags();
     return {
       version: this.version.toNumber(),
-      flags: flags.toNumber(),
+      flags: this.flags.toNumber(),
       uri: this.uri ? this.uri.toJson() : null,
       systemid: this.systemID ? this.systemID.toJson() : null,
       parentid: this.parentID ? this.parentID.toJson() : null,
@@ -183,7 +182,6 @@ export class ProvisionIdentityDetails implements SerializableEntity {
   }
 
   static fromJson(data: any): ProvisionIdentityDetails {
-
     const provision = new ProvisionIdentityDetails();
     provision.version = new BN(data?.version || 0);
     provision.flags = new BN(data?.flags || 0);
@@ -211,7 +209,7 @@ export class ProvisionIdentityDetails implements SerializableEntity {
   }
 
   calcFlags(): BigNumber {
-    let flags = new BN(0, 10);
+    let flags = new BN(this.flags);
 
     if (this.systemID) {
       flags = flags.or(ProvisionIdentityDetails.FLAG_HAS_SYSTEMID);
@@ -222,7 +220,7 @@ export class ProvisionIdentityDetails implements SerializableEntity {
     }
 
     if (this.identityID) {
-      flags = flags.or(ProvisionIdentityDetails.FLAG_IS_A_DEFINED_NAME_TO_PROVISION);
+      flags = flags.or(ProvisionIdentityDetails.FLAG_HAS_IDENTITY_ID);
     }
 
     if (this.uri) {
@@ -236,7 +234,6 @@ export class ProvisionIdentityDetails implements SerializableEntity {
     this.flags = this.calcFlags();
   }
 
-
   isValid(): boolean {
     let valid = this.flags != null && this.flags.gte(new BN(0));
 
@@ -247,5 +244,4 @@ export class ProvisionIdentityDetails implements SerializableEntity {
      
     return valid;
   }
-
 }

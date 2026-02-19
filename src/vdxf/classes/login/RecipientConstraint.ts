@@ -1,7 +1,7 @@
 import bufferutils from "../../../utils/bufferutils";
 import { SerializableEntity } from "../../../utils/types/SerializableEntity";
 import varuint from "../../../utils/varuint";
-import { CompactAddressObjectJson, CompactIAddressObject } from "../CompactAddressObject";
+import { CompactAddressObject, CompactAddressObjectJson, CompactIAddressObject } from "../CompactAddressObject";
 
 export interface RecipientConstraintJson {
   type: number;
@@ -51,11 +51,11 @@ export class RecipientConstraint implements SerializableEntity {
     return writer.buffer;
   }
 
-  fromBuffer(buffer: Buffer, offset?: number): number {
+  fromBuffer(buffer: Buffer, offset?: number, rootSystemName: string = 'VRSC'): number {
     const reader = new bufferutils.BufferReader(buffer, offset);
 
     this.type = reader.readCompactSize();
-    this.identity = new CompactIAddressObject();
+    this.identity = new CompactIAddressObject({ type: CompactIAddressObject.TYPE_I_ADDRESS, address: '', rootSystemName });
     reader.offset = this.identity.fromBuffer(reader.buffer, reader.offset);
 
     return reader.offset;
@@ -93,6 +93,28 @@ export class RecipientConstraint implements SerializableEntity {
     return new RecipientConstraint({
       type: RecipientConstraint.REQUIRED_PARENT,
       identity: CompactIAddressObject.fromAddress(iaddr),
+    });
+  }
+
+  static requiredSystemFromFQN(fqn: string, rootSystemName: string = "VRSC"): RecipientConstraint {
+    return new RecipientConstraint({
+      type: RecipientConstraint.REQUIRED_SYSTEM,
+      identity: new CompactIAddressObject({
+        type: CompactAddressObject.TYPE_FQN,
+        address: fqn,
+        rootSystemName: rootSystemName
+      }),
+    });
+  }
+
+  static requiredParentFromFQN(fqn: string, rootSystemName: string = "VRSC"): RecipientConstraint {
+    return new RecipientConstraint({
+      type: RecipientConstraint.REQUIRED_PARENT,
+      identity: new CompactIAddressObject({
+        type: CompactAddressObject.TYPE_FQN,
+        address: fqn,
+        rootSystemName: rootSystemName
+      }),
     });
   }
 }

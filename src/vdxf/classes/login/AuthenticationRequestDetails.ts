@@ -132,13 +132,13 @@ export class AuthenticationRequestDetails implements SerializableEntity {
     return writer.buffer;
   }
 
-  fromBuffer(buffer: Buffer, offset?: number): number {
+  fromBuffer(buffer: Buffer, offset?: number, rootSystemName: string = 'VRSC'): number {
     const reader = new bufferutils.BufferReader(buffer, offset);
 
     this.flags = new BN(reader.readCompactSize());
 
     if (this.hasRequestID()) {
-      this.requestID = new CompactIAddressObject();
+      this.requestID = new CompactIAddressObject({ type: CompactIAddressObject.TYPE_I_ADDRESS, address: '', rootSystemName });
 
       reader.offset = this.requestID.fromBuffer(reader.buffer, reader.offset);
     }
@@ -149,7 +149,7 @@ export class AuthenticationRequestDetails implements SerializableEntity {
 
       for (let i = 0; i < recipientConstraintsLength; i++) {
         const recipientConstraint = new RecipientConstraint();
-        reader.offset = recipientConstraint.fromBuffer(buffer, reader.offset);
+        reader.offset = recipientConstraint.fromBuffer(buffer, reader.offset, rootSystemName);
         this.recipientConstraints.push(recipientConstraint);
       }
     } 
@@ -162,10 +162,8 @@ export class AuthenticationRequestDetails implements SerializableEntity {
   }
 
   toJson(): AuthenticationRequestDetailsJson {
-    const flags = this.calcFlags();
-
     const retval = {
-      flags: flags.toNumber(),
+      flags: this.flags.toNumber(),
       requestid: this.requestID.toJson(),
       recipientConstraints: this.recipientConstraints ? this.recipientConstraints.map(p => p.toJson()) : undefined,
       expirytime: this.expiryTime ? this.expiryTime.toNumber() : undefined

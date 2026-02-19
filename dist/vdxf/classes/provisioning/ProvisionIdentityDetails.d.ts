@@ -45,7 +45,7 @@ export declare class ProvisionIdentityDetails implements SerializableEntity {
     static VERSION_LASTVALID: import("bn.js");
     static FLAG_HAS_SYSTEMID: import("bn.js");
     static FLAG_HAS_PARENTID: import("bn.js");
-    static FLAG_IS_A_DEFINED_NAME_TO_PROVISION: import("bn.js");
+    static FLAG_HAS_IDENTITY_ID: import("bn.js");
     static FLAG_HAS_URI: import("bn.js");
     constructor(data?: ProvisionIdentityDetailsInterface);
     hasSystemId(): boolean;
@@ -54,7 +54,7 @@ export declare class ProvisionIdentityDetails implements SerializableEntity {
     hasUri(): boolean;
     getByteLength(): number;
     toBuffer(): Buffer;
-    fromBuffer(buffer: Buffer, offset?: number): number;
+    fromBuffer(buffer: Buffer, offset?: number, rootSystemName?: string): number;
     toJson(): ProvisionIdentityDetailsJson;
     static fromJson(data: any): ProvisionIdentityDetails;
     calcFlags(): BigNumber;

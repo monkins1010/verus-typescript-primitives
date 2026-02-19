@@ -40,8 +40,8 @@ export class AppEncryptionResponseDetails implements SerializableEntity {
   address: SaplingPaymentAddress;
   extendedSpendingKey?: SaplingExtendedSpendingKey;
 
-  static RESPONSE_CONTAINS_REQUEST_ID = new BN(1, 10);
-  static RESPONSE_CONTAINS_EXTENDED_SPENDING_KEY = new BN(2, 10);
+  static FLAG_HAS_REQUEST_ID = new BN(1, 10);
+  static FLAG_HAS_EXTENDED_SPENDING_KEY = new BN(2, 10);
 
   constructor(data?: AppEncryptionResponseDetailsInterface) {
     this.version = data?.version ?? new BN(1);
@@ -62,19 +62,19 @@ export class AppEncryptionResponseDetails implements SerializableEntity {
   }
 
   containsRequestID() {
-    return !!(this.flags.and(AppEncryptionResponseDetails.RESPONSE_CONTAINS_REQUEST_ID).toNumber());
+    return !!(this.flags.and(AppEncryptionResponseDetails.FLAG_HAS_REQUEST_ID).toNumber());
   }
 
   toggleContainsRequestID() {
-    this.flags = this.flags.xor(AppEncryptionResponseDetails.RESPONSE_CONTAINS_REQUEST_ID);
+    this.flags = this.flags.xor(AppEncryptionResponseDetails.FLAG_HAS_REQUEST_ID);
   }
 
   containsExtendedSpendingKey() {
-    return !!(this.flags.and(AppEncryptionResponseDetails.RESPONSE_CONTAINS_EXTENDED_SPENDING_KEY).toNumber());
+    return !!(this.flags.and(AppEncryptionResponseDetails.FLAG_HAS_EXTENDED_SPENDING_KEY).toNumber());
   }
 
   toggleContainsExtendedSpendingKey() {
-    this.flags = this.flags.xor(AppEncryptionResponseDetails.RESPONSE_CONTAINS_EXTENDED_SPENDING_KEY);
+    this.flags = this.flags.xor(AppEncryptionResponseDetails.FLAG_HAS_EXTENDED_SPENDING_KEY);
   }
 
   toSha256() {
@@ -121,13 +121,13 @@ export class AppEncryptionResponseDetails implements SerializableEntity {
     return writer.buffer;
   }
 
-  fromBuffer(buffer: Buffer, offset: number = 0) {
+  fromBuffer(buffer: Buffer, offset: number = 0, rootSystemName: string = 'VRSC') {
     const reader = new BufferReader(buffer, offset);
 
     this.flags = reader.readVarInt();
 
     if (this.containsRequestID()) {
-      this.requestID = new CompactIAddressObject();
+      this.requestID = new CompactIAddressObject({ type: CompactIAddressObject.TYPE_I_ADDRESS, address: '', rootSystemName });
 
       reader.offset = this.requestID.fromBuffer(reader.buffer, reader.offset);
     }

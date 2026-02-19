@@ -78,7 +78,7 @@ export class AppEncryptionRequestDetails implements SerializableEntity {
   }
 
   calcFlags(): BigNumber {
-    let flags = new BN(0);
+    let flags = new BN(this.flags);
 
     if (this.requestID != null) {
       flags = flags.or(AppEncryptionRequestDetails.FLAG_HAS_REQUEST_ID);
@@ -115,13 +115,14 @@ export class AppEncryptionRequestDetails implements SerializableEntity {
     return flags.and(AppEncryptionRequestDetails.FLAG_HAS_ENCRYPT_RESPONSE_TO_ADDRESS).gt(new BN(0));
   }
 
+  returnESK(flags: BigNumber = this.flags): boolean {
+    return flags.and(AppEncryptionRequestDetails.FLAG_RETURN_ESK).gt(new BN(0));
+  }
+
   getByteLength(): number {
-
-    const flags = this.calcFlags();
-
     let length = 0;
 
-    length += varuint.encodingLength(flags.toNumber());
+    length += varuint.encodingLength(this.flags.toNumber());
 
     if (this.hasEncryptResponseToAddress()) {
       length += this.encryptResponseToAddress.getByteLength();
@@ -129,11 +130,11 @@ export class AppEncryptionRequestDetails implements SerializableEntity {
 
     length += varuint.encodingLength(this.derivationNumber.toNumber());
 
-    if (this.hasDerivationID(flags)) {
+    if (this.hasDerivationID()) {
       length += this.derivationID.getByteLength();
     }
 
-    if (this.hasRequestID(flags)) {
+    if (this.hasRequestID()) {
       length += this.requestID.getByteLength();
     }
 
@@ -141,11 +142,10 @@ export class AppEncryptionRequestDetails implements SerializableEntity {
   }
 
   toBuffer(): Buffer {
-    const flags = this.calcFlags();
     const writer = new BufferWriter(Buffer.alloc(this.getByteLength()));
 
     // Write flags
-    writer.writeCompactSize(flags.toNumber());
+    writer.writeCompactSize(this.flags.toNumber());
 
     if (this.hasEncryptResponseToAddress()) {
       writer.writeSlice(this.encryptResponseToAddress.toBuffer());
@@ -154,18 +154,18 @@ export class AppEncryptionRequestDetails implements SerializableEntity {
     // Write mandatory derivation number
     writer.writeVarInt(this.derivationNumber);
 
-    if (this.hasDerivationID(flags)) {
+    if (this.hasDerivationID()) {
       writer.writeSlice(this.derivationID.toBuffer());
     }
 
-    if (this.hasRequestID(flags)) {
+    if (this.hasRequestID()) {
       writer.writeSlice(this.requestID.toBuffer());
     }
 
     return writer.buffer;
   }
 
-  fromBuffer(buffer: Buffer, offset?: number): number {
+  fromBuffer(buffer: Buffer, offset?: number, rootSystemName: string = 'VRSC'): number {
     const reader = new BufferReader(buffer, offset);
 
     // Read flags
@@ -182,13 +182,13 @@ export class AppEncryptionRequestDetails implements SerializableEntity {
     this.derivationNumber = reader.readVarInt();
 
     if (this.hasDerivationID()) {
-      const derivationIDObj = new CompactIAddressObject();
+      const derivationIDObj = new CompactIAddressObject({ type: CompactIAddressObject.TYPE_I_ADDRESS, address: '', rootSystemName });
       reader.offset = derivationIDObj.fromBuffer(reader.buffer, reader.offset);
       this.derivationID = derivationIDObj;
     }
 
     if (this.hasRequestID()) {
-      this.requestID = new CompactIAddressObject();
+      this.requestID = new CompactIAddressObject({ type: CompactIAddressObject.TYPE_I_ADDRESS, address: '', rootSystemName });
 
       reader.offset = this.requestID.fromBuffer(reader.buffer, reader.offset);
     }
@@ -197,12 +197,9 @@ export class AppEncryptionRequestDetails implements SerializableEntity {
   }
 
   toJson(): AppEncryptionRequestDetailsJson {
-    // Set flags before serialization
-    const flags = this.calcFlags();
-
     return {
       version: this.version.toNumber(),
-      flags: flags.toNumber(),
+      flags: this.flags.toNumber(),
       encrypttozaddress: this.encryptResponseToAddress.toAddressString(),
       derivationnumber: this.derivationNumber.toNumber(),
       derivationid: this.derivationID?.toJson(),

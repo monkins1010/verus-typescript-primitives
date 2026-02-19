@@ -51,6 +51,7 @@ export declare class CompactAddressObject<V extends CompactAddressVariantName = 
     toString(): string;
     static fromIAddress(iaddr: string): CompactAddressObject<CompactAddressIVariant>;
     static fromXAddress(xaddr: string, nameSpace?: string): CompactAddressObject<CompactAddressXVariant>;
+    private getFQNWithoutSuffix;
     getByteLength(): number;
     toBuffer(): Buffer;
     fromBuffer(buffer: Buffer, offset?: number): number;
@@ -58,12 +59,14 @@ export declare class CompactAddressObject<V extends CompactAddressVariantName = 
     static fromJson<V extends CompactAddressVariantName>(json: any): CompactAddressObject<V>;
 }
 export declare class CompactXAddressObject extends CompactAddressObject<CompactAddressXVariant> {
-    static fromAddress(xaddr: string, nameSpace?: string): CompactXAddressObject;
+    static fromAddress(xaddr: string, rootSystemName?: string, nameSpace?: string): CompactXAddressObject;
+    static fromDataKey(xaddr: string, rootSystemName: "VRSC", nameSpace?: string): CompactXAddressObject;
     toAddress(): string;
     static fromCompactAddressObjectJson(json: any): CompactXAddressObject;
 }
 export declare class CompactIAddressObject extends CompactAddressObject<CompactAddressIVariant> {
-    static fromAddress(iaddr: string, nameSpace?: string): CompactIAddressObject;
+    static fromAddress(iaddr: string, rootSystemName?: string, nameSpace?: string): CompactIAddressObject;
+    static fromFQN(iaddr: string, rootSystemName?: string, nameSpace?: string): CompactIAddressObject;
     toAddress(): string;
     static fromCompactAddressObjectJson(json: any): CompactIAddressObject;
 }

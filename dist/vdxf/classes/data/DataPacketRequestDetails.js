@@ -41,9 +41,7 @@ class DataPacketRequestDetails {
         this.flags = this.calcFlags();
     }
     calcFlags() {
-        let flags = new bn_js_1.BN(this.flags.and(DataPacketRequestDetails.FLAG_FOR_USERS_SIGNATURE
-            .or(DataPacketRequestDetails.FLAG_FOR_TRANSMITTAL_TO_USER)
-            .or(DataPacketRequestDetails.FLAG_HAS_URL_FOR_DOWNLOAD)));
+        let flags = new bn_js_1.BN(this.flags);
         if (this.statements && this.statements.length > 0) {
             flags = flags.or(DataPacketRequestDetails.FLAG_HAS_STATEMENTS);
         }
@@ -124,7 +122,7 @@ class DataPacketRequestDetails {
         }
         return writer.buffer;
     }
-    fromBuffer(buffer, offset) {
+    fromBuffer(buffer, offset, rootSystemName = 'VRSC') {
         const reader = new BufferReader(buffer, offset);
         this.flags = new bn_js_1.BN(reader.readCompactSize());
         // Read signableObjects array
@@ -150,16 +148,15 @@ class DataPacketRequestDetails {
             this.signature = signature;
         }
         if (this.hasRequestID()) {
-            this.requestID = new CompactAddressObject_1.CompactIAddressObject();
+            this.requestID = new CompactAddressObject_1.CompactIAddressObject({ type: CompactAddressObject_1.CompactIAddressObject.TYPE_I_ADDRESS, address: '', rootSystemName });
             reader.offset = this.requestID.fromBuffer(reader.buffer, reader.offset);
         }
         return reader.offset;
     }
     toJson() {
-        const flags = this.calcFlags();
         return {
             version: this.version.toNumber(),
-            flags: flags.toNumber(),
+            flags: this.flags.toNumber(),
             signableobjects: this.signableObjects.map(obj => obj.toJson()),
             statements: this.statements,
             signature: this.signature ? this.signature.toJson() : undefined,

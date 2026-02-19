@@ -18,10 +18,12 @@ export declare class RecipientConstraint implements SerializableEntity {
     static fromData(data: RecipientConstraint | RecipientConstraintInterface): RecipientConstraint;
     getByteLength(): number;
     toBuffer(): Buffer;
-    fromBuffer(buffer: Buffer, offset?: number): number;
+    fromBuffer(buffer: Buffer, offset?: number, rootSystemName?: string): number;
     toJson(): RecipientConstraintJson;
     static fromJson(data: RecipientConstraintJson): RecipientConstraint;
     static requiredIDFromAddress(iaddr: string): RecipientConstraint;
     static requiredSystemFromAddress(iaddr: string): RecipientConstraint;
     static requiredParentFromAddress(iaddr: string): RecipientConstraint;
+    static requiredSystemFromFQN(fqn: string, rootSystemName?: string): RecipientConstraint;
+    static requiredParentFromFQN(fqn: string, rootSystemName?: string): RecipientConstraint;
 }

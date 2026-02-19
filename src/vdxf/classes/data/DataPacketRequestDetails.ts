@@ -83,9 +83,7 @@ export class DataPacketRequestDetails implements SerializableEntity {
   }
 
   calcFlags(): BigNumber {
-    let flags = new BN(this.flags.and(DataPacketRequestDetails.FLAG_FOR_USERS_SIGNATURE
-      .or(DataPacketRequestDetails.FLAG_FOR_TRANSMITTAL_TO_USER)
-      .or(DataPacketRequestDetails.FLAG_HAS_URL_FOR_DOWNLOAD)));
+    let flags = new BN(this.flags);
     
     if (this.statements && this.statements.length > 0) {
       flags = flags.or(DataPacketRequestDetails.FLAG_HAS_STATEMENTS);
@@ -194,7 +192,7 @@ export class DataPacketRequestDetails implements SerializableEntity {
     return writer.buffer;
   }
 
-  fromBuffer(buffer: Buffer, offset?: number): number {
+  fromBuffer(buffer: Buffer, offset?: number, rootSystemName: string = 'VRSC'): number {
     const reader = new BufferReader(buffer, offset);
 
     this.flags = new BN(reader.readCompactSize());
@@ -226,7 +224,7 @@ export class DataPacketRequestDetails implements SerializableEntity {
     }
 
     if (this.hasRequestID()) {
-      this.requestID = new CompactIAddressObject();
+      this.requestID = new CompactIAddressObject({ type: CompactIAddressObject.TYPE_I_ADDRESS, address: '', rootSystemName });
 
       reader.offset = this.requestID.fromBuffer(reader.buffer, reader.offset);
     }
@@ -235,11 +233,9 @@ export class DataPacketRequestDetails implements SerializableEntity {
   }
 
   toJson(): DataPacketRequestDetailsJson {
-    const flags = this.calcFlags();
-
     return {
       version: this.version.toNumber(),
-      flags: flags.toNumber(),
+      flags: this.flags.toNumber(),
       signableobjects: this.signableObjects.map(obj => obj.toJson()),
       statements: this.statements,
       signature: this.signature ? this.signature.toJson() : undefined,

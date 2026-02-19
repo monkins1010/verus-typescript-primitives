@@ -138,6 +138,34 @@ export class CompactAddressObject<V extends CompactAddressVariantName = CompactA
     })
   }
 
+  private getFQNWithoutSuffix(): string {
+    if (!this.isFQN()) return this.address;
+
+    // If FQN ends with ".", it's explicitly defined - don't modify
+    if (this.address.endsWith(".") || this.address.endsWith(".@")) return this.address;
+
+    // Don't modify the root system name itself or VDXF keys
+    if (this.address.toLowerCase() === this.rootSystemName.toLowerCase() || this.address.includes("::")) {
+      return this.address;
+    }
+
+    const suffix = `.${this.rootSystemName.toLowerCase()}`;
+    const lowerAddr = this.address.toLowerCase();
+
+    // Check for pattern: .rootSystemName@ (e.g., "michael.vrsc@" → "michael@")
+    if (lowerAddr.endsWith(`${suffix}@`)) {
+      // Remove the suffix but keep the @
+      return this.address.slice(0, -(suffix.length + 1)) + '@';
+    }
+
+    // Check for pattern: .rootSystemName (e.g., "michael.vrsc" → "michael")
+    if (lowerAddr.endsWith(suffix)) {
+      return this.address.slice(0, -suffix.length);
+    }
+
+    return this.address;
+  }
+
   getByteLength(): number {
     let length = 0;
 
@@ -147,7 +175,9 @@ export class CompactAddressObject<V extends CompactAddressVariantName = CompactA
     if (this.isIaddress() || this.isXaddress()) {
       length += HASH160_BYTE_LENGTH; // identityuint160
     } else {
-      const addrLen = Buffer.from(this.address, 'utf8').byteLength;
+      // For FQN, use the address without the root system suffix
+      const addrToSerialize = this.getFQNWithoutSuffix();
+      const addrLen = Buffer.from(addrToSerialize, 'utf8').byteLength;
 
       length += varuint.encodingLength(addrLen) + addrLen
     }
@@ -164,7 +194,9 @@ export class CompactAddressObject<V extends CompactAddressVariantName = CompactA
     if (this.isIaddress() || this.isXaddress()) {
       writer.writeSlice(fromBase58Check(this.address).hash);
     } else {
-      writer.writeVarSlice(Buffer.from(this.address, 'utf8'));
+      // For FQN, write without the root system suffix to save space
+      const addrToSerialize = this.getFQNWithoutSuffix();
+      writer.writeVarSlice(Buffer.from(addrToSerialize, 'utf8'));
     }
 
     return writer.buffer;
@@ -179,6 +211,8 @@ export class CompactAddressObject<V extends CompactAddressVariantName = CompactA
     if (this.isIaddress() || this.isXaddress()) {
       this.address = toBase58Check(reader.readSlice(20), this.isIaddress() ? I_ADDR_VERSION : X_ADDR_VERSION);
     } else {
+      // Read FQN as-is without re-adding suffix
+      // The suffix was stripped during serialization and remains stripped
       this.address = reader.readVarSlice().toString('utf8');
     }
 
@@ -207,11 +241,21 @@ export class CompactAddressObject<V extends CompactAddressVariantName = CompactA
 }
 
 export class CompactXAddressObject extends CompactAddressObject<CompactAddressXVariant> {
-  static fromAddress(xaddr: string, nameSpace: string = DEFAULT_VERUS_CHAINID): CompactXAddressObject {
+  static fromAddress(xaddr: string, rootSystemName: string = "VRSC", nameSpace?: string): CompactXAddressObject {
     return new CompactXAddressObject({
       address: xaddr,
       nameSpace: nameSpace,
+      rootSystemName: rootSystemName,
       type: CompactAddressObject.TYPE_X_ADDRESS
+    })
+  }
+
+  static fromDataKey(xaddr: string, rootSystemName: "VRSC", nameSpace?: string): CompactXAddressObject {
+    return new CompactXAddressObject({
+      address: xaddr,
+      nameSpace: nameSpace,
+      rootSystemName: rootSystemName,
+      type: CompactAddressObject.TYPE_FQN
     })
   }
 
@@ -227,11 +271,21 @@ export class CompactXAddressObject extends CompactAddressObject<CompactAddressXV
 };
 
 export class CompactIAddressObject extends CompactAddressObject<CompactAddressIVariant> {
-  static fromAddress(iaddr: string, nameSpace: string = DEFAULT_VERUS_CHAINID): CompactIAddressObject {
+  static fromAddress(iaddr: string, rootSystemName: string = "VRSC", nameSpace?: string): CompactIAddressObject {
     return new CompactIAddressObject({
       address: iaddr,
+      rootSystemName: rootSystemName,
       nameSpace: nameSpace,
       type: CompactAddressObject.TYPE_I_ADDRESS
+    })
+  }
+
+  static fromFQN(iaddr: string, rootSystemName: string = "VRSC", nameSpace?: string): CompactIAddressObject {
+    return new CompactIAddressObject({
+      address: iaddr,
+      rootSystemName: rootSystemName,
+      nameSpace: nameSpace,
+      type: CompactAddressObject.TYPE_FQN
     })
   }
 

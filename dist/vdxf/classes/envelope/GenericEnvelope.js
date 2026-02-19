@@ -90,7 +90,7 @@ class GenericEnvelope {
             this.setHasMultiDetails();
     }
     getRawDataSha256(includeSig = false) {
-        return (0, crypto_1.createHash)("sha256").update(this.toBufferOptionalSig(includeSig)).digest();
+        return (0, crypto_1.createHash)("sha256").update(this.toBufferOptionalSig(includeSig, true)).digest();
     }
     getDetailsIdentitySignatureHash(signedBlockheight) {
         if (this.isSigned()) {
@@ -154,28 +154,28 @@ class GenericEnvelope {
         }
         return writer.buffer;
     }
-    internalGetByteLength(includeSig = true) {
+    internalGetByteLength(includeSig = true, forHashing = false) {
         let length = 0;
         length += varuint_1.default.encodingLength(this.version.toNumber());
         length += varuint_1.default.encodingLength(this.flags.toNumber());
         if (this.isSigned() && includeSig) {
-            length += this.signature.getByteLength();
+            length += forHashing ? this.signature.getByteLengthForHashing() : this.signature.getByteLength();
         }
         length += this.getDataBufferLengthAfterSig();
         return length;
     }
-    getByteLengthOptionalSig(includeSig) {
-        return this.internalGetByteLength(includeSig);
+    getByteLengthOptionalSig(includeSig, forHashing) {
+        return this.internalGetByteLength(includeSig, forHashing);
     }
     getByteLength() {
         return this.getByteLengthOptionalSig(true);
     }
-    toBufferOptionalSig(includeSig = true) {
-        const writer = new bufferutils_1.default.BufferWriter(Buffer.alloc(this.internalGetByteLength(includeSig)));
+    toBufferOptionalSig(includeSig = true, forHashing = false) {
+        const writer = new bufferutils_1.default.BufferWriter(Buffer.alloc(this.internalGetByteLength(includeSig, forHashing)));
         writer.writeCompactSize(this.version.toNumber());
         writer.writeCompactSize(this.flags.toNumber());
         if (this.isSigned() && includeSig) {
-            writer.writeSlice(this.signature.toBuffer());
+            writer.writeSlice(forHashing ? this.signature.toBufferForHashing() : this.signature.toBuffer());
         }
         writer.writeSlice(this.getDataBufferAfterSig());
         return writer.buffer;
@@ -190,12 +190,13 @@ class GenericEnvelope {
         this.version = new bn_js_1.BN(reader.readCompactSize());
         this.flags = new bn_js_1.BN(reader.readCompactSize());
         if (this.isSigned()) {
-            const _sig = new VerifiableSignatureData_1.VerifiableSignatureData();
+            const _sig = new VerifiableSignatureData_1.VerifiableSignatureData({ isTestnet: this.isTestnet() });
             reader.offset = _sig.fromBuffer(reader.buffer, reader.offset);
             this.signature = _sig;
         }
+        const rootSystemName = this.isTestnet() ? 'VRSCTEST' : 'VRSC';
         if (this.hasRequestID()) {
-            this.requestID = new CompactAddressObject_1.CompactIAddressObject();
+            this.requestID = new CompactAddressObject_1.CompactIAddressObject({ type: CompactAddressObject_1.CompactIAddressObject.TYPE_I_ADDRESS, address: '', rootSystemName });
             reader.offset = this.requestID.fromBuffer(reader.buffer, reader.offset);
         }
         if (this.hasCreatedAt()) {
@@ -205,20 +206,20 @@ class GenericEnvelope {
             this.salt = reader.readVarSlice();
         }
         if (this.hasAppOrDelegatedID()) {
-            this.appOrDelegatedID = new CompactAddressObject_1.CompactIAddressObject();
+            this.appOrDelegatedID = new CompactAddressObject_1.CompactIAddressObject({ type: CompactAddressObject_1.CompactIAddressObject.TYPE_I_ADDRESS, address: '', rootSystemName });
             reader.offset = this.appOrDelegatedID.fromBuffer(reader.buffer, reader.offset);
         }
         if (this.hasMultiDetails()) {
             this.details = [];
             const numItems = reader.readCompactSize();
             for (let i = 0; i < numItems; i++) {
-                const ord = OrdinalVDXFObject_1.OrdinalVDXFObject.createFromBuffer(reader.buffer, reader.offset);
+                const ord = OrdinalVDXFObject_1.OrdinalVDXFObject.createFromBuffer(reader.buffer, reader.offset, false, rootSystemName);
                 reader.offset = ord.offset;
                 this.details.push(ord.obj);
             }
         }
         else {
-            const ord = OrdinalVDXFObject_1.OrdinalVDXFObject.createFromBuffer(reader.buffer, reader.offset);
+            const ord = OrdinalVDXFObject_1.OrdinalVDXFObject.createFromBuffer(reader.buffer, reader.offset, false, rootSystemName);
             reader.offset = ord.offset;
             this.details = [ord.obj];
         }

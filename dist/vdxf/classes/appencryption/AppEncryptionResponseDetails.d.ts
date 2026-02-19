@@ -30,8 +30,8 @@ export declare class AppEncryptionResponseDetails implements SerializableEntity 
     extendedViewingKey: SaplingExtendedViewingKey;
     address: SaplingPaymentAddress;
     extendedSpendingKey?: SaplingExtendedSpendingKey;
-    static RESPONSE_CONTAINS_REQUEST_ID: import("bn.js");
-    static RESPONSE_CONTAINS_EXTENDED_SPENDING_KEY: import("bn.js");
+    static FLAG_HAS_REQUEST_ID: import("bn.js");
+    static FLAG_HAS_EXTENDED_SPENDING_KEY: import("bn.js");
     constructor(data?: AppEncryptionResponseDetailsInterface);
     containsRequestID(): boolean;
     toggleContainsRequestID(): void;
@@ -40,7 +40,7 @@ export declare class AppEncryptionResponseDetails implements SerializableEntity 
     toSha256(): Buffer<ArrayBufferLike>;
     getByteLength(): number;
     toBuffer(): Buffer<ArrayBufferLike>;
-    fromBuffer(buffer: Buffer, offset?: number): number;
+    fromBuffer(buffer: Buffer, offset?: number, rootSystemName?: string): number;
     toJson(): AppEncryptionResponseDetailsJson;
     static fromJson(json: AppEncryptionResponseDetailsJson): AppEncryptionResponseDetails;
 }
