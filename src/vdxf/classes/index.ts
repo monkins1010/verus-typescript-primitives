@@ -58,6 +58,7 @@ export * from './appencryption/AppEncryptionRequestDetails'
 export * from './data/DataPacketRequestDetails'
 export * from './CompactAddressObject'
 export * from './VerifiableSignatureData'
+export * from './data/DataResponseDetails'
 
 export * from './attestation/InformationRequest'
 export * from './attestation/AttestationDetails'

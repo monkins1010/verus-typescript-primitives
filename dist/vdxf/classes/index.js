@@ -74,6 +74,7 @@ __exportStar(require("./appencryption/AppEncryptionRequestDetails"), exports);
 __exportStar(require("./data/DataPacketRequestDetails"), exports);
 __exportStar(require("./CompactAddressObject"), exports);
 __exportStar(require("./VerifiableSignatureData"), exports);
+__exportStar(require("./data/DataResponseDetails"), exports);
 __exportStar(require("./attestation/InformationRequest"), exports);
 __exportStar(require("./attestation/AttestationDetails"), exports);
 __exportStar(require("./endorsement/Endorsement"), exports);
