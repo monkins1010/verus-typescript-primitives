@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.decodeEthDestination = exports.decodeDestination = exports.toXAddress = exports.toIAddress = exports.fqnToAddress = exports.nameAndParentAddrToIAddr = exports.nameAndParentAddrToAddr = exports.toBase58Check = exports.fromBase58Check = void 0;
+exports.decodeEthDestination = exports.decodeDestination = exports.toXAddress = exports.toIAddress = exports.fqnToParentAddress = exports.fqnToParentFqn = exports.fqnToAddress = exports.nameAndParentAddrToIAddr = exports.nameAndParentAddrToAddr = exports.toBase58Check = exports.fromBase58Check = void 0;
 exports.getDataKey = getDataKey;
 const pbaas_1 = require("../constants/pbaas");
 const vdxf_1 = require("../constants/vdxf");
@@ -92,6 +92,27 @@ const fqnToAddress = (fullyqualifiedname, rootSystemName = "", version = vdxf_1.
     return (0, exports.toBase58Check)((0, hash_1.hash160)(idHash), version);
 };
 exports.fqnToAddress = fqnToAddress;
+const fqnToParentFqn = (fullyqualifiedname, rootSystemName = "") => {
+    const splitFqnAt = fullyqualifiedname.split("@").filter(x => x.length > 0);
+    if (splitFqnAt.length !== 1)
+        throw new Error("Invalid name");
+    const splitFqnDot = splitFqnAt[0].split('.');
+    if ((0, tolower_1.toLowerCaseCLocale)(splitFqnDot[splitFqnDot.length - 1]) !== (0, tolower_1.toLowerCaseCLocale)(rootSystemName) &&
+        splitFqnDot[splitFqnDot.length - 1] !== "") {
+        splitFqnDot.push(rootSystemName);
+    }
+    splitFqnDot.shift();
+    const parentSegments = splitFqnDot.filter(s => s.length > 0);
+    if (parentSegments.length === 0)
+        return null;
+    return parentSegments.join(".");
+};
+exports.fqnToParentFqn = fqnToParentFqn;
+const fqnToParentAddress = (fullyqualifiedname, rootSystemName = "") => {
+    const parentFqn = (0, exports.fqnToParentFqn)(fullyqualifiedname, rootSystemName);
+    return parentFqn ? (0, exports.fqnToAddress)(parentFqn + ".", "") : null;
+};
+exports.fqnToParentAddress = fqnToParentAddress;
 const toIAddress = (fullyqualifiedname, rootSystemName = "") => {
     return (0, exports.fqnToAddress)(fullyqualifiedname, rootSystemName, vdxf_1.I_ADDR_VERSION);
 };
